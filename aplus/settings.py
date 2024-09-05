@@ -274,11 +274,14 @@ SIS_ENROLL_DELAY = 15
 
 # Number of seconds after which a submission can be resent to grader, if not completed
 # If set to None, retries are disabled.
-SUBMISSION_EXPIRY_TIMEOUT = 30 * 60
+SUBMISSION_EXPIRY_TIMEOUT = 30
 
 # List of services with automatic grading where retries are allowed
 # Network location is sufficient, e.g. "localhost:8080" or "grader.cs.aalto.fi"
-SUBMISSION_RETRY_SERVICES = []
+SUBMISSION_RETRY_SERVICES = ["grader:8080"]
+
+# Maximum number of retries to grade a given submission
+SUBMISSION_RETRY_LIMIT = 3
 
 # Number of unresponded retries beyond which we move to recovery state.
 # In recovery state there likely is more persistent problem with the grader
@@ -618,5 +621,5 @@ if ENABLE_DJANGO_DEBUG_TOOLBAR:
         DEBUG_TOOLBAR_CONFIG.setdefault('SHOW_TOOLBAR_CONFIG', 'lib.helpers.show_debug_toolbar')
     except NameError:
         DEBUG_TOOLBAR_CONFIG = {
-            'SHOW_TOOLBAR_CALLBACK': 'lib.helpers.show_debug_toolbar',
+            'SHOW_TOOLBAR_CALLBACK': lambda request: False if request.headers.get('x-requested-with') == 'XMLHttpRequest' else True,
         }

@@ -3918,6 +3918,13 @@ msgstr "Pending submission"
 msgid "MODEL_NAME_PENDING_SUBMISSION_PLURAL"
 msgstr "Pending submissions"
 
+#: exercise/submission_models.py
+#, python-format
+msgid "REGRADING_MESSAGE -- %(num_retries), %(max_retries)"
+msgstr ""
+"Grading did not finish on time, trying again."
+"This is retry number %(num_retries) (max %(max_retries))."
+
 #: exercise/templates/exercise/_category_points.html
 #: exercise/templates/exercise/_exercisecollection.html
 msgid "TOTAL_POINTS"
@@ -4867,6 +4874,14 @@ msgstr "Submission"
 #: exercise/templates/exercise/submission.html
 msgid "FILES_IN_SUBMISSION"
 msgstr "Files in this submission"
+
+#: exercise/templates/exercise/submission_plain.html
+#, python-format
+msgid "SUBMISSION_GRADING_RETRIED -- %(num_retries)s, %(max_retries)s"
+msgstr ""
+"Grading this submission did not finish in time, and has been automatically "
+"retried %(num_retries)s time(s). It will be retried until successful, "
+"or until the limit of %(max_retries)s retries is reached."
 
 #: exercise/templates/exercise/submission.html
 #: exercise/templates/exercise/submission_plain.html

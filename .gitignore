@@ -19,6 +19,7 @@ aplus/secret_key.py
 venv/
 /static/
 /media/
+venv_aplus/
 
 /assets/sass/vendor/
 /node_cache/
