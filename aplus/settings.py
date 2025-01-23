@@ -174,7 +174,7 @@ INSTALLED_APPS = (
     'django.forms',
 
     # 3rd party applications
-    'bootstrapform',
+    'django_bootstrap5',
     'rest_framework',
     'rest_framework.authtoken',
     'pylti1p3.contrib.django.lti1p3_tool_config',

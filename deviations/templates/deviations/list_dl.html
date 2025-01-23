@@ -33,7 +33,7 @@
 			<div class="card-header bg-primary">
 				<h5 class="card-title text-white">{% translate "DEADLINE_DEVIATIONS" %}</h5>
 			</div>
-			<table class="table table-striped table-bordered table-sm filtered-table ordered-table grouped-table" data-default-sort-column="6" data-default-sort-order="desc">
+			<table class="table table-striped table-bordered table-sm filtered-table ordered-table grouped-table mb-0" data-default-sort-column="6" data-default-sort-order="desc">
 				<thead>
 					<tr>
 						<th>{% translate "SUBMITTER" %}</th>
@@ -76,7 +76,7 @@
 						</td>
 						<td>
 							{% if deviations.0.without_late_penalty %}
-								<i class="bi-ok"></i>
+								<i class="bi-check-lg"></i>
 								{% translate "YES" %}
 							{% else %}
 								<i class="bi-x-lg"></i>
@@ -120,7 +120,7 @@
 						</td>
 						<td>
 							{% if deviation.without_late_penalty %}
-								<i class="bi-ok"></i>
+								<i class="bi-check-lg"></i>
 								{% translate "YES" %}
 							{% else %}
 								<i class="bi-x-lg"></i>

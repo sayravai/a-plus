@@ -1,7 +1,7 @@
 {% extends "edit_course/edit_course_base.html" %}
 {% load i18n %}
 {% load course %}
-{% load bootstrap %}
+{% load django_bootstrap5 %}
 
 {% block edittitle %}{% if object.id %}{% blocktranslate trimmed with model=model_name id=object.id %}EDIT_MODEL -- {{ model }}, {{ id }}{% endblocktranslate %}{% else %}{% blocktranslate trimmed with model=model_name %}ADD_NEW_MODEL -- {{ model }}{% endblocktranslate %}{% endif %}{% endblock %}
 

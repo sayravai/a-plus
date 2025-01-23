@@ -26,18 +26,25 @@
 <!-- To upgrade plugin versions, go to https://datatables.net/download/index
 Note that the linked file contains comments with a link to the DataTables download builder
 that includes the correct DataTables extensions. -->
-<link rel="stylesheet" type="text/css"
+<!--<link rel="stylesheet" type="text/css"
 		href="https://cdn.datatables.net/v/bs/jszip-3.10.1/dt-1.13.6/b-2.4.1/b-html5-2.4.1/datatables.min.css"
 		integrity="sha384-T9nIBlJy7lb54CCkbU4Xxh/F+ZEdfSez3gA08MymuNN8ifrUBNW1weV/96xqfbbL"
 		crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script type="text/javascript"
 		src="https://cdn.datatables.net/v/bs/jszip-3.10.1/dt-1.13.6/b-2.4.1/b-html5-2.4.1/datatables.min.js"
 		integrity="sha384-ZUGRkvDvQeccM9JYOPtXV3yP1HTmkHCe2WzRIr2xXvaJGExPHD1ERMoYADKqH+06"
-		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
+
+<!-- DataTables plugin with Bootstrap 5 styling and Buttons/export support -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/b-3.2.1/b-html5-3.2.1/datatables.min.css" rel="stylesheet">
+
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/b-3.2.1/b-html5-3.2.1/datatables.min.js"></script>
+
 <!-- DataTables plugin for calculating a sum during data filtering -->
-<script src="https://cdn.datatables.net/plug-ins/1.13.6/api/sum().js"
+<script src="https://cdn.datatables.net/plug-ins/2.2.1/api/sum().js"></script>
+<!--<script src="https://cdn.datatables.net/plug-ins/1.13.6/api/sum().js"
 		integrity="sha384-VxQASjltoUFzCM7sSOzPQ44by+o1OPrp80OoLh8PgR30+674xTzKa1Z8d7+U87tg"
-		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>-->
 
 <!--Custom for loading animation (loading_animation.css) and other extra customizations (results_staff.css)
     results_staff.js is the main script for this page. -->
@@ -194,14 +201,14 @@ that includes the correct DataTables extensions. -->
 
 		<!--Navigation bar to choose how data is shown-->
 		<ul id="exercise-nav-tabs" class="nav nav-tabs" role="tablist" style="padding-top: 20px">
-			<li id="difficulty-exercises" role="presentation" class="active">
-				<a onclick="changeDisplayMode(1);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#difficulty">{% translate "RESULTS_SHOW_EXERCISES_BY_DIFFICULTY" %}</a>
+			<li id="difficulty-exercises" role="presentation" class="nav-item active">
+				<a class="nav-link" onclick="changeDisplayMode(1);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#difficulty">{% translate "RESULTS_SHOW_EXERCISES_BY_DIFFICULTY" %}</a>
 			</li>
-			<li id="module-exercises" role="presentation">
-				<a onclick="changeDisplayMode(2);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#module">{% translate "RESULTS_SHOW_EXERCISES_BY_MODULE" %}</a>
+			<li id="module-exercises" role="presentation" class="nav-item">
+				<a class="nav-link" onclick="changeDisplayMode(2);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#module">{% translate "RESULTS_SHOW_EXERCISES_BY_MODULE" %}</a>
 			</li>
-			<li id="all-exercises" role="presentation">
-				<a onclick="changeDisplayMode(3);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#exercise">{% translate "RESULTS_SHOW_ALL_EXERCISES" %}</a>
+			<li id="all-exercises" role="presentation" class="nav-item">
+				<a class="nav-link" onclick="changeDisplayMode(3);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#exercise">{% translate "RESULTS_SHOW_ALL_EXERCISES" %}</a>
 			</li>
 		</ul>
 
