@@ -12,7 +12,7 @@
     <p>{% translate "EARNED_POINTS" %}</p>
     <p><strong class="h2 exercise-info-points">
         {% format_points summary.official_points summary.feedback_revealed False %}
-        <small>
+        <small class="text-body-secondary">
             / {{ exercise.max_points }}
             {% if summary.get_penalty %}
             <span class="badge">
@@ -25,8 +25,8 @@
     {% endif %}
 </div>
 
-<div class="panel panel-primary">
-	<div class="panel-heading">
+<div class="card">
+	<div class="card-header bg-primary">
 			<h4 class="panel-title">{% translate "EXERCISE_INFO" %}</h4>
 	</div>
 	<div class="panel-body">

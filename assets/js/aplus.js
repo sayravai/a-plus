@@ -56,7 +56,7 @@ $(function () {
   // Mark active menu item
   $("[class^=menu-] a").each(function () {
     if ($(this)[0].pathname === location.pathname) {
-      $(this).parent().addClass("active");
+      $(this).addClass("active");
     }
   });
 
@@ -69,7 +69,7 @@ $(function () {
     }
   }
 
-  $('[data-toggle="tooltip"]').tooltip();
+  $('[data-bs-toggle="tooltip"]').tooltip();
   $('.menu-groups').aplusGroupSelect();
   $('.ajax-tail-list').aplusListTail();
   $('.page-modal').aplusModalLink();
@@ -121,8 +121,8 @@ $(function () {
   function setSidebarState(collapsed) {
     sidebarCollapsed = collapsed;
     $('#course-content').toggleClass('sidebar-collapsed', collapsed);
-    $('#course-sidebar').toggleClass('hidden', collapsed);
-    $('.course-sidebar-expander').toggleClass('hidden', !collapsed);
+    $('#course-sidebar').toggleClass('d-sm-block', !collapsed);
+    $('.course-sidebar-expander').toggleClass('d-none', !collapsed);
     localStorage.setItem('sidebarCollapsed', collapsed);
     if (!collapsed) {
       modifyMenu();
@@ -155,13 +155,13 @@ $(function () {
 
   function addExternalLinkIcon(link) {
     if (!link.querySelector('.icon')) {
-      link.insertAdjacentHTML('beforeend', `<i class="icon glyphicon glyphicon-new-window"></i>`);
+      link.insertAdjacentHTML('beforeend', `<i class="icon bi-box-arrow-up-right"></i>`);
     }
   }
 
   function addScreenReaderMessage(link, message) {
-    if (!link.querySelector('.sr-only')) {
-      link.insertAdjacentHTML('beforeend', `<span class="sr-only"> (${message})</span>`);
+    if (!link.querySelector('.visually-hidden')) {
+      link.insertAdjacentHTML('beforeend', `<span class="visually-hidden"> (${message})</span>`);
     }
   }
   $(document).on("aplus:translation-ready", function () {
@@ -172,13 +172,13 @@ $(function () {
     });
   });
 
-  // Simple visibility toggling: add data-toggle="visibility" and
+  // Simple visibility toggling: add data-bs-toggle="visibility" and
   // data-target="<selector>" to toggle the visibility of all elements that
   // match <selector>.
-  $(document).on('click', '[data-toggle="visibility"]', function (event) {
+  $(document).on('click', '[data-bs-toggle="visibility"]', function (event) {
     event.preventDefault();
     const targetSelector = $(this).data('target');
-    $(targetSelector).toggleClass('hidden');
+    $(targetSelector).toggleClass('d-none');
   });
 });
 
@@ -715,12 +715,12 @@ $(function () {
       const perPage = this.element.attr(settings.per_page_attr);
       if (this.element.find(settings.entry_selector).length >= perPage) {
         var tail = this.element.find(settings.more_selector);
-        tail.removeClass("hide").on("click", function (event) {
+        tail.removeClass("d-none").on("click", function (event) {
           event.preventDefault();
           var link = tail.find(settings.link_selector)
             .hide();
           var loader = tail.find(settings.loader_selector)
-            .removeClass("hide").show();
+            .removeClass("d-none").show();
           var url = link.attr("href");
           $.get(url, function (html) {
             loader.hide();
@@ -797,31 +797,6 @@ $(function () {
 })(jQuery, document);
 
 /*
-* Change bootstrap dropdowns to dropups when appropriate, copied from
-* https://stackoverflow.com/questions/21232685/bootstrap-drop-down-menu-auto-dropup-according-to-screen-position
-*/
-(function ($, window, document) {
-  "use strict";
-
-  $(document).on("shown.bs.dropdown", ".dropdown", function () {
-    // calculate the required sizes, spaces
-    var $ul = $(this).children(".dropdown-menu");
-    var $button = $(this).children(".dropdown-toggle");
-    var ulOffset = $ul.offset();
-    // how much space would be left on the top if the dropdown opened that direction
-    var spaceUp = (ulOffset.top - $button.height() - $ul.height()) - $(window).scrollTop();
-    // how much space is left at the bottom
-    var spaceDown = $(window).scrollTop() + $(window).height() - (ulOffset.top + $ul.height());
-    // switch to dropup only if there is no space at the bottom AND there is space at the top, or there isn't either but it would be still better fit
-    if (spaceDown < 0 && (spaceUp >= 0 || spaceUp > spaceDown))
-      $(this).addClass("dropup");
-  }).on("hidden.bs.dropdown", ".dropdown", function () {
-    // always reset after close
-    $(this).removeClass("dropup");
-  });
-})(jQuery, window, document);
-
-/*
 * Listen to link click events and copy the hl query parameter from
 * the current url to the next.
 * Note! The hl parameter is used to force translations to a certain language
@@ -839,7 +814,7 @@ $(function () {
       // The link may be opened from the context menu too, thus the hl parameter
       // should be copied.
       (event.type != "mousedown" || event.which == 2) &&
-      $(this).attr("data-toggle") != "dropdown" &&
+      $(this).attr("data-bs-toggle") != "dropdown" &&
       this.protocol === window.location.protocol &&
       this.host === window.location.host // hostname:port
     ) {
@@ -855,3 +830,15 @@ function changeLanguage(lang) {
     url.searchParams.set('hl', lang);
     window.location.href = url.toString();
 }
+
+// Some automatic conversion for material that is not yet updated to BS5
+$(document).ready(function() {
+  // Change any old-style data-toggle attributes to BS5 namespaced format
+  $('[data-toggle]').each(function() {
+    const value = $(this).attr('data-toggle');
+    $(this).attr('data-bs-toggle', value);
+    $(this).removeAttr('data-toggle');
+  });
+  // Change "collapse in" to "collapse show" to correct initial visibility with BS5
+  $('.collapse.in').removeClass('in').addClass('show');
+});

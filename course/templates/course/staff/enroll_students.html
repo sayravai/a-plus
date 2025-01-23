@@ -18,7 +18,7 @@
   <p>
   {% translate "ENROLL_STUDENTS_MANUALLY_DESCRIPTION" %}
   </p>
-  <form method="post" class="well form">
+  <form method="post" class="card form">
     {% csrf_token %}
     <legend>{% translate "ENROLL_STUDENTS_IN_COURSE" %}</legend>
     {{ form|bootstrap }}

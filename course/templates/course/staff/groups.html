@@ -21,7 +21,7 @@
     </a>
   </p>
 
-  <table class="table table-condensed">
+  <table class="table table-sm">
     <thead>
       <tr>
         <th>{% translate "ID" %}</th>
@@ -38,11 +38,11 @@
         <td>{{ group.timestamp }}</td>
         <td>
           <a class="aplus-button--secondary aplus-button--xs" role="button" href="{% url 'groups-edit' course_slug=course.url instance_slug=instance.url group_id=group.id %}">
-            <i class="bi-edit" aria-hidden="true"></i>
+            <i class="bi-pencil-square" aria-hidden="true"></i>
             {% translate "EDIT" %}
           </a>
           <a class="aplus-button--secondary aplus-button--xs" role="button" href="{% url 'groups-delete' course_slug=course.url instance_slug=instance.url group_id=group.id %}">
-            <i class="bi-remove" aria-hidden="true"></i>
+            <i class="bi-x-lg" aria-hidden="true"></i>
             {% translate "REMOVE" %}
           </a>
         </td>

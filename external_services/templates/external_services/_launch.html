@@ -58,7 +58,7 @@ E.g. {% static 'js/external_launcher.js' ‰}
 				       value="{% if exercise %}{% if exercise.open_in_iframe %}{% translate 'LOAD_THE_EXERCISE' %}{% else %}{% translate 'OPEN_EXERCISE_IN_NEW_WINDOW' %}{% endif %}{% else %}{% translate 'CONTINUE_TO_SERVICE' %}{% endif %}">
 				{% if parameters %}
 					<a href="#extserv-more-{{ form_id }}" class="aplus-button--secondary aplus-button--md"
-					   aria-controls="{{ collapse_id }}" role="button" aria-expanded="false" data-toggle="collapse"
+					   aria-controls="{{ collapse_id }}" role="button" aria-expanded="false" data-bs-toggle="collapse"
 					>{% translate "SHOW_DETAILS" %}</a>
 				{% endif %}
 			</form>

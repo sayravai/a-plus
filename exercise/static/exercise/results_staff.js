@@ -334,7 +334,7 @@
 
             let header = (
                 '<th class="stick-on-scroll indicator-heading" colspan="2" ' +
-                'data-toggle="tooltip" data-container="body" title="' +
+                'data-bs-toggle="tooltip" data-container="body" title="' +
                 _(summaries[item]['TOOLTIP']) +
                 (summaries[item]['PERCENTAGE_TOOLTIP']
                     ? '\n' + _(summaries[item]['PERCENTAGE_TOOLTIP'])
@@ -949,7 +949,7 @@
         if(tags.length) {
             let html = '';
             tags.split('|').forEach(function(tag) {
-                html += '<span class="colortag colortag-active label label-xs" style="color: ' + _usertags[tag].font_color + '; background-color: ' + _usertags[tag].color + '; margin-right: 5px;">' + _usertags[tag].name + '</span>';
+                html += '<span class="colortag colortag-active badge" style="color: ' + _usertags[tag].font_color + '; background-color: ' + _usertags[tag].color + '; margin-right: 5px;">' + _usertags[tag].name + '</span>';
             })
             return html;
         } else return '';

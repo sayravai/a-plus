@@ -50,13 +50,13 @@
 		</td>
 		<td>
 			{% if not menu.enabled %}
-			<span class="label label-default">{% translate "DISABLED" %}</span>
+			<span class="badge text-bg-default">{% translate "DISABLED" %}</span>
 			{% endif %}
-			<small>{{ menu.access|menu_access }}</small>
+			<small class="text-body-secondary">{{ menu.access|menu_access }}</small>
 		</td>
 		<td>
 			<a href="{{ menu|url:'external-services-edit-menu' }}" role="button" class="aplus-button--secondary aplus-button--xs">
-				<i class="bi-pencil" aria-hidden="true"></i>
+				<i class="bi-pencil-square" aria-hidden="true"></i>
 				{% translate "EDIT" %}
 			</a>
 		</td>
@@ -64,7 +64,7 @@
 			<form method="post" action="{{ menu|url:'external-services-remove-menu' }}">
 				{% csrf_token %}
 				<button type="submit" class="aplus-button--danger aplus-button--xs">
-					<i class="bi-remove" aria-hidden="true"></i>
+					<i class="bi-x-lg" aria-hidden="true"></i>
 					{% translate "REMOVE" %}
 				</button>
 			</form>
@@ -74,8 +74,8 @@
 </table>
 <br />
 <p>
-	<a class="btn btn-primary btn-xs" href="{{ instance|url:'external-services-add-menu' }}">
-		<i class="bi-plus-sign" aria-hidden="true"></i>
+	<a class="btn btn-primary btn-sm" href="{{ instance|url:'external-services-add-menu' }}">
+		<i class="bi-plus-lg" aria-hidden="true"></i>
 		{% translate "ADD_NEW_MENU_ITEM" %}
 	</a>
 </p>

@@ -7,16 +7,16 @@
 // First import the custom colours
 @import 'colors/theme';
 // Set some Bootstrap variables
-$brand-primary: $aplus-brand-primary;
+$primary: $aplus-brand-primary;
 $gray-base: $aplus-foreground;
 $body-bg: $aplus-background;
 
 // Next, import the functional colours
 @import 'colors/functional';
-$brand-success: $aplus-success;
-$brand-info: $aplus-info;
-$brand-warning: $aplus-warning;
-$brand-danger: $aplus-danger;
+$success: $aplus-success;
+$info: $aplus-info;
+$warning: $aplus-warning;
+$danger: $aplus-danger;
 // The default $headings-small-color has a low contrast in most of the cases.
 $headings-small-color: #535353;
 
@@ -39,7 +39,15 @@ $font-family-monospace: $aplus-font-family-monospace;
 $font-family-base: $aplus-font-family-base;
 //$font-size-base:  $aplus-font-size-base;
 
+// Make links look like in Bootstrap 3
+$link-decoration: none;
+$link-hover-decoration: underline;
+
 @import 'vendor/bootstrap5';
+
+// Import Bootstrap Icons (change font file directory from default)
+$bootstrap-icons-font-dir: '../fonts/bootstrap-icons/fonts';
+@import 'vendor/bootstrap-icons/bootstrap-icons';
 
 /*!
  * A+ Legacy Styles
@@ -66,8 +74,8 @@ $grid-float-breakpoint-max: ($grid-float-breakpoint - 1) !default;
 $line-height-computed:    floor(($font-size-base * $line-height-base)) !default; // ~20px
 // Basics of a navbar
 $navbar-height:                    3.125rem !default;
-//$navbar-margin-bottom:             $line-height-computed !default;
-//$navbar-border-radius:             $border-radius-base !default;
+$navbar-margin-bottom:             $line-height-computed !default;
+$navbar-border-radius:             $border-radius !default;
 $navbar-padding-horizontal:        floor(($grid-gutter-width / 2)) !default;
 $navbar-padding-vertical:          (($navbar-height - $line-height-computed) / 2) !default;
 $font-size-large:         ceil(($font-size-base * 1.25)) !default; // ~18px

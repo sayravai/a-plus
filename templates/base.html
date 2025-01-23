@@ -28,7 +28,7 @@
 	<script src="{% static 'js/popper.min.js' %}"></script>
 	<script src="{% static 'js/bootstrap5.min.js' %}"></script>
 
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">-->
 	<!--<link href="https://use.fontawesome.com/releases/v5.15.4/css/solid.css" rel="stylesheet"
 			integrity="sha384-Tv5i09RULyHKMwX0E8wJUqSOaXlyu3SQxORObAI08iUwIalMmN5L6AvlPX2LMoSE"
 			crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -120,19 +120,18 @@
 					<div style="display: flex; max-width: 500px">
 						<a class="navbar-brand" href="{% url 'home' %}">{% brand_name %}</a>
 						<span class="navbar-brand">{{ APLUS_VERSION }}</span>
-						<ul class="navbar-dropdown">
+						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 							<li role="presentation" class="nav-item dropdown">
 								<a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button"
 									aria-haspopup="true" aria-expanded="false">
 									{% if instance %}
 									{{ course|parse_localization }}
 									{% if not instance.visible_to_students %}
-									<span class="label label-danger">{% translate "HIDDEN_capitalized" %}</span>
+									<span class="badge text-bg-danger">{% translate "HIDDEN_capitalized" %}</span>
 									{% endif %}
 									{% else %}
 									{% translate "SELECT_COURSE" %}
 									{% endif %}
-									
 								</a>
 								{% course_menu %}
 							</li>
@@ -167,14 +166,14 @@
 								<i class="bi-person-fill" aria-hidden="true" data-testid="user-menu"></i>
 								{{ user.first_name }} {{ user.last_name }} 
 							</a>
-							<ul class="dropdown-menu">
-								<li role="presentation">
+							<ul class="dropdown-menu" style="position: absolute; right: 0; left: auto">
+								<li role="presentation" class="dropdown-item">
 									<a class="nav-link" href="{% url 'profile' %}">{% translate "PROFILE" %}</a>
 								</li>
-								<li role="separator" class="divider"></li>
-								<li role="presentation">
+								<li role="separator" class="dropdown-divider"></li>
+								<li role="presentation" class="dropdown-item">
 									<a class="nav-link" href="{% url 'logout' %}">
-										<i class="bi-caret-left-fill" aria-hidden="true"></i>
+										<i class="bi-box-arrow-right" aria-hidden="true"></i>
 										{% translate "LOG_OUT"%}
 									</a>
 								</li>
@@ -196,6 +195,7 @@
 						{% if n_count > 0 %}
 						<span class="badge badge-danger float-end">{{ n_count }}</span>
 						{% endif %}
+						<span class="navbar-toggler-icon"></span>
 					</button>
 					<div class="collapse navbar-collapse" id="bs-navbar-collapse">
 
@@ -223,7 +223,7 @@
 							{% if user.is_authenticated %}
 							<li class="nav-item">
 								<a class="nav-link" href="{% url 'profile' %}">
-									<i class="bi-user" aria-hidden="true"></i>
+									<i class="bi-person-fill" aria-hidden="true"></i>
 									{{ user.first_name }} {{ user.last_name }}
 								</a>
 							</li>
@@ -314,7 +314,7 @@
 				</div>
 				<div class="modal-body"></div>
 				<div class="modal-footer">
-					<button type="button" class="aplus-button--secondary aplus-button--md" data-dismiss="modal">
+					<button type="button" class="aplus-button--secondary aplus-button--md" data-bs-dismiss="modal">
 						{% translate "CLOSE" %}
 					</button>
 				</div>
@@ -333,7 +333,7 @@
 					</div>
 				</div>
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="{% translate 'CLOSE' %}">
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="{% translate 'CLOSE' %}">
 						<span aria-hidden="true">&times;</span>
 					</button>
 					<h4 class="modal-title"></h4>
