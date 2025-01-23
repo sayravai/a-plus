@@ -14,7 +14,7 @@
 
 {% block columns %}
 <div class="col-md-12">
-	<form method="post" class="well form-horizontal">
+	<form method="post" class="card form-horizontal">
 		{% csrf_token %}
 		<legend>{% translate "ADD_DEADLINE_DEVIATIONS" %}</legend>
 		{{ form|bootstrap_horizontal }}

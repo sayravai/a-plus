@@ -67,7 +67,7 @@
 			<div id="study-calendar"></div>
 			<p>
 				<a href="{{ instance|url:'export-calendar' }}">
-					<small>{% trans "Download calendar (ics)" %}</small>
+					<small class="text-body-secondary">{% trans "Download calendar (ics)" %}</small>
 				</a>
 			</p>
 		</div>
@@ -136,13 +136,13 @@
 		{% endif %}
 		{% block siblings %}{% endblock %}
 		{% block breadcrumb %}
-		<div role="navigation" aria-label="{% translate 'BREADCRUMB' %}">
+		<nav aria-label="{% translate 'BREADCRUMB' %}">
 			<ol class="breadcrumb">
 				{% block breadcrumblist %}
-				<li><a href="{{ instance|url }}">{{ course.code }}</a></li>
+				<li class="breadcrumb-item"><a href="{{ instance|url }}">{{ course.code }}</a></li>
 				{% endblock %}
 			</ol>
-		</div>
+		</nav>
 		{% endblock %}
 		<main class="row">
 			{% block columns %}
@@ -165,7 +165,7 @@
 	<div class="modal-dialog" role="document">
 	  <div class="modal-content">
 		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>
 			<h4 class="modal-title" id="unenroll-modal-title">
@@ -189,7 +189,7 @@
 				<button
 					type="button"
 					class="aplus-button--secondary aplus-button--md"
-					data-dismiss="modal"
+					data-bs-dismiss="modal"
 				>
 					{% trans "CANCEL" %}
 				</button>

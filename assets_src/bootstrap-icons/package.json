@@ -1,11 +1,11 @@
 {
-  "name": "aplus-bootstrap",
-  "description": "Bootstrap 3 for A+",
+  "name": "aplus-bootstrap-icons",
+  "description": "bootstrap-icons for A+",
   "repository": ".",
   "license": "MIT",
   "version": "1.0.0",
   "dependencies": {
-    "bootstrap-sass": "^3.4.1"
+    "bootstrap-icons": "^1.11.3"
   },
   "devDependencies": {},
   "scripts": {

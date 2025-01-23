@@ -46,16 +46,16 @@
 	</div>
 
 	<p id="llama-filter-tags">
-		<button class="btn btn-success btn-xs" data-id="aalto">
+		<button class="btn btn-success btn-sm" data-id="aalto">
 			<i class="bi-square" aria-hidden="true"></i>
 			{{ internal_user_label|safe }}
 		</button>
-		<button class="btn btn-info btn-xs" data-id="mooc">
+		<button class="btn btn-info btn-sm" data-id="mooc">
 			<i class="bi-square" aria-hidden="true"></i>
 			{{ external_user_label|safe }}
 		</button>
 		{% for tag in tags %}
-		<button class="btn btn-default btn-xs" style="background-color:{{ tag.color }};color:{{ tag.font_color }};" data-id="{{ tag.id }}">
+		<button class="btn btn-light btn-sm" style="background-color:{{ tag.color }};color:{{ tag.font_color }};" data-id="{{ tag.id }}">
 			<i class="bi-square" aria-hidden="true"></i>
 			{{ tag.name }}
 		</button>
@@ -75,28 +75,28 @@
 
 	<div id="llama-view-table">
 		<div class="btn-group">
-			<a class="btn btn-default btn-sm" href="#">
+			<a class="btn btn-light btn-sm" href="#">
 				<i class="bi-download-alt" aria-hidden="true"></i>
 				{% translate "DOWNLOAD_CSV" %}
 			</a>
-			<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button type="button" class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				
 				<span class="visually-hidden">{% translate "TOGGLE_DROPDOWN" %}</span>
 			</button>
 			<ul class="dropdown-menu">
-				<li><a href="#">{% translate "OPEN_API" %}</a></li>
+				<li class="dropdown-item"><a href="#">{% translate "OPEN_API" %}</a></li>
 			</ul>
 		</div>
 	</div>
 
 	<div id="llama-view-learners">
 		<div>
-			<button class="btn btn-default btn-xs">{% translate "CLEAR_SELECTION" %}</button>
+			<button class="btn btn-light btn-sm">{% translate "CLEAR_SELECTION" %}</button>
 		</div>
 		<div class="placeholder hidden llama-beacon">
 			<a href="#">
 				<div class="header">
-					<small>
+					<small class="text-body-secondary">
 						<span class="studentid">123456</span>
 						<span class="name">N. N.</span>
 					</small>

@@ -16,7 +16,7 @@
 
 {% block columns %}
 <div class="col-md-12">
-      <form method="post" class="well form">
+      <form method="post" class="card form">
           {% csrf_token %}
           {{ form|bootstrap }}
           <div class="form-group">
@@ -26,7 +26,7 @@
       </form>
       {% if groups %}
       <h4>{% translate "QUICK_SELECT_GROUP" %}</h4>
-      <table class="table table-condensed" id="group-select">
+      <table class="table table-sm" id="group-select">
         <tbody>
           {% for group in groups %}
           <tr>

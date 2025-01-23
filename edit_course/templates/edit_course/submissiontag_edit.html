@@ -13,7 +13,7 @@
 
 {% block coursecontent %}
 <br />
-<form method="post" class="well form-horizontal">
+<form method="post" class="card form-horizontal">
 	{% csrf_token %}
 	<legend>{% translate "EDIT_SUBMISSION_TAG" %}</legend>
 	{{ form|bootstrap_horizontal }}

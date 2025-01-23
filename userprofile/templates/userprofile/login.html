@@ -118,7 +118,7 @@
 						{% csrf_token %}
 						{% if form.non_field_errors %}
 							<div class="alert alert-danger">
-								<a class="close" aria-label="{% translate 'CLOSE_ERROR_LIST' %}" data-dismiss="alert">×</a>
+								<a class="close" aria-label="{% translate 'CLOSE_ERROR_LIST' %}" data-bs-dismiss="alert">×</a>
 									{% for error in form.non_field_errors %}
 										<p>{{ error }}</p>
 									{% endfor %}
@@ -152,7 +152,7 @@
 		</section>
 
 		<div class="col-sm-1">
-			<button class="btn btn-default show-extra-login-btn"
+			<button class="btn btn-light show-extra-login-btn"
 				aria-label="{% translate 'SHOW_MORE_LOGIN_OPTIONS' %}"
 				title="{% translate 'SHOW_MORE_LOGIN_OPTIONS' %}"
 			>

@@ -14,7 +14,7 @@
 
 {% block coursecontent %}
 <br/>
-<form method="post" class="well form-horizontal">
+<form method="post" class="card form-horizontal">
     {% csrf_token %}
     <legend>{% translate "ADD_MENU_ITEM" %}</legend>
     {{ form|bootstrap_horizontal }}

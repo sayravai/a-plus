@@ -13,11 +13,13 @@
 {% block coursecontent %}
 <br />
 <form method="post" class="card">
-    {% csrf_token %}
-    <legend>{% translate "EDIT_COURSE_INDEX" %}</legend>
-    {{ form|bootstrap }}
-    <button type="submit" class="aplus-button--default aplus-button--md">
-        {% translate "SAVE" %}
-    </button>
+    <div class="card-body">
+        {% csrf_token %}
+        <legend>{% translate "EDIT_COURSE_INDEX" %}</legend>
+        {{ form|bootstrap }}
+        <button type="submit" class="aplus-button--default aplus-button--md">
+            {% translate "SAVE" %}
+        </button>
+    </div>
 </form>
 {% endblock %}

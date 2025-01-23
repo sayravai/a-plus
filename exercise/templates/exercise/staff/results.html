@@ -96,7 +96,7 @@ that includes the correct DataTables extensions. -->
 		<div class="col-md-6 col-sm-12">
 			<!--Tags-->
 			<div style="padding: 10px 10px 30px 10px;" class="filter-users">
-				<small>{% translate "FILTER_USERS" %}:</small>
+				<small class="text-body-secondary">{% translate "FILTER_USERS" %}:</small>
 				<span class="radio-inline">
 					<label><input type="radio" class="tags-operator" name="tags-operator" value="and" checked>AND</label>
 				</span>
@@ -105,7 +105,7 @@ that includes the correct DataTables extensions. -->
 				</span>
 				<br>
 				{% for tag in tags %}
-				<button class="btn btn-default btn-xs tag-button" style="background-color:{{ tag.color }};color:{{ tag.font_color }};" data-tag-slug="{{ tag.slug }}" data-tag-name="{{ tag.name }}">
+				<button class="btn btn-light btn-sm tag-button" style="background-color:{{ tag.color }};color:{{ tag.font_color }};" data-tag-slug="{{ tag.slug }}" data-tag-name="{{ tag.name }}">
 					<i class="bi-square" aria-hidden="true"></i>
 					{{ tag.name }}
 				</button>
@@ -116,25 +116,25 @@ that includes the correct DataTables extensions. -->
 		<div class="col-sm-12">
 			<h4>{% translate "OPTIONS" %}</h4>
 			<span class="has-error">
-				<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+				<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 					data-placement="right"
 					title="{% translate 'UNOFFICIAL_POINTS_TOOLTIP' %}">
 						<input type="checkbox" class="unofficial-checkbox" value="unofficial">
 						{% translate "RESULTS_SHOW_UNOFFICIAL_POINTS" %}
 				</label>
-				<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+				<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 					data-placement="right"
 					title="{% translate 'UNCONFIRMED_POINTS_TOOLTIP' %}">
 						<input type="checkbox" class="unconfirmed-checkbox" value="unconfirmed">
 						{% translate "RESULTS_SHOW_UNCONFIRMED_POINTS" %}
 				</label>
 			</span>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_SHOW_ONLY_STUDENT_WITH_SUBMISSIONS' %}">
 				<input type="checkbox" class="withsubs-checkbox" value="withsubs">
 				{% translate "RESULTS_SHOW_ONLY_STUDENT_WITH_SUBMISSIONS" %}
 			</label>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_IGNORE_GRADING_MODE_LAST_TOOLTIP' %}">
 				<input type="checkbox" id="ignore-last-mode-checkbox" value="ignorelastmode" checked autocomplete="off">
 				{% translate "RESULTS_IGNORE_GRADING_MODE_LAST" %}
@@ -144,48 +144,48 @@ that includes the correct DataTables extensions. -->
 		<div class="col-sm-12" style="padding-bottom: 20px">
 			<!--Checkboxes to select extra information about data-->
 			<h4>{% translate "SUMMARIES" %}</h4>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'SUMMARIES_SELECT_OR_DESELECT_ALL' %}">
 				<input type="checkbox" id="summary-all" value="all">
 				{% translate "ALL" %}
 			</label>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_TOTAL_SUBMISSIONS_TOOLTIP' %}">
 				<input type="checkbox" id="summary-0" class="summary-checkbox" value="0">
 				{% translate "TOTAL_SUBMISSIONS" %}
 			</label>
 
-			<label style="margin-left: 10px;" class="ml-10 checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="ml-10 checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_AVERAGE_SUBMISSIONS_PER_STUDENT_TOOLTIP' %}">
 				<input type="checkbox" id="summary-1" class="summary-checkbox" value="1">
 				{% translate "AVERAGE_SUBMISSIONS_PER_STUDENT" %}
 			</label>
 
-			<label style="margin-left: 10px;" class="ml-10 checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="ml-10 checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_MAXIMUM_SUBMISSIONS_TOOLTIP' %}">
 				<input type="checkbox" id="summary-2" class="summary-checkbox" value="2">
 				{% translate "MAXIMUM_SUBMISSIONS" %}
 			</label>
 
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_STUDENTS_W_SUBMISSIONS_TOOLTIP' %}">
 				<input type="checkbox" id="summary-3" class="summary-checkbox" value="3">
 				{% translate "STUDENTS_W_SUBMISSIONS" %}
 			</label>
 
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_STUDENTS_W_MAX_POINTS_TOOLTIP' %}">
 				<input type="checkbox" id="summary-4" class="summary-checkbox" value="4">
 				{% translate "STUDENTS_W_MAX_POINTS" %}
 			</label>
 
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_AVERAGE_POINTS_PER_STUDENT_TOOLTIP' %}">
 				<input type="checkbox" id="summary-5" class="summary-checkbox" value="5">
 				{% translate "AVERAGE_POINTS_PER_STUDENT" %}
 			</label>
 
-			<label style="margin-left: 10px;" class="checkbox-inline" data-toggle="tooltip"
+			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
 				title="{% translate 'RESULTS_MAX_POINTS_TOOLTIP' %}">
 				<input type="checkbox" id="summary-6" class="summary-checkbox" value="6">
 				{% translate "MAX_POINTS" %}
@@ -195,19 +195,19 @@ that includes the correct DataTables extensions. -->
 		<!--Navigation bar to choose how data is shown-->
 		<ul id="exercise-nav-tabs" class="nav nav-tabs" role="tablist" style="padding-top: 20px">
 			<li id="difficulty-exercises" role="presentation" class="active">
-				<a onclick="changeDisplayMode(1);" role="tab" aria-controls="table-points-div" data-toggle="tab" href="#difficulty">{% translate "RESULTS_SHOW_EXERCISES_BY_DIFFICULTY" %}</a>
+				<a onclick="changeDisplayMode(1);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#difficulty">{% translate "RESULTS_SHOW_EXERCISES_BY_DIFFICULTY" %}</a>
 			</li>
 			<li id="module-exercises" role="presentation">
-				<a onclick="changeDisplayMode(2);" role="tab" aria-controls="table-points-div" data-toggle="tab" href="#module">{% translate "RESULTS_SHOW_EXERCISES_BY_MODULE" %}</a>
+				<a onclick="changeDisplayMode(2);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#module">{% translate "RESULTS_SHOW_EXERCISES_BY_MODULE" %}</a>
 			</li>
 			<li id="all-exercises" role="presentation">
-				<a onclick="changeDisplayMode(3);" role="tab" aria-controls="table-points-div" data-toggle="tab" href="#exercise">{% translate "RESULTS_SHOW_ALL_EXERCISES" %}</a>
+				<a onclick="changeDisplayMode(3);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#exercise">{% translate "RESULTS_SHOW_ALL_EXERCISES" %}</a>
 			</li>
 		</ul>
 
 		<!--Data table-->
 		<div class="table-responsive" role="tabpanel" style="padding: 20px 0px 0px 0px;">
-			<table id="table-points" class="table table-striped table-bordered table-condensed">
+			<table id="table-points" class="table table-striped table-bordered table-sm">
 				<thead id="table-heading">
 				</thead>
 				<tbody id="table-body">

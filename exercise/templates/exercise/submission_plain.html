@@ -41,7 +41,7 @@
 			{% if exercise.parent %}{{ exercise.parent|parse_localization }}:{% endif %}
 			{{ exercise|parse_localization }}
 		</p>
-		<table class="submission-info table table-bordered table-condensed">
+		<table class="submission-info table table-bordered table-sm">
 			<tr>
 				{% is_ajax as is_ajax_result %}
 				{% if not is_ajax_result %}
@@ -60,7 +60,7 @@
 				<td>
 					{{ submission.submission_time|date:'DATETIME_SECONDS_FORMAT' }}
 					{% if submission.late_penalty_applied %}
-					<span class="label label-warning">
+					<span class="badge text-bg-warning">
 						{% blocktranslate trimmed with percent=submission.late_penalty_applied|percent %}
 						LATE_W_PENALTY -- {{ percent }}
 						{% endblocktranslate %}
