@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load course %}
 {% load editcourse %}
-{% load bootstrap %}
+{% load django_bootstrap5 %}
 
 {% block editbreadcrumblist %}
 <li class="active">{% translate "EDIT_COURSE" %}</li>
@@ -189,7 +189,7 @@
 <form method="post" class="card">
   <div class="card-body">
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {% bootstrap_form form %}
     <br>
     <button class="aplus-button--default aplus-button--md" type="submit" name="save">{% translate "SAVE" %}</button>
     <button class="aplus-button--secondary aplus-button--md" type="submit" name="renumbermodule">{% translate "RENUMERATE_LEARNING_OBJECTS_FOR_EACH_MODULE" %}</button>

@@ -205,7 +205,7 @@ $(function () {
       this.element.find("form").on("submit", function (event) {
         event.preventDefault();
         self.selection.hide();
-        self.loader.removeClass("hidden").show();
+        self.loader.removeClass("d-none").show();
         var form = $(this);
         $.ajax(form.attr("action"), {
           type: "POST",

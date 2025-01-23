@@ -20,16 +20,16 @@
 					{% if clipboard_options %}
 					{% for option in clipboard_options %}
 					<li class="paste-option" data-field="{{ option.field }}">
-						<a href="#">{% translate 'IMPORT_LIST' %} ({{ option.label }})</a>
+						<a class="dropdown-item" href="#">{% translate 'IMPORT_LIST' %} ({{ option.label }})</a>
 					</li>
 					{% endfor %}
 					{% else %}
 					<li class="paste-option">
-						<a href="#">{% translate 'IMPORT_LIST' %}</a>
+						<a class="dropdown-item" href="#">{% translate 'IMPORT_LIST' %}</a>
 					</li>
 					{% endif %}
 					<li class="not-found">
-						<a href="#">{% translate "NO_MATCHES" %}</a>
+						<a class="dropdown-item" href="#">{% translate "NO_MATCHES" %}</a>
 					</li>
 				</ul>
 			</div>
@@ -64,7 +64,7 @@
 				<ul class="dropdown-menu dropdown-menu-right" role="menu">
 					{% for option in clipboard_options %}
 					<li>
-						<a href="#" class="copy-option" data-field="{{ option.field }}" data-clipboard-target="#{{ widget.attrs.id }} input">
+						<a href="#" class="dropdown-item copy-option" data-field="{{ option.field }}" data-clipboard-target="#{{ widget.attrs.id }} input">
 							{{ option.label }}
 						</a>
 					</li>
@@ -75,7 +75,7 @@
 		</div>
 	</div>
 
-	<div class="hidden">
+	<div class="d-none">
 		{% include "django/forms/widgets/select.html" with widget=inner_widget %}
 	</div>
 </div>

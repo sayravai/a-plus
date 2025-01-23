@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load course %}
 {% load deviations %}
-{% load bootstrap %}
+{% load django_bootstrap5 %}
 
 {% block title %}{% translate "ADD_DEADLINE_DEVIATIONS" %} | {{ block.super }}{% endblock %}
 {% block view_tag %}deadline-deviations{% endblock %}
@@ -73,7 +73,7 @@
 					</td>
 					<td>
 						{% if deviations.0.without_late_penalty %}
-							<i class="bi-ok"></i>
+							<i class="bi-check-lg"></i>
 							{% translate "YES" %}
 						{% else %}
 							<i class="bi-x-lg"></i>
@@ -82,7 +82,7 @@
 					</td>
 					<td>
 						{% if session_data.without_late_penalty %}
-							<i class="bi-ok"></i>
+							<i class="bi-check-lg"></i>
 							{% translate "YES" %}
 						{% else %}
 							<i class="bi-x-lg"></i>
@@ -112,7 +112,7 @@
 					</td>
 					<td>
 						{% if deviation.without_late_penalty %}
-							<i class="bi-ok"></i>
+							<i class="bi-check-lg"></i>
 							{% translate "YES" %}
 						{% else %}
 							<i class="bi-x-lg"></i>
@@ -121,7 +121,7 @@
 					</td>
 					<td>
 						{% if session_data.without_late_penalty %}
-							<i class="bi-ok"></i>
+							<i class="bi-check-lg"></i>
 							{% translate "YES" %}
 						{% else %}
 							<i class="bi-x-lg"></i>

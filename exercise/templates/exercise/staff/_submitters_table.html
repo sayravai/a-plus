@@ -12,7 +12,7 @@
 		{% endif %}
 
 		<a class="aplus-button--secondary aplus-button--xs" href="{{ exercise|url:'submission-next-unassessed' }}">
-			<i class="bi-ok" aria-hidden="true"></i>
+			<i class="bi-check-lg" aria-hidden="true"></i>
 			{% translate "START_MANUAL_ASSESSMENT" %}
 		</a>
 		<a class="aplus-button--secondary aplus-button--xs" href="{{ exercise|url:'submission-summary' }}">
@@ -105,7 +105,7 @@
 			</td>
 			<td>
 				{% if submitter.count_assessed > 0 %}
-					<i class="bi-ok"></i>
+					<i class="bi-check-lg"></i>
 					{% translate "YES" %}
 				{% else %}
 					<i class="bi-x-lg"></i>

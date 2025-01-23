@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load course %}
 {% load exercise %}
-{% load bootstrap %}
+{% load django_bootstrap5 %}
 {% load colortag %}
 {% load static %}
 
@@ -11,7 +11,7 @@
 		<div class="assessment-bar assessment-toggle{% if form.errors %} hidden{% endif %}">
 			<div class="assessment-bar-fill assessment-bar-text">
 				{% if submission.grader %}
-				<i class="bi-ok" aria-hidden="true"></i>
+				<i class="bi-check-lg" aria-hidden="true"></i>
 				{% if not pseudonymize %}
 					{% blocktranslate trimmed with user=submission.grader.user.get_full_name time=submission.grading_time %}
 					ASSESSED_BY -- {{ user }}, {{ time }}
