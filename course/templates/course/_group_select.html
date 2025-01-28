@@ -14,8 +14,8 @@
     </span>
   </a>
   <ul class="dropdown-menu">
-    <li class="dropdown-item">
-      <form id="group-select-form" method="post" action="{{ instance|url:'group-select' }}">
+    <li>
+      <form class="dropdown-item" id="group-select-form" method="post" action="{{ instance|url:'group-select' }}">
         {% csrf_token %}
         <button type="submit" name="group" value="0" data-group-size="1">
           {% translate "SUBMIT_ALONE" %}

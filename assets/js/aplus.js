@@ -173,11 +173,11 @@ $(function () {
   });
 
   // Simple visibility toggling: add data-bs-toggle="visibility" and
-  // data-target="<selector>" to toggle the visibility of all elements that
+  // data-bs-target="<selector>" to toggle the visibility of all elements that
   // match <selector>.
   $(document).on('click', '[data-bs-toggle="visibility"]', function (event) {
     event.preventDefault();
-    const targetSelector = $(this).data('target');
+    const targetSelector = $(this).data('bs-target');
     $(targetSelector).toggleClass('d-none');
   });
 });

@@ -52,145 +52,140 @@
 {% endif %}
 <div class="col-md-12">
 	<div id="main-body">
-		<div class="col-md-6 col-sm-12">
-			<!--Selection options for modules and exercises-->
-			<table style="margin: 10px;">
-				<tbody>
-					<tr>
-						<td style="padding: 5px 10px 5px 10px;">
-							<label for="module-selection">{% translate "SELECT_MODULES" %}</label>
-						</td>
-						<td style="padding: 5px 10px 5px 10px;">
-							<select id="module-selection" multiple="multiple">
-							</select>
-						</td>
-					</tr>
+		<div class="row">
+			<div class="col-md col-sm-12 mb-3">
+				<!--Selection options for modules and exercises-->
+				<div style="display: flex; flex-direction: column; gap:0.75rem">
+					<div style="display: flex; flex-direction: column">
+						<label for="module-selection">{% translate "SELECT_MODULES" %}</label>
+						<select id="module-selection" multiple="multiple">
+						</select>
+					</div>
+					<div style="display: flex; flex-direction: column">
+						<label for="exercise-collection">{% translate "SELECT_EXERCISES" %}</label>
+						<select id="exercise-selection" multiple="multiple">
+						</select>
+					</div>
+				</div>
+			</div>
 
-					<tr>
-						<td style="padding: 5px 10px 5px 10px;">
-							<label for="exercise-collection">{% translate "SELECT_EXERCISES" %}</label>
-						</td>
-						<td style="padding: 5px 10px 5px 10px;">
-							<select id="exercise-selection" multiple="multiple">
-							</select>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-		<div class="col-md-6 col-sm-12">
-			<!--Tags-->
-			<div style="padding: 10px 10px 30px 10px;" class="filter-users">
-				<small class="text-body-secondary">{% translate "FILTER_USERS" %}:</small>
-				<span class="radio-inline">
-					<label><input type="radio" class="tags-operator" name="tags-operator" value="and" checked>AND</label>
-				</span>
-				<span class="radio-inline">
-					<label><input type="radio" class="tags-operator" name="tags-operator" value="or">OR</label>
-				</span>
-				<br>
-				{% for tag in tags %}
-				<button class="btn btn-light btn-sm tag-button" style="background-color:{{ tag.color }};color:{{ tag.font_color }};" data-tag-slug="{{ tag.slug }}" data-tag-name="{{ tag.name }}">
-					<i class="bi-square" aria-hidden="true"></i>
-					{{ tag.name }}
-				</button>
-				{% endfor %}
+			<div class="col-md-auto col-sm-12 mb-3">
+				<!--Tags-->
+				<div class="filter-users">
+					<small class="text-body-secondary">{% translate "FILTER_USERS" %}:</small>
+					<span class="radio-inline">
+						<label><input type="radio" class="tags-operator" name="tags-operator" value="and" checked>AND</label>
+					</span>
+					<span class="radio-inline">
+						<label><input type="radio" class="tags-operator" name="tags-operator" value="or">OR</label>
+					</span>
+					<br>
+					{% for tag in tags %}
+					<button class="btn btn-light btn-sm tag-button" style="background-color:{{ tag.color }};color:{{ tag.font_color }};" data-tag-slug="{{ tag.slug }}" data-tag-name="{{ tag.name }}">
+						<i class="bi-square" aria-hidden="true"></i>
+						{{ tag.name }}
+					</button>
+					{% endfor %}
+				</div>
 			</div>
 		</div>
-
-		<div class="col-sm-12">
-			<h4>{% translate "OPTIONS" %}</h4>
-			<span class="has-error">
-				<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-					data-placement="right"
-					title="{% translate 'UNOFFICIAL_POINTS_TOOLTIP' %}">
+		<div class="row">
+			<div class="col-md-6 col-sm-12">
+				<h4>{% translate "OPTIONS" %}</h4>
+				<div style="display: flex; flex-direction: column;">
+					<label data-bs-toggle="tooltip"
+						data-placement="right"
+						title="{% translate 'UNOFFICIAL_POINTS_TOOLTIP' %}">
 						<input type="checkbox" class="unofficial-checkbox" value="unofficial">
 						{% translate "RESULTS_SHOW_UNOFFICIAL_POINTS" %}
-				</label>
-				<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-					data-placement="right"
-					title="{% translate 'UNCONFIRMED_POINTS_TOOLTIP' %}">
+						<i class="bi-exclamation-triangle-fill text-danger"></i>
+					</label>
+					<label data-bs-toggle="tooltip"
+						data-placement="right"
+						title="{% translate 'UNCONFIRMED_POINTS_TOOLTIP' %}">
 						<input type="checkbox" class="unconfirmed-checkbox" value="unconfirmed">
 						{% translate "RESULTS_SHOW_UNCONFIRMED_POINTS" %}
-				</label>
-			</span>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_SHOW_ONLY_STUDENT_WITH_SUBMISSIONS' %}">
-				<input type="checkbox" class="withsubs-checkbox" value="withsubs">
-				{% translate "RESULTS_SHOW_ONLY_STUDENT_WITH_SUBMISSIONS" %}
-			</label>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_IGNORE_GRADING_MODE_LAST_TOOLTIP' %}">
-				<input type="checkbox" id="ignore-last-mode-checkbox" value="ignorelastmode" checked autocomplete="off">
-				{% translate "RESULTS_IGNORE_GRADING_MODE_LAST" %}
-			</label>
+						<i class="bi-exclamation-triangle-fill text-danger"></i>
+					</label>
+					<label data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_SHOW_ONLY_STUDENT_WITH_SUBMISSIONS' %}">
+						<input type="checkbox" class="withsubs-checkbox" value="withsubs">
+						{% translate "RESULTS_SHOW_ONLY_STUDENT_WITH_SUBMISSIONS" %}
+					</label>
+					<label data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_IGNORE_GRADING_MODE_LAST_TOOLTIP' %}">
+						<input type="checkbox" id="ignore-last-mode-checkbox" value="ignorelastmode" checked autocomplete="off">
+						{% translate "RESULTS_IGNORE_GRADING_MODE_LAST" %}
+					</label>
+				</div>
+			</div>
+
+			<div class="col-md-6 col-sm-12">
+				<!--Checkboxes to select extra information about data-->
+				<h4>{% translate "SUMMARIES" %}</h4>
+				<div style="display: flex; column-gap: 1em; flex-wrap: wrap">
+					<label class="checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'SUMMARIES_SELECT_OR_DESELECT_ALL' %}">
+						<input type="checkbox" id="summary-all" value="all">
+						{% translate "ALL" %}
+					</label>
+					<label class="checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_TOTAL_SUBMISSIONS_TOOLTIP' %}">
+						<input type="checkbox" id="summary-0" class="summary-checkbox" value="0">
+						{% translate "TOTAL_SUBMISSIONS" %}
+					</label>
+
+					<label class="ml-10 checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_AVERAGE_SUBMISSIONS_PER_STUDENT_TOOLTIP' %}">
+						<input type="checkbox" id="summary-1" class="summary-checkbox" value="1">
+						{% translate "AVERAGE_SUBMISSIONS_PER_STUDENT" %}
+					</label>
+
+					<label class="ml-10 checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_MAXIMUM_SUBMISSIONS_TOOLTIP' %}">
+						<input type="checkbox" id="summary-2" class="summary-checkbox" value="2">
+						{% translate "MAXIMUM_SUBMISSIONS" %}
+					</label>
+
+					<label class="checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_STUDENTS_W_SUBMISSIONS_TOOLTIP' %}">
+						<input type="checkbox" id="summary-3" class="summary-checkbox" value="3">
+						{% translate "STUDENTS_W_SUBMISSIONS" %}
+					</label>
+
+					<label class="checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_STUDENTS_W_MAX_POINTS_TOOLTIP' %}">
+						<input type="checkbox" id="summary-4" class="summary-checkbox" value="4">
+						{% translate "STUDENTS_W_MAX_POINTS" %}
+					</label>
+
+					<label class="checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_AVERAGE_POINTS_PER_STUDENT_TOOLTIP' %}">
+						<input type="checkbox" id="summary-5" class="summary-checkbox" value="5">
+						{% translate "AVERAGE_POINTS_PER_STUDENT" %}
+					</label>
+
+					<label class="checkbox-inline" data-bs-toggle="tooltip"
+						title="{% translate 'RESULTS_MAX_POINTS_TOOLTIP' %}">
+						<input type="checkbox" id="summary-6" class="summary-checkbox" value="6">
+						{% translate "MAX_POINTS" %}
+					</label>
+				</div>
+			</div>
+
+			<!--Navigation bar to choose how data is shown-->
+			<ul id="exercise-nav-tabs" class="nav nav-pills mt-4" role="tablist">
+				<li id="difficulty-exercises" role="presentation" class="nav-item">
+					<a class="nav-link active" onclick="changeDisplayMode(1);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#difficulty">{% translate "RESULTS_SHOW_EXERCISES_BY_DIFFICULTY" %}</a>
+				</li>
+				<li id="module-exercises" role="presentation" class="nav-item">
+					<a class="nav-link" onclick="changeDisplayMode(2);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#module">{% translate "RESULTS_SHOW_EXERCISES_BY_MODULE" %}</a>
+				</li>
+				<li id="all-exercises" role="presentation" class="nav-item">
+					<a class="nav-link" onclick="changeDisplayMode(3);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#exercise">{% translate "RESULTS_SHOW_ALL_EXERCISES" %}</a>
+				</li>
+			</ul>
 		</div>
-
-		<div class="col-sm-12" style="padding-bottom: 20px">
-			<!--Checkboxes to select extra information about data-->
-			<h4>{% translate "SUMMARIES" %}</h4>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'SUMMARIES_SELECT_OR_DESELECT_ALL' %}">
-				<input type="checkbox" id="summary-all" value="all">
-				{% translate "ALL" %}
-			</label>
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_TOTAL_SUBMISSIONS_TOOLTIP' %}">
-				<input type="checkbox" id="summary-0" class="summary-checkbox" value="0">
-				{% translate "TOTAL_SUBMISSIONS" %}
-			</label>
-
-			<label style="margin-left: 10px;" class="ml-10 checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_AVERAGE_SUBMISSIONS_PER_STUDENT_TOOLTIP' %}">
-				<input type="checkbox" id="summary-1" class="summary-checkbox" value="1">
-				{% translate "AVERAGE_SUBMISSIONS_PER_STUDENT" %}
-			</label>
-
-			<label style="margin-left: 10px;" class="ml-10 checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_MAXIMUM_SUBMISSIONS_TOOLTIP' %}">
-				<input type="checkbox" id="summary-2" class="summary-checkbox" value="2">
-				{% translate "MAXIMUM_SUBMISSIONS" %}
-			</label>
-
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_STUDENTS_W_SUBMISSIONS_TOOLTIP' %}">
-				<input type="checkbox" id="summary-3" class="summary-checkbox" value="3">
-				{% translate "STUDENTS_W_SUBMISSIONS" %}
-			</label>
-
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_STUDENTS_W_MAX_POINTS_TOOLTIP' %}">
-				<input type="checkbox" id="summary-4" class="summary-checkbox" value="4">
-				{% translate "STUDENTS_W_MAX_POINTS" %}
-			</label>
-
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_AVERAGE_POINTS_PER_STUDENT_TOOLTIP' %}">
-				<input type="checkbox" id="summary-5" class="summary-checkbox" value="5">
-				{% translate "AVERAGE_POINTS_PER_STUDENT" %}
-			</label>
-
-			<label style="margin-left: 10px;" class="checkbox-inline" data-bs-toggle="tooltip"
-				title="{% translate 'RESULTS_MAX_POINTS_TOOLTIP' %}">
-				<input type="checkbox" id="summary-6" class="summary-checkbox" value="6">
-				{% translate "MAX_POINTS" %}
-			</label>
-		</div>
-
-		<!--Navigation bar to choose how data is shown-->
-		<ul id="exercise-nav-tabs" class="nav nav-tabs" role="tablist" style="padding-top: 20px">
-			<li id="difficulty-exercises" role="presentation" class="nav-item active">
-				<a class="nav-link" onclick="changeDisplayMode(1);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#difficulty">{% translate "RESULTS_SHOW_EXERCISES_BY_DIFFICULTY" %}</a>
-			</li>
-			<li id="module-exercises" role="presentation" class="nav-item">
-				<a class="nav-link" onclick="changeDisplayMode(2);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#module">{% translate "RESULTS_SHOW_EXERCISES_BY_MODULE" %}</a>
-			</li>
-			<li id="all-exercises" role="presentation" class="nav-item">
-				<a class="nav-link" onclick="changeDisplayMode(3);" role="tab" aria-controls="table-points-div" data-bs-toggle="tab" href="#exercise">{% translate "RESULTS_SHOW_ALL_EXERCISES" %}</a>
-			</li>
-		</ul>
-
 		<!--Data table-->
 		<div class="table-responsive" role="tabpanel" style="padding: 20px 0px 0px 0px;">
 			<table id="table-points" class="table table-striped table-bordered table-sm">

@@ -24,10 +24,10 @@
 }
 
 #table-heading th {
-	/*min-width: 6em;
+	min-width: 6em;
 	width: 15vw;
 	max-width: calc(12em + 26px);
-	background-color: white;*/
+	/*background-color: white;*/
 	position: -webkit-sticky; /* Safari */
 	position: sticky;
 	top: 0;
@@ -37,24 +37,23 @@
 
 #table-heading th.student-id,
 #table-heading th.total {
-	/*max-width: calc(8em + 26px);*/
+	max-width: calc(8em + 26px);
 }
 
 #table-heading .form-control { /* Search bars in heading cells */
-	/*min-width: 6em;
-	width: min(12em, 14vw);*/
+	min-width: 6em;
+	width: min(12em, 14vw);
 }
 
 #table-heading th.student-id .form-control,
 #table-heading th.total .form-control {
-	/*max-width: 8em;*/
+	max-width: 8em;
 }
 
-#table-heading th,
-#table-heading td {
-	/*border-top-width: 1px;
-	border-bottom-width: 1px;*/
-} 
+#table-heading th.student-id, #table-heading th.student-id input
+{
+	max-width: 6em;
+}
 
 #table-heading th.stick-on-scroll:not(.indicator-heading) {
     left: 0;
@@ -72,16 +71,10 @@ tbody td.stick-on-scroll {
     z-index: 1;
 }
 
-#table-heading th.stick-on-scroll,
-tbody td.stick-on-scroll {
-	/*background-color: #d6d6d6 100%;*/
-}
-
 #table-heading th.stick-on-scroll:nth-child(2),
 tbody td.stick-on-scroll:nth-child(2) {
-    left: min(calc(8em + 10px), calc(14vw + 26px));
+	left: 6em;
 }
-
 
 table#table-points thead td div.ratio {
 	text-align: right;

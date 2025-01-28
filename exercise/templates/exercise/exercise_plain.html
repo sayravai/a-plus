@@ -96,8 +96,8 @@
 								</a>
 								<ul class="dropdown-menu" style="position: absolute; left: 0; right: auto">
 									{% for submission in submissions %}
-										<li class="dropdown-item">
-											<a href="{{ submission|url:'submission-plain' }}" data-hash="{{ submission.hash }}">
+										<li>
+											<a class="dropdown-item" href="{{ submission|url:'submission-plain' }}" data-hash="{{ submission.hash }}">
 												{{ forloop.revcounter }}.
 												{{ submission.date|date:'DATETIME_SECONDS_FORMAT' }}
 												{% points_badge submission%}
