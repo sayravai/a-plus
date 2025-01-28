@@ -117,12 +117,12 @@
 		<header>
 			<nav class="topbar navbar sticky-top visible-xs" aria-label="{% translate 'MAIN' %}">
 				<div class="container-fluid">
-					<div style="display: flex; max-width: 500px">
+					<div style="display: flex; align-items: baseline">
 						<a class="navbar-brand" href="{% url 'home' %}">{% brand_name %}</a>
 						<span class="navbar-brand">{{ APLUS_VERSION }}</span>
 						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 							<li role="presentation" class="nav-item dropdown">
-								<a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button"
+								<a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" role="button"
 									aria-haspopup="true" aria-expanded="false">
 									{% if instance %}
 									{{ course|parse_localization }}
@@ -137,57 +137,59 @@
 							</li>
 						</ul>
 					</div>
-					<ul class="navbar-dropdown user-menu d-none d-sm-block">
-							<li>
-								{% if show_language_toggle %}
+					<div class="d-none d-sm-flex">
+						<ul class="nav navbar-nav user-menu" style="flex-direction: row; align-items: baseline; gap: 1em">
+							{% if show_language_toggle %}
+							<li class="nav-item">
 								{% if request.LANGUAGE_CODE == 'fi' %}
-								<a href="?hl=en" role="button" aria-label="{% translate 'CHANGE_LANGUAGE_TO_ENGLISH' %}" hreflang="en" onclick="changeLanguage('en'); return false;">
+								<a class="nav-link" href="?hl=en" role="button" aria-label="{% translate 'CHANGE_LANGUAGE_TO_ENGLISH' %}" hreflang="en" onclick="changeLanguage('en'); return false;">
 									<span>
 										<img src="{% static 'images/uls_white.svg' %}" alt="">
 										EN
 									</span>
 								</a>
 								{% else %}
-								<a href="?hl=fi" role="button" aria-label="{% translate 'CHANGE_LANGUAGE_TO_FINNISH' %}" hreflang="fi" onclick="changeLanguage('fi'); return false;">
+								<a class="nav-link" href="?hl=fi" role="button" aria-label="{% translate 'CHANGE_LANGUAGE_TO_FINNISH' %}" hreflang="fi" onclick="changeLanguage('fi'); return false;">
 									<span>
 										<img src="{% static 'images/uls_white.svg' %}" alt="">
 										FI
 									</span>
 								</a>
 								{% endif %}
-								{% endif %}
 							</li>
-						{% if user.is_authenticated %}
-						{% group_select %}
-						{% notification_menu %}
-						<li role="presentation" class="profile-menu nav-item dropdown">
-							<a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button"
-								aria-haspopup="true" aria-expanded="false">
-								<i class="bi-person-fill" aria-hidden="true" data-testid="user-menu"></i>
-								{{ user.first_name }} {{ user.last_name }} 
-							</a>
-							<ul class="dropdown-menu" style="position: absolute; right: 0; left: auto">
-								<li role="presentation" class="dropdown-item">
-									<a class="nav-link" href="{% url 'profile' %}">{% translate "PROFILE" %}</a>
-								</li>
-								<li role="separator" class="dropdown-divider"></li>
-								<li role="presentation" class="dropdown-item">
-									<a class="nav-link" href="{% url 'logout' %}">
-										<i class="bi-box-arrow-right" aria-hidden="true"></i>
-										{% translate "LOG_OUT"%}
-									</a>
-								</li>
-							</ul>
-						</li>
-						{% else %}
-						<li role="presentation">
-							<a href="{% url 'login' %}{% login_next %}">
-								<i class="bi-box-arrow-in-right" aria-hidden="true"></i>
-								{% translate "LOG_IN"%}
-							</a>
-						</li>
-						{% endif %}
-					</ul>
+							{% endif %}
+							{% if user.is_authenticated %}
+							{% group_select %}
+							{% notification_menu %}
+							<li role="presentation" class="profile-menu nav-item dropdown">
+								<a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" role="button"
+									aria-haspopup="true" aria-expanded="false">
+									<i class="bi-person-fill" aria-hidden="true" data-testid="user-menu"></i>
+									{{ user.first_name }} {{ user.last_name }} 
+								</a>
+								<ul class="dropdown-menu" style="position: absolute; right: 0; left: auto">
+									<li role="presentation">
+										<a class="dropdown-item" href="{% url 'profile' %}">{% translate "PROFILE" %}</a>
+									</li>
+									<li role="separator" class="dropdown-divider"></li>
+									<li role="presentation">
+										<a class="dropdown-item" href="{% url 'logout' %}">
+											<i class="bi-box-arrow-right" aria-hidden="true"></i>
+											{% translate "LOG_OUT"%}
+										</a>
+									</li>
+								</ul>
+							</li>
+							{% else %}
+							<li role="presentation">
+								<a href="{% url 'login' %}{% login_next %}">
+									<i class="bi-box-arrow-in-right" aria-hidden="true"></i>
+									{% translate "LOG_IN"%}
+								</a>
+							</li>
+							{% endif %}
+						</ul>
+					</div>
 					<button type="button" class="navbar-toggler collapsed d-block d-sm-none" data-bs-toggle="collapse"
 						data-bs-target="#bs-navbar-collapse" aria-expanded="false">
 						<span class="visually-hidden">{% translate "TOGGLE_NAVIGATION" %}</span>
@@ -333,10 +335,9 @@
 					</div>
 				</div>
 				<div class="modal-header">
-					<button type="button" class="close" data-bs-dismiss="modal" aria-label="{% translate 'CLOSE' %}">
-						<span aria-hidden="true">&times;</span>
-					</button>
 					<h4 class="modal-title"></h4>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate "CLOSE" %}">
+					</button>
 				</div>
 				<div class="modal-body"></div>
 			</div>

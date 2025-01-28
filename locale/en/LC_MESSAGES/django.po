@@ -4963,7 +4963,7 @@ msgstr ""
 #, python-brace-format
 msgid "PERSONAL_EXTENDED_DEADLINE_PLURAL -- {count}"
 msgstr ""
-"<span data-toggle=\"tooltip\" title=\"Personal extended deadlines: "
+"<span data-bs-toggle=\"tooltip\" title=\"Personal extended deadlines: "
 "{count}\"><span class=\"bi-clock\" aria-hidden=\"true\"></"
 "span><span class=\"visually-hidden\">Personal extended deadlines: {count}</span></"
 "span>"

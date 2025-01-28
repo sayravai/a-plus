@@ -23,50 +23,52 @@
 {% block coursecontent %}
 <br />
 <form method="post" class="card form-horizontal"{% if form.multipart %} enctype="multipart/form-data"{% endif %}>
-    {% csrf_token %}
+    <div class="card-body">
+        {% csrf_token %}
 
-    {% for hidden in form.hidden_fields %}
-        {{ hidden }}
-    {% endfor %}
-
-    {% if form.remote_service_head %}
-    <fieldset>
-        <legend>{% translate "REMOTE_SERVICE" %}</legend>
-
-        <div>
-            {{ form.service_url|bootstrap_horizontal }}
-        </div>
-        <div class="col-sm-10 col-sm-offset-2">
-            <p>
-                {% translate "FILL_IN_URL_AND" %}
-                <a id="fetch-metadata" class="btn btn-primary btn-sm" href="#">
-                    {% translate "DOWNLOAD_POSSIBLE_METADATA" %}
-                    <i class="bi-download" aria-hidden="true"></i>
-                </a>
-            </p>
-            <div id="metadata-progress" class="progress d-none">
-                <div class="aplus-progress-bar aplus-progress-bar-striped active" role="progressbar" style="width: 100%;"></div>
-            </div>
-        </div>
-    </fieldset>
-    {% endif %}
-
-    {% for fieldset in form.get_fieldsets %}
-    <fieldset>
-        {% if fieldset.legend %}
-        <legend>{{ fieldset.legend }}</legend>
-        {% endif %}
-        {% for field in fieldset.fields %}
-        {{ field|bootstrap_horizontal }}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
         {% endfor %}
-    </fieldset>
-    {% endfor %}
-    <div class="form-group">
-        <div class="col-sm-10 col-sm-offset-2">
-            <button type="submit" class="aplus-button--default aplus-button--md">{% translate "SAVE" %}</button>
-            <a class="aplus-button--secondary aplus-button--md" href="{{ instance|url:'course-edit' }}" role="button">
-                {% translate "CANCEL" %}
-            </a>
+
+        {% if form.remote_service_head %}
+        <fieldset>
+            <legend>{% translate "REMOTE_SERVICE" %}</legend>
+
+            <div>
+                {% bootstrap_field form.service_url layout="horizontal" %}
+            </div>
+            <div class="col-sm-10 col-sm-offset-2">
+                <p>
+                    {% translate "FILL_IN_URL_AND" %}
+                    <a id="fetch-metadata" class="btn btn-primary btn-sm" href="#">
+                        {% translate "DOWNLOAD_POSSIBLE_METADATA" %}
+                        <i class="bi-download" aria-hidden="true"></i>
+                    </a>
+                </p>
+                <div id="metadata-progress" class="progress d-none">
+                    <div class="aplus-progress-bar aplus-progress-bar-striped active" role="progressbar" style="width: 100%;"></div>
+                </div>
+            </div>
+        </fieldset>
+        {% endif %}
+
+        {% for fieldset in form.get_fieldsets %}
+        <fieldset>
+            {% if fieldset.legend %}
+            <legend>{{ fieldset.legend }}</legend>
+            {% endif %}
+            {% for field in fieldset.fields %}
+            {% bootstrap_field field layout="horizontal" %}
+            {% endfor %}
+        </fieldset>
+        {% endfor %}
+        <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+                <button type="submit" class="aplus-button--default aplus-button--md">{% translate "SAVE" %}</button>
+                <a class="aplus-button--secondary aplus-button--md" href="{{ instance|url:'course-edit' }}" role="button">
+                    {% translate "CANCEL" %}
+                </a>
+            </div>
         </div>
     </div>
 </form>

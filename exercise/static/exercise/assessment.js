@@ -78,7 +78,7 @@ $(function () {
     const label2 = feedback2.find('label');
     const feedbackToggleButton = $('<button class="aplus-button--secondary aplus-button--xs"></button>')
       .attr({
-        'data-toggle': 'visibility',
+        'data-bs-toggle': 'visibility',
         'data-target': '.feedback-toggle'
       });
     label1.after(feedbackToggleButton.clone().text(label2.text())).after(' | ');

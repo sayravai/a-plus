@@ -1321,18 +1321,14 @@
              */
             function removeHtmlFromColumns( data, row, column, node ) {
                 if (typeof(data) === "string") {
-                    // This is expected to be the Tags column
-                    if (data.includes("<span class=\"colortag")) return data.replace( /(<[^>]*>)+/g, ',' ).slice(1,-1);
+                    // Column 4 is expected to be the Tags column
                     // The other HTML - rendered columns (name, studentID)
                     // are just cleaned up of HTML
-                    else if (data.includes("<a href")) return data.replace( /<[^>]*>/g, '' );
-                    else return data;
+                    return column === 4 ?
+                    data.replace( /(<[^>]*>)+/g, ',' ).slice(1,-1) :
+                    $.fn.dataTable.util.stripHtml(data);
                 }
                 else return data;
-                // When the next version of DataTables.Buttons is released, we can replace the above with:
-                // return column === 2 ?
-                // data.replace( /(<[^>]*>)+/g, ',' ).slice(1,-1) :
-                // column$.fn.dataTable.Buttons.stripData(data);
             }
 
             /**

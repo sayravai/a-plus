@@ -130,7 +130,7 @@
             {% endfor %}
             <tr>
                 <td colspan="2">
-                    <a class="aplus-button--secondary aplus-button--xs" data-bs-toggle="modal" data-target="#lobject{{ module.id }}" role="button">
+                    <a class="aplus-button--secondary aplus-button--xs" data-bs-toggle="modal" data-bs-target="#lobject{{ module.id }}" role="button">
                         <i class="bi-plus-lg" aria-hidden="true"></i>
                         {% translate "ADD_NEW_LEARNING_OBJECT" %}
                     </a>
@@ -138,12 +138,11 @@
                       <div class="modal-dialog" role="document">
                         <div class="modal-content">
                           <div class="modal-header">
-                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
                             <h4 class="modal-title" id="lobject{{ module.id }}Label">
                               {% translate "CHOOSE_LEARNING_OBJECT_TYPE" %}
                             </h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate "CLOSE" %}">
+                            </button>
                           </div>
                           <div class="modal-body">
                             <div class="list-group">
