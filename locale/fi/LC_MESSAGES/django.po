@@ -4197,7 +4197,7 @@ msgstr "Tällä tehtävällä ei ole pohjatiedostoa."
 #: exercise/templates/exercise/_text_stats.html
 #, python-format
 msgid "SUBMITTER_COUNT -- %(number)s, %(percentage)s"
-msgstr "Palauttajia: %(number)s <small class="text-body-secondary">%(percentage)s%%</small>"
+msgstr "Palauttajia: %(number)s <small class=\"text-body-secondary\">%(percentage)s%%</small>"
 
 #: exercise/templates/exercise/_user_last.html
 #, python-format
@@ -4617,7 +4617,7 @@ msgstr "Arvosteltu manuaalisesti"
 #: exercise/templates/exercise/submission_plain.html
 #, python-format
 msgid "LATE_W_PENALTY -- %(percent)s"
-msgstr "Myöhässä <small class="text-body-secondary">-%(percent)s%%</small>"
+msgstr "Myöhässä <small class=\"text-body-secondary\">-%(percent)s%%</small>"
 
 #: exercise/templates/exercise/staff/_submissions_table.html
 msgid "NO_SUBMISSIONS"
