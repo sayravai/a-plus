@@ -61,7 +61,7 @@
 					<i class="bi-copy" aria-hidden="true"></i>
 				</button>
 				{% if clipboard_options %}
-				<ul class="dropdown-menu dropdown-menu-right" role="menu">
+				<ul class="dropdown-menu dropdown-menu-end" role="menu">
 					{% for option in clipboard_options %}
 					<li>
 						<a href="#" class="dropdown-item copy-option" data-field="{{ option.field }}" data-clipboard-target="#{{ widget.attrs.id }} input">

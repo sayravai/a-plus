@@ -47,12 +47,12 @@
 		const form = modal.closest("form");
 		modal.on('shown.bs.modal', function() {
 			const hiddenSelected = form.find('tr.hidden-filter input[name="id"]:checked');
-			$("#remove-selected-hidden-warning").toggleClass("hidden", hiddenSelected.length === 0);
+			$("#remove-selected-hidden-warning").toggleClass("d-none", hiddenSelected.length === 0);
 
 			const selected = form.find('input[name="id"]:checked');
-			$("#remove-selected-no-selection-warning").toggleClass("hidden", selected.length > 0);
+			$("#remove-selected-no-selection-warning").toggleClass("d-none", selected.length > 0);
 			$("#remove-selected-confirmation")
-			.toggleClass("hidden", selected.length === 0)
+			.toggleClass("d-none", selected.length === 0)
 			.text(
 				_("Are you sure you want to remove the selected deviation? |||| Are you sure you want to remove the %{smart_count} selected deviations?",
 				{ smart_count: selected.length })

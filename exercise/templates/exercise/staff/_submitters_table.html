@@ -28,11 +28,11 @@
 			>
 				{% translate "DOWNLOAD_POINTS" %} <span class="caret"></span>
 			</button>
-			<ul class="dropdown-menu dropdown-menu-right" aria-labeledby="download-data">
+			<ul class="dropdown-menu dropdown-menu-end" aria-labeledby="download-data">
 				{% get_format_info_list "json csv excel.csv" as formats %}
 				{% for format in formats %}
 				<li>
-					<a href="{% url 'api:course-submissiondata-list' version=2 course_id=instance.id %}?exercise_id={{ exercise.id }}&amp;format={{ format.name }}">
+					<a class="dropdown-item" href="{% url 'api:course-submissiondata-list' version=2 course_id=instance.id %}?exercise_id={{ exercise.id }}&amp;format={{ format.name }}">
 						{{ format.verbose_name }}
 					</a>
 				</li>
@@ -49,11 +49,11 @@
 				>
 					{% translate "DOWNLOAD_SUBMISSIONS" %} <span class="caret"></span>
 				</button>
-				<ul class="dropdown-menu dropdown-menu-right" aria-labeledby="download-zip-data">
+				<ul class="dropdown-menu dropdown-menu-end" aria-labeledby="download-zip-data">
 					{% get_zip_info_list "all best" as types %}
 					{% for type in types %}
 					<li>
-						<a href="{% url 'api:exercise-submissions-zip' version=2 exercise_id=exercise.id %}?best={{ type.best }}">
+						<a class="dropdown-item" href="{% url 'api:exercise-submissions-zip' version=2 exercise_id=exercise.id %}?best={{ type.best }}">
 							{{ type.verbose_name }}
 						</a>
 					</li>

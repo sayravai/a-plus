@@ -967,7 +967,7 @@
 
         selectedModules.each(function() {
             let showModuleClass = '.' + $(this).val();
-            multiSelectSelector.find(showModuleClass).removeClass("hidden disabled");
+            multiSelectSelector.find(showModuleClass).removeClass("d-none disabled");
             multiSelectSelector.find(showModuleClass).prop("selected", true);
             exerciseSelectRef.find(showModuleClass).prop("selected", true);
             if(_displayMode === dm.MODULE) {
@@ -977,7 +977,7 @@
 
         nonSelectedModules.each(function() {
             let hideModuleClass = '.' + $(this).val();
-            multiSelectSelector.find(hideModuleClass).addClass("hidden disabled");
+            multiSelectSelector.find(hideModuleClass).addClass("d-none disabled");
             multiSelectSelector.find(hideModuleClass).prop("selected", false);
             exerciseSelectRef.find(hideModuleClass).prop("selected", false);
         });
