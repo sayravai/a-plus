@@ -26,7 +26,8 @@ def test_compare_submissions(page: Page) -> None:
     login(page, "assistant", "assistant")
     page.get_by_role("link", name="Def. Course Current DEF000 1.").click()
     page.get_by_role("link", name="Course materials").click()
-    page.get_by_role("link", name="6.3 Exercises with Python").first.click()
+    first_link = page.get_by_role("link", name="6.3 Exercises with Python").first
+    first_link.click()
     page.get_by_label("6.3.6 Wallet").get_by_role(
         "button", name="View all submissions").click()
     page.locator("#submission-2").get_by_role("link", name="Inspect").click()
