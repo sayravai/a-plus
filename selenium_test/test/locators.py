@@ -57,7 +57,10 @@ class HomePageLocators:
 
 class ExercisePageLocators:
     MAIN_TITLE = (By.XPATH, "//*[@id='title']")
-    EXERCISE_SCORE = (By.XPATH, ".//*[@id='exercise-info']/div[contains(@class, 'card')]/div/p/strong[contains(@class, 'exercise-info-points')]")
+    EXERCISE_SCORE = (
+        By.XPATH,
+        ".//*[@id='exercise-info']/div[contains(@class,'card')]/div/p/strong[contains(@class,'exercise-info-points')]"
+    )
     NUMBER_OF_SUBMITTERS = (By.XPATH, "//*[@id='exercise-info']//dl/dd[contains(@class, 'exercise-info-submitters')]")
     ALLOWED_SUBMISSIONS = (By.XPATH, "//*[@id='exercise-info']//dl/dd[contains(@class, 'exercise-info-submissions')]")
     MY_SUBMISSIONS_LIST = (By.XPATH, "//li[contains(@class, 'menu-submission')]/ul[@class='dropdown-menu']/li")
