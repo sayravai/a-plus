@@ -254,16 +254,16 @@ $(function () {
       button.attr(buttonOptions.attrs);
     }
     if (buttonOptions.icon) {
-      const buttonContent = $('<span class="glyphicon" aria-hidden="true"></span>').addClass('glyphicon-' + buttonOptions.icon);
+      const buttonContent = $('<i class="bi-' + buttonOptions.icon + '" aria-hidden="true"></i>');
       buttonContent.appendTo(button);
       if (buttonOptions.toggle) {
         button.on('click', function () {
-          buttonContent.toggleClass('glyphicon-check glyphicon-unchecked');
+          buttonContent.toggleClass('bi-square bi-check-square');
         });
       }
     }
     if (buttonOptions.text) {
-      const buttonText = $('<span></span>').text(buttonOptions.text);
+      const buttonText = $('<span></span>').text(' ' + buttonOptions.text);
       buttonText.appendTo(button);
     }
     button.appendTo(buttonContainer);
@@ -427,8 +427,8 @@ $(function () {
             if (!element.hasClass('active')) {
               element
                 .find(iconSelector)
-                .toggleClass('glyphicon-unchecked')
-                .toggleClass('glyphicon-check');
+                .toggleClass('bi-square')
+                .toggleClass('bi-check-square');
             }
           });
         };
@@ -436,12 +436,12 @@ $(function () {
         let action, iconSelector, localStorageKey;
         if ($('.submission-container').find(buttonContainer).length > 0) {
           // buttonContainer is related to submitted files on inspect submission page
-          iconSelector = `.submitted-file-data > div > p > button:contains(${_("Word wrap")}) > .glyphicon`;
+          iconSelector = `.submitted-file-data > div > p > button:contains(${_("Word wrap")}) > i`;
           localStorageKey = 'fileWrap';
           action = () => toggleWrap($('.submission-container'), iconSelector, localStorageKey);
         } else if ($('.grader-container').find(buttonContainer).length > 0) {
           // buttonContainer is related to feedback and errors on inspect submission page
-          iconSelector = `div > p > button:contains(${_("Word wrap")}) > .glyphicon`;
+          iconSelector = `div > p > button:contains(${_("Word wrap")}) > i`;
           localStorageKey = 'graderFeedbackWrap';
           action = () => toggleWrap($('.grader-container'), iconSelector, localStorageKey);
         } else {
@@ -461,7 +461,7 @@ $(function () {
 
         addButton(buttonContainer, {
           action: action,
-          icon: doWrap ? 'check' : 'unchecked',
+          icon: doWrap ? 'check-square' : 'square',
           text: _('Word wrap'),
           toggle: true,
         });
@@ -478,7 +478,7 @@ $(function () {
               console.error("Download button clicked, but there is no data-url set on the downloadable pre content. Can not download.");
             }
           },
-          icon: 'download-alt',
+          icon: 'download',
           text: _('Download'),
         });
       }

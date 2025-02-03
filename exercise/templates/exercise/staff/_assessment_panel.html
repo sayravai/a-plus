@@ -104,12 +104,12 @@
 					<form class="assessment-bar assessment-toggle{% if not form.errors %} d-none{% endif %}" method="post">
 						{% csrf_token %}
 						<div class="assessment-bar-fill">
-							{% bootstrap_field form.assistant_feedback %}
-							{% bootstrap_field form.feedback %}
+							{% bootstrap_field form.assistant_feedback wrapper_class='mb-0' %}
+							{% bootstrap_field form.feedback wrapper_class='mb-0' %}
 						</div>
 						<div style="flex-basis: 200px">
-							{% bootstrap_field form.points %}
-							{% bootstrap_field form.mark_as_final %}
+							{% bootstrap_field form.points wrapper_class='mb-0' %}
+							{% bootstrap_field form.mark_as_final wrapper_class='mb-0' %}
 						</div>
 						<div class="text-right">
 							<div>

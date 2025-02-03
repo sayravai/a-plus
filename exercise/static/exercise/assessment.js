@@ -42,7 +42,7 @@ $(function () {
         }
         toggleSticky(this.parent(), iconSelector);
       },
-      icon: isSticky ? 'check' : 'unchecked',
+      icon: isSticky ? 'check-square' : 'square',
       text: _('Scroll separately'),
       toggle: true,
     };
