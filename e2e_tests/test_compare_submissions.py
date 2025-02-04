@@ -3,6 +3,7 @@ from e2e_tests.helpers import upload_submission, login, logout, File
 
 
 def test_compare_submissions(page: Page) -> None:
+    page.goto("http://localhost:8000/?hl=en")
     chapter_name = "6.3 Exercises with Python"
     exercise_name = "#chapter-exercise-6"
     green = "rgb(212, 237, 218)"
