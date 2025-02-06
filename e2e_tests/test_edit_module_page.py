@@ -21,8 +21,7 @@ def test_edit_module_page(page: Page) -> None:
     page.get_by_placeholder("Name").fill(exerciseName)
     page.get_by_placeholder("Introduction").fill(introduction)
     page.get_by_placeholder("Points to pass").fill(pointsToPass)
-    page.get_by_placeholder("Late submission penalty").fill('')
-    page.get_by_placeholder("Late submission penalty").type('0,33')
+    page.get_by_placeholder("Late submission penalty").fill('0.33')
     page.locator('id=id_model_solution-currently_revealed').check()
     page.locator('id=id_model_solution-show_zero_points_immediately').check()
 
@@ -37,7 +36,6 @@ def test_edit_module_page(page: Page) -> None:
     expect(page.get_by_placeholder("Name")).to_have_value(exerciseName)
     expect(page.get_by_placeholder("Introduction")).to_have_value(introduction)
     expect(page.get_by_placeholder("Points to pass")).to_have_value(pointsToPass)
-    # The field value when reading the input is "0.33", not "0,33"
     expect(page.get_by_placeholder("Late submission penalty")).to_have_value('0.33')
     expect(page.locator('id=id_model_solution-currently_revealed')).to_be_checked()
     expect(page.locator('id=id_model_solution-show_zero_points_immediately')).to_be_checked()
