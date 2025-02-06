@@ -84,8 +84,11 @@ def test_compare_submissions(page: Page) -> None:
     notification_menu.click()
 
     # Click on the first item on the notification menu
-    page.locator("#notification-alert").get_by_role("link", name="DEF000 6.3 Exercises with Python grader utils, 6.3.6 Wallet").click()
-    
+    page.locator("#notification-alert").get_by_role(
+        "link",
+        name="DEF000 6.3 Exercises with Python grader utils, 6.3.6 Wallet"
+    ).click()
+
     # Check that we have the correct feedback
     expect(page.locator("#exercise-all")).to_contain_text(ASSISTANT_FEEDBACK_TEXT)
     expect(page.locator("#exercise-all")).to_contain_text(FEEDBACK_TEXT)

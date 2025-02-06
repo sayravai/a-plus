@@ -1,5 +1,5 @@
 from playwright.sync_api import Page, expect
-from e2e_tests.helpers import upload_submission, login, logout, navigate_to_default_course, File
+from e2e_tests.helpers import login, navigate_to_default_course
 
 
 def test_edit_exercise_page(page: Page) -> None:
@@ -30,7 +30,7 @@ def test_edit_exercise_page(page: Page) -> None:
 
     page.goto(
         "http://localhost:8000/def/current/teachers/exercise/" 
-        + str(exerciseNumber) 
+        + str(exerciseNumber)
         + "/"
     )
 

@@ -1,5 +1,5 @@
 from playwright.sync_api import Page, expect
-from e2e_tests.helpers import upload_submission, login, logout, navigate_to_default_course, File
+from e2e_tests.helpers import login, navigate_to_default_course
 
 
 def test_edit_module_page(page: Page) -> None:
@@ -12,9 +12,6 @@ def test_edit_module_page(page: Page) -> None:
     # Click the first assignment edit button as we don't know which ids are
     # exercises (not chapters) at this point
     page.get_by_role("button").filter(has_text="Edit module").first.click()
-
-    # Get the exercise number from the URL we navigated to via previous button click
-    moduleNumber = page.url.split("/")[-2]
 
     exerciseName = "Testimoduuli"
     introduction = "Tämä on testimoduuli."
@@ -33,7 +30,7 @@ def test_edit_module_page(page: Page) -> None:
 
     # Check for a successful save message
     expect(page.locator(".site-message")).to_contain_text("The module was saved successfully.")
-    
+
     # Check that the exercise details were saved correctly
     page.get_by_role("button").filter(has_text="Edit module").first.click()
 
@@ -44,4 +41,3 @@ def test_edit_module_page(page: Page) -> None:
     expect(page.get_by_placeholder("Late submission penalty")).to_have_value('0.33')
     expect(page.locator('id=id_model_solution-currently_revealed')).to_be_checked()
     expect(page.locator('id=id_model_solution-show_zero_points_immediately')).to_be_checked()
-
