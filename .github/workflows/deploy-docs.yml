@@ -40,9 +40,9 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git clone --depth 1 --branch gh-pages https://github.com/sayravai/apluslms.github.io.git gh-pages
-          rsync -av --delete docs/_build/html/ gh-pages/docs/aplus/
-          cd gh-pages
+          git clone --depth 1 --branch master https://github.com/sayravai/apluslms.github.io.git master
+          rsync -av --delete docs/build/_build/html/ master/code/aplus/
+          cd master
           git add .
           git commit -m "Update A+ Sphinx documentation"
-          git push origin gh-pages
+          git push origin master
