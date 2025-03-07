@@ -12,6 +12,8 @@ import django
 
 sys.path.insert(0, os.path.abspath('../..'))
 
+# Set the BASE_URL environment variable if not already set
+os.environ.setdefault("BASE_URL", "http://localhost:8000/")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "aplus.settings")
 django.setup()
 
