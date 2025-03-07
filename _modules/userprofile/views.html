@@ -1,0 +1,531 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>userprofile.views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">userprofile.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for userprofile.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">unquote</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoginView</span><span class="p">,</span> <span class="n">LogoutView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.cache.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_template_fragment_key</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span><span class="p">,</span> <span class="n">HttpRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template.loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateDoesNotExist</span><span class="p">,</span> <span class="n">get_template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span><span class="p">,</span> <span class="n">translate_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_has_allowed_host_and_scheme</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_for_language</span><span class="p">,</span>
+    <span class="n">get_language</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">require_POST</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings_text</span><span class="p">,</span> <span class="n">remove_query_param_from_url</span><span class="p">,</span> <span class="n">is_ajax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfileView</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.userprofile&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AplusLoginView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.AplusLoginView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AplusLoginView</span><span class="p">(</span><span class="n">LoginView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This login view class extends the default Django login class and</span>
+<span class="sd">    overrides some of the default settings. Namely, the template and its context.&quot;&quot;&quot;</span>
+
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;userprofile/login.html&quot;</span>
+    <span class="n">redirect_authenticated_user</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># Redirecting authenticated users enables &quot;social media fingerprinting&quot;</span>
+    <span class="c1"># unless images are hosted on a different domain from the Django app.</span>
+    <span class="n">extra_context</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;shibboleth_login&#39;</span><span class="p">:</span> <span class="s1">&#39;shibboleth_login&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">,</span>
+        <span class="s1">&#39;haka_login&#39;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;HAKA_LOGIN&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="s1">&#39;mooc_login&#39;</span><span class="p">:</span> <span class="s1">&#39;social_django&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">extra_context</span><span class="p">[</span><span class="s1">&#39;haka_login&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">extra_context</span><span class="p">[</span><span class="s1">&#39;shibboleth_login&#39;</span><span class="p">]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Shibboleth login not enabled, but Haka login flag set as true.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AplusLoginView.get_context_data">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.AplusLoginView.get_context_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># The following template context parameters can not be defined in</span>
+        <span class="c1"># the class variable extra_context because they require that Django</span>
+        <span class="c1"># translations are active. That is, there must be an HTTP request so</span>
+        <span class="c1"># that the language can be defined. There is no request in the code</span>
+        <span class="c1"># in the class level, but there is a request when this method is called</span>
+        <span class="c1"># (self.request).</span>
+        <span class="n">brand_name</span> <span class="o">=</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;BRAND_NAME&#39;</span><span class="p">)</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s1">&#39;brand_name&#39;</span><span class="p">:</span> <span class="n">brand_name</span><span class="p">,</span>
+            <span class="s1">&#39;shibboleth_title_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;SHIBBOLETH_TITLE_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;shibboleth_body_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;SHIBBOLETH_BODY_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;shibboleth_button_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;SHIBBOLETH_BUTTON_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;haka_title_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;HAKA_TITLE_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;haka_body_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;HAKA_BODY_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;haka_button_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;HAKA_BUTTON_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;mooc_title_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;MOOC_TITLE_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;mooc_body_text&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;MOOC_BODY_TEXT&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;user_data_info&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;LOGIN_USER_DATA_INFO&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">brand_name</span><span class="o">=</span><span class="n">brand_name</span><span class="p">,</span>
+                <span class="n">privacy_url</span><span class="o">=</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;privacy_notice&#39;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;show_language_toggle&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+<div class="viewcode-block" id="AplusLogoutView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.AplusLogoutView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AplusLogoutView</span><span class="p">(</span><span class="n">LogoutView</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;userprofile/logout.html&quot;</span>
+<div class="viewcode-block" id="AplusLogoutView.get_context_data">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.AplusLogoutView.get_context_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;show_language_toggle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+<div class="viewcode-block" id="set_user_language">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.set_user_language">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_user_language</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overrides set_language function from django.views.i18n.&quot;&quot;&quot;</span>
+    <span class="n">LANGUAGE_PARAMETER</span> <span class="o">=</span> <span class="s1">&#39;language&#39;</span>
+    <span class="c1"># pylint: disable-next=redefined-builtin</span>
+    <span class="nb">next</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">)),</span> <span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">((</span><span class="nb">next</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">))</span> <span class="ow">and</span>
+            <span class="ow">not</span> <span class="n">url_has_allowed_host_and_scheme</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="nb">next</span><span class="p">,</span>
+                            <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">{</span><span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()},</span>
+                            <span class="n">require_https</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">is_secure</span><span class="p">())):</span>
+        <span class="nb">next</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">),</span> <span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+        <span class="nb">next</span> <span class="o">=</span> <span class="nb">next</span> <span class="ow">and</span> <span class="n">unquote</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>  <span class="c1"># HTTP_REFERER may be encoded.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url_has_allowed_host_and_scheme</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="nb">next</span><span class="p">,</span>
+                            <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">{</span><span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()},</span>
+                            <span class="n">require_https</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">is_secure</span><span class="p">()):</span>
+            <span class="nb">next</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span> <span class="k">if</span> <span class="nb">next</span> <span class="k">else</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">204</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">lang_code</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">LANGUAGE_PARAMETER</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lang_code</span> <span class="ow">and</span> <span class="n">check_for_language</span><span class="p">(</span><span class="n">lang_code</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">next</span><span class="p">:</span>
+                <span class="n">next_trans</span> <span class="o">=</span> <span class="n">translate_url</span><span class="p">(</span><span class="nb">next</span><span class="p">,</span> <span class="n">lang_code</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">next_trans</span> <span class="o">!=</span> <span class="nb">next</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">next_trans</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+                <span class="n">userprofile</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+                <span class="n">userprofile</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">lang_code</span>
+                <span class="n">userprofile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span>
+                    <span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_NAME</span><span class="p">,</span> <span class="n">lang_code</span><span class="p">,</span>
+                    <span class="n">max_age</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_AGE</span><span class="p">,</span>
+                    <span class="n">path</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_PATH</span><span class="p">,</span>
+                    <span class="n">domain</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_DOMAIN</span><span class="p">,</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span></div>
+
+
+
+<div class="viewcode-block" id="regenerate_access_token">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.regenerate_access_token">[docs]</a>
+<span class="nd">@login_required</span>
+<span class="nd">@require_POST</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">regenerate_access_token</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Regenerates the API access token.&quot;&quot;&quot;</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">regenerate_api_token</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;profile&#39;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="try_get_template">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.try_get_template">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">try_get_template</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_template</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TemplateDoesNotExist</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Template </span><span class="si">%s</span><span class="s2"> not found&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="PrivacyNoticeView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.PrivacyNoticeView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrivacyNoticeView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span><span class="o">=</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+    <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;userprofile/privacy.html&quot;</span>
+
+<div class="viewcode-block" id="PrivacyNoticeView.get_common_objects">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.PrivacyNoticeView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="n">lang</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">get_language</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">make_template_fragment_key</span><span class="p">(</span><span class="s1">&#39;privacy_notice&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">lang</span><span class="p">])</span>
+        <span class="n">privacy_text</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">privacy_text</span><span class="p">:</span>
+            <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;privacy_notice</span><span class="si">{}</span><span class="s2">.html&quot;</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No localized privacy notice for language </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No privacy notice at all!&quot;</span><span class="p">)</span>
+
+            <span class="n">privacy_text</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span> <span class="k">if</span> <span class="n">template</span> <span class="k">else</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;NO_PRIVACY_NOTICE&#39;</span><span class="p">)</span>
+            <span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">privacy_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">privacy_text</span> <span class="o">=</span> <span class="n">privacy_text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_language_toggle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;privacy_text&quot;</span><span class="p">,</span> <span class="s2">&quot;show_language_toggle&quot;</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CookieNoticeView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.CookieNoticeView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CookieNoticeView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span><span class="o">=</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+    <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;userprofile/cookies.html&quot;</span>
+
+<div class="viewcode-block" id="CookieNoticeView.get_common_objects">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.CookieNoticeView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="n">lang</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">get_language</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">make_template_fragment_key</span><span class="p">(</span><span class="s1">&#39;cookie_notice&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">lang</span><span class="p">])</span>
+        <span class="n">cookies_text</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cookies_text</span><span class="p">:</span>
+            <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;cookie_notice</span><span class="si">{}</span><span class="s2">.html&quot;</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No localized cookie notice for language </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No cookie notice at all!&quot;</span><span class="p">)</span>
+
+            <span class="n">cookies_text</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span> <span class="k">if</span> <span class="n">template</span> <span class="k">else</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;NO_COOKIE_NOTICE&#39;</span><span class="p">)</span>
+            <span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">cookies_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookies_text</span> <span class="o">=</span> <span class="n">cookies_text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_language_toggle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;cookies_text&quot;</span><span class="p">,</span> <span class="s2">&quot;show_language_toggle&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AccessibilityStatementView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.AccessibilityStatementView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AccessibilityStatementView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+    <span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;userprofile/accessibility.html&quot;</span>
+
+<div class="viewcode-block" id="AccessibilityStatementView.get_common_objects">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.AccessibilityStatementView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="n">lang</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">get_language</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">make_template_fragment_key</span><span class="p">(</span><span class="s1">&#39;accessibility_statement&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">lang</span><span class="p">])</span>
+        <span class="n">accessibility_statement</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="c1"># TODO: refactor to a helper function</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">accessibility_statement</span><span class="p">:</span>
+            <span class="n">local_template_name</span> <span class="o">=</span> <span class="s2">&quot;institution_accessibility_text</span><span class="si">{}</span><span class="s2">.html&quot;</span>
+            <span class="n">local_template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">local_template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">local_template</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">local_template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">local_template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">local_template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No localized accessibility statement for language </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+                <span class="n">local_template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">local_template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">local_template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No local accessibility content at all!&quot;</span><span class="p">)</span>
+
+            <span class="n">local_accessibility_statement</span> <span class="o">=</span> <span class="n">local_template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span> <span class="k">if</span> <span class="n">local_template</span> <span class="k">else</span> <span class="n">gettext</span><span class="p">(</span>
+                <span class="s1">&#39;NO_LOCAL_ACCESSIBILITY_STATEMENT&#39;</span>
+            <span class="p">)</span>
+
+            <span class="n">system_template_name</span> <span class="o">=</span> <span class="s2">&quot;accessibility_issues</span><span class="si">{}</span><span class="s2">.html&quot;</span>
+            <span class="n">system_template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">system_template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">system_template</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">system_template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">system_template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">system_template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No localized system accessibility content for language </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+                <span class="n">system_template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">system_template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">system_template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No system accessibility content at all!&quot;</span><span class="p">)</span>
+
+            <span class="n">system_accessibility_statement</span> <span class="o">=</span> <span class="n">system_template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span> <span class="k">if</span> <span class="n">system_template</span> <span class="k">else</span> <span class="n">gettext</span><span class="p">(</span>
+                <span class="s1">&#39;NO_SYSTEM-WIDE_ACCESSIBILITY_STATEMENT&#39;</span>
+            <span class="p">)</span>
+
+            <span class="n">accessibility_statement</span> <span class="o">=</span> <span class="n">local_accessibility_statement</span> <span class="o">+</span> <span class="n">system_accessibility_statement</span>
+            <span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">accessibility_statement</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">accessibility_statement</span> <span class="o">=</span> <span class="n">accessibility_statement</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_language_toggle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;accessibility_statement&quot;</span><span class="p">,</span> <span class="s2">&quot;show_language_toggle&quot;</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="SupportView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.SupportView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SupportView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;userprofile/support.html&quot;</span>
+    <span class="n">extra_context</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;brand_name&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;BRAND_NAME&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;brand_name_long&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;BRAND_NAME_LONG&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;brand_institution_name&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;BRAND_INSTITUTION_NAME&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="SupportView.get_common_objects">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.SupportView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="n">lang</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">get_language</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">make_template_fragment_key</span><span class="p">(</span><span class="s1">&#39;support_channels&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">lang</span><span class="p">])</span>
+        <span class="n">support_channels</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">support_channels</span><span class="p">:</span>
+            <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;support_channels</span><span class="si">{}</span><span class="s2">.html&quot;</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">lang</span><span class="p">[:</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">try_get_template</span><span class="p">(</span><span class="n">template_name</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">template</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The support page is missing&quot;</span><span class="p">)</span>
+
+            <span class="n">support_channels</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">()</span> <span class="k">if</span> <span class="n">template</span> <span class="k">else</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;NO_SUPPORT_PAGE&#39;</span><span class="p">)</span>
+
+            <span class="n">cache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">support_channels</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">support_channels</span> <span class="o">=</span> <span class="n">support_channels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_language_toggle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;support_channels&quot;</span><span class="p">,</span> <span class="s2">&quot;show_language_toggle&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ProfileView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.ProfileView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProfileView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;userprofile/profile.html&quot;</span>
+    <span class="n">extra_context</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;brand_name&#39;</span><span class="p">:</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;BRAND_NAME&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="ProfileView.get_context_data">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.ProfileView.get_context_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;is_google&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">social_auth</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="s2">&quot;google-oauth2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">SOCIAL_AUTH</span>
+            <span class="k">else</span> <span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TeacherListView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.TeacherListView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TeacherListView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">SUPERUSER</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;userprofile/teachers.html&quot;</span>
+
+<div class="viewcode-block" id="TeacherListView.entry">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.TeacherListView.entry">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">teacher</span><span class="p">:</span> <span class="n">UserProfile</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">teacher</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">teacher</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span>
+            <span class="n">teacher</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">instance</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">starting_time</span><span class="p">),</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">ending_time</span><span class="p">),</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TeacherListView.entries">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.TeacherListView.entries">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">entries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a list of entries generated by entry_generator based on</span>
+<span class="sd">        instances from the date range in the request&quot;&quot;&quot;</span>
+        <span class="n">start_date</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;start_date&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">start_date</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+
+        <span class="n">end_date</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;end_date&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+
+        <span class="c1"># get all course instances with any overlap with the date range</span>
+        <span class="n">instances</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">starting_time__date__lte</span> <span class="o">=</span> <span class="n">end_date</span><span class="p">,</span>
+            <span class="n">ending_time__date__gte</span> <span class="o">=</span> <span class="n">start_date</span>
+        <span class="p">)</span>
+
+        <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">instances</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">teacher</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="n">teacher</span><span class="p">,</span> <span class="n">instance</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;with_assistants&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">assistant</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">assistants</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                    <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entry</span><span class="p">(</span><span class="n">assistant</span><span class="p">,</span> <span class="n">instance</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">entries</span></div>
+
+
+<div class="viewcode-block" id="TeacherListView.post">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.TeacherListView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the teacher list as csv or the emails as a comma separated list&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;emails_only&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># export only the emails</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="n">csv</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># export the whole table</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="n">csv</span> <span class="o">=</span> <span class="s2">&quot;teacher,email,instance,starting time,ending time</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+                <span class="n">csv</span> <span class="o">+=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entry</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">csv</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;attachment; filename=teachers.txt&quot;</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="TeacherListView.get_context_data">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.TeacherListView.get_context_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;entries&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PseudonymizeView">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.PseudonymizeView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PseudonymizeView</span><span class="p">(</span><span class="n">BaseView</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PseudonymizeView.get">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.views.PseudonymizeView.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">pseudonymize</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pseudonymize&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s2">&quot;pseudonymize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">pseudonymize</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HTTP_REFERER&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

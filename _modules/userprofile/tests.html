@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>userprofile.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">userprofile.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for userprofile.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Course</span><span class="p">,</span> <span class="n">CourseInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectCategory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+
+<div class="viewcode-block" id="UserProfileTestCase">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.tests.UserProfileTestCase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserProfileTestCase</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UserProfileTestCase.setUpTestData">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.tests.UserProfileTestCase.setUpTestData">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpTestData</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="c1"># Set the user&#39;s id manually so that user.id is different than userprofile.id.</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">,</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s2">&quot;Superb&quot;</span><span class="p">,</span>
+            <span class="n">last_name</span><span class="o">=</span><span class="s2">&quot;Student&quot;</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="s2">&quot;test@aplus.com&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student_profile</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student_profile</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="s2">&quot;12345X&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student_profile</span><span class="o">.</span><span class="n">organization</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LOCAL_ORGANIZATION</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student_profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">grader</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="mi">102</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="s2">&quot;grader&quot;</span><span class="p">,</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s2">&quot;Grumpy&quot;</span><span class="p">,</span>
+            <span class="n">last_name</span><span class="o">=</span><span class="s2">&quot;Grader&quot;</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="s2">&quot;grader@aplus.com&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;graderPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">grader_profile</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">userprofile</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">grader_profile</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="s2">&quot;67890Y&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">grader_profile</span><span class="o">.</span><span class="n">organization</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LOCAL_ORGANIZATION</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">grader_profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="mi">103</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="s2">&quot;teacher&quot;</span><span class="p">,</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s2">&quot;Tedious&quot;</span><span class="p">,</span>
+            <span class="n">last_name</span><span class="o">=</span><span class="s2">&quot;Teacher&quot;</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="s2">&quot;teacher@aplus.com&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;teacherPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">teacher_profile</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">superuser</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="mi">104</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="s2">&quot;superuser&quot;</span><span class="p">,</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s2">&quot;Super&quot;</span><span class="p">,</span>
+            <span class="n">last_name</span><span class="o">=</span><span class="s2">&quot;User&quot;</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="s2">&quot;superuser@aplus.com&quot;</span><span class="p">,</span>
+            <span class="n">is_superuser</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">superuser</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;superuserPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">superuser</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">superuser_profile</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">superuser</span><span class="o">.</span><span class="n">userprofile</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test course&quot;</span><span class="p">,</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;Course-Url&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">two_days_from_now</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance1</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Fall 2011 day 1&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;T-00.1000_d1&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance1</span><span class="o">.</span><span class="n">add_teacher</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance1</span><span class="o">.</span><span class="n">add_assistant</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance2</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Fall 2011 day 2&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">two_days_from_now</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;T-00.1000_d2&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance2</span><span class="o">.</span><span class="n">add_teacher</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category1</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test category 1&quot;</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance1</span>
+        <span class="p">)</span>
+        <span class="c1">#cls.learning_object_category1.hidden_to.add(cls.student_profile)</span>
+        <span class="c1">#cls.learning_object_category1.hidden_to.add(cls.grader_profile)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category2</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test category 2&quot;</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance1</span>
+        <span class="p">)</span>
+        <span class="c1">#cls.learning_object_category2.hidden_to.add(cls.student_profile)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category3</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test category 3&quot;</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance2</span>
+        <span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="UserProfileTest">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.tests.UserProfileTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserProfileTest</span><span class="p">(</span><span class="n">UserProfileTestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UserProfileTest.test_user_id_not_equal_profile_id">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.tests.UserProfileTest.test_user_id_not_equal_profile_id">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_user_id_not_equal_profile_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">102</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">103</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">superuser</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">104</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student_profile</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grader_profile</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">teacher_profile</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">superuser_profile</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grader_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">superuser</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">superuser_profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserProfileTest.test_userprofile_get_by_student_id">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.tests.UserProfileTest.test_userprofile_get_by_student_id">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_userprofile_get_by_student_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student_profile</span><span class="p">,</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">get_by_student_id</span><span class="p">(</span><span class="s2">&quot;12345X&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grader_profile</span><span class="p">,</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">get_by_student_id</span><span class="p">(</span><span class="s2">&quot;67890Y&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">get_by_student_id</span><span class="p">,</span> <span class="s2">&quot;111111&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UserProfileTest.test_userprofile_unicode_string">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.tests.UserProfileTest.test_userprofile_unicode_string">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_userprofile_unicode_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;testUser (Superb Student, test@aplus.com, 12345X)&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student_profile</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;grader (Grumpy Grader, grader@aplus.com, 67890Y)&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grader_profile</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;teacher (Tedious Teacher, teacher@aplus.com)&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">teacher_profile</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;superuser (Super User, superuser@aplus.com)&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">superuser_profile</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="UserProfileTest.test_userprofile_shortname">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.tests.UserProfileTest.test_userprofile_shortname">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_userprofile_shortname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Superb S.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student_profile</span><span class="o">.</span><span class="n">shortname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Grumpy G.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grader_profile</span><span class="o">.</span><span class="n">shortname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Tedious T.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher_profile</span><span class="o">.</span><span class="n">shortname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Super U.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">superuser_profile</span><span class="o">.</span><span class="n">shortname</span><span class="p">)</span></div>
+</div>
+
+
+<span class="c1">#     def test_userprofile_reset_hidden_categories_cache(self):</span>
+<span class="c1">#         self.student_profile.reset_hidden_categories_cache()</span>
+<span class="c1">#         self.assertEqual(2, len(self.student_profile.cached_hidden_categories))</span>
+<span class="c1">#         self.assertEqual(self.learning_object_category1, self.student_profile.cached_hidden_categories[0])</span>
+<span class="c1">#         self.assertEqual(self.learning_object_category2, self.student_profile.cached_hidden_categories[1])</span>
+<span class="c1">#</span>
+<span class="c1">#         self.grader_profile.reset_hidden_categories_cache()</span>
+<span class="c1">#         self.assertEqual(1, len(self.grader_profile.cached_hidden_categories))</span>
+<span class="c1">#         self.assertEqual(self.learning_object_category1, self.grader_profile.cached_hidden_categories[0])</span>
+<span class="c1">#</span>
+<span class="c1">#         self.teacher_profile.reset_hidden_categories_cache()</span>
+<span class="c1">#         self.assertEqual(0, len(self.teacher_profile.cached_hidden_categories))</span>
+<span class="c1">#</span>
+<span class="c1">#         self.superuser_profile.reset_hidden_categories_cache()</span>
+<span class="c1">#         self.assertEqual(0, len(self.superuser_profile.cached_hidden_categories))</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#     def test_userprofile_hidden_categories_cache(self):</span>
+<span class="c1">#         student_hidden_categories_cache = self.student_profile.get_hidden_categories_cache()</span>
+<span class="c1">#         self.assertEqual(2, len(student_hidden_categories_cache))</span>
+<span class="c1">#         self.assertEqual(self.learning_object_category1, student_hidden_categories_cache[0])</span>
+<span class="c1">#         self.assertEqual(self.learning_object_category2, student_hidden_categories_cache[1])</span>
+<span class="c1">#</span>
+<span class="c1">#         grader_hidden_categories_cache = self.grader_profile.get_hidden_categories_cache()</span>
+<span class="c1">#         self.assertEqual(1, len(grader_hidden_categories_cache))</span>
+<span class="c1">#         self.assertEqual(self.learning_object_category1, grader_hidden_categories_cache[0])</span>
+<span class="c1">#</span>
+<span class="c1">#         self.assertEqual(0, len(self.teacher_profile.get_hidden_categories_cache()))</span>
+<span class="c1">#</span>
+<span class="c1">#         self.assertEqual(0, len(self.superuser_profile.get_hidden_categories_cache()))</span>
+
+<span class="c1">#     def test_studentgroup_students_from_request(self):</span>
+<span class="c1">#         requestWithGroup = HttpRequest()</span>
+<span class="c1">#         requestWithGroup.user = self.student</span>
+<span class="c1">#         requestWithGroup.META[&quot;STUDENT_GROUP&quot;] = self.student_group2</span>
+<span class="c1">#         studentsFromRequestWithGroup = StudentGroup.get_students_from_request(requestWithGroup)</span>
+<span class="c1">#         self.assertEqual(2, len(studentsFromRequestWithGroup))</span>
+<span class="c1">#         self.assertEqual(self.student_profile, studentsFromRequestWithGroup[0])</span>
+<span class="c1">#         self.assertEqual(self.grader_profile, studentsFromRequestWithGroup[1])</span>
+<span class="c1">#</span>
+<span class="c1">#         requestWithoutGroup = HttpRequest()</span>
+<span class="c1">#         requestWithoutGroup.user = self.student</span>
+<span class="c1">#         studentsFromRequestWithoutGroup = StudentGroup.get_students_from_request(requestWithoutGroup)</span>
+<span class="c1">#         self.assertEqual(1, len(studentsFromRequestWithoutGroup))</span>
+<span class="c1">#         self.assertEqual(self.student_profile, studentsFromRequestWithoutGroup[0])</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

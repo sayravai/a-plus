@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.api.core &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.api.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.api.core</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">distutils.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">LooseVersion</span> <span class="k">as</span> <span class="n">_version</span> <span class="c1"># pylint: disable=deprecated-module</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">exceptions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONRenderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.versioning</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcceptHeaderVersioning</span><span class="p">,</span> <span class="n">URLPathVersioning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.negotiation</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultContentNegotiation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.compat</span><span class="w"> </span><span class="kn">import</span> <span class="n">unicode_http_header</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">mediatypes</span>
+
+
+<span class="c1"># define this here as it&#39;s project dependent and not installation</span>
+<span class="c1"># there is no point to redefine it ever</span>
+<span class="n">APLUS_JSON_TYPE</span> <span class="o">=</span> <span class="s1">&#39;application/vnd.aplus+json&#39;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_MediaType</span><span class="p">(</span><span class="n">mediatypes</span><span class="o">.</span><span class="n">_MediaType</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Slightly modified private _MediaType class from Django REST framework.</span>
+<span class="sd">    This version has full_type property for convenience.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_type</span><span class="p">)</span>
+
+    <span class="nd">@full_type</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_type</span><span class="p">,</span> <span class="n">_sep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_type</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="nd">@full_type</span><span class="o">.</span><span class="n">deleter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_type</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sub_type</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+
+
+<div class="viewcode-block" id="APlusJSONRenderer">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.core.APlusJSONRenderer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">APlusJSONRenderer</span><span class="p">(</span><span class="n">JSONRenderer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Just mark that our own responses are aplus json and not normal one</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">media_type</span> <span class="o">=</span> <span class="n">APLUS_JSON_TYPE</span></div>
+
+
+
+<div class="viewcode-block" id="APlusVersioning">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.core.APlusVersioning">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">APlusVersioning</span><span class="p">(</span><span class="n">URLPathVersioning</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Our versioning class takes major version from URL real api version is</span>
+<span class="sd">    then read from settings based on major version.</span>
+
+<span class="sd">    If client provides version in accept header (only with correct media type)</span>
+<span class="sd">    it will be tested that it is less or equal to what we support.</span>
+
+<span class="sd">    If version in URL or in Accept header is not supported, corect html error</span>
+<span class="sd">    is returned. (URL case should not be possible if urls.py is correct).</span>
+
+<span class="sd">    Task of telling the client our api version in content type is also done here.</span>
+<span class="sd">    This is due to design of django rest framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">invalid_accept_version_message</span> <span class="o">=</span> <span class="n">AcceptHeaderVersioning</span><span class="o">.</span><span class="n">invalid_version_message</span>
+
+<div class="viewcode-block" id="APlusVersioning.determine_version">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.core.APlusVersioning.determine_version">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">determine_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">major_version</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">determine_version</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">api_version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">allowed_versions</span><span class="p">[</span><span class="n">major_version</span><span class="p">]</span>
+
+        <span class="c1">## get and update version in request media type</span>
+        <span class="c1"># this is only location where need to check the requested version and we</span>
+        <span class="c1"># update the version so the respond content type has the correct version</span>
+        <span class="n">media_type</span> <span class="o">=</span> <span class="n">_MediaType</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">accepted_media_type</span><span class="p">)</span>
+        <span class="n">accept_version</span> <span class="o">=</span> <span class="n">unicode_http_header</span><span class="p">(</span><span class="n">media_type</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version_param</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">media_type</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">version_param</span><span class="p">]</span> <span class="o">=</span> <span class="n">api_version</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+        <span class="c1"># dict values in _MediaType.params must be of type bytes.</span>
+        <span class="c1"># DRF calls val.decode(&#39;ascii&#39;) on them in _MediaType.__str__</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">accepted_media_type</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">media_type</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">accept_version</span><span class="p">:</span>
+            <span class="n">accept_major_version</span> <span class="o">=</span> <span class="n">accept_version</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">accept_major_version</span> <span class="o">!=</span> <span class="n">major_version</span> <span class="ow">or</span> <span class="n">_version</span><span class="p">(</span><span class="n">api_version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">_version</span><span class="p">(</span><span class="n">accept_version</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">NotAcceptable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">invalid_accept_version_message</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">major_version</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="APlusContentNegotiation">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.core.APlusContentNegotiation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">APlusContentNegotiation</span><span class="p">(</span><span class="n">DefaultContentNegotiation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    We add to default content negotiation feature will update all application/json</span>
+<span class="sd">    with our own type. This is not the optimal way to handle the problem.</span>
+<span class="sd">    Real solution would do it in media_type_matches function in django rest framework</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="APlusContentNegotiation.get_accept_list">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.core.APlusContentNegotiation.get_accept_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_accept_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">accept_list</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_accept_list</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">accepts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">accept</span> <span class="ow">in</span> <span class="n">accept_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">accept</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;application/json&#39;</span><span class="p">):</span>
+                <span class="c1"># convert generic json to aplus json type</span>
+                <span class="n">mt</span> <span class="o">=</span> <span class="n">_MediaType</span><span class="p">(</span><span class="n">accept</span><span class="p">)</span>
+                <span class="n">mt</span><span class="o">.</span><span class="n">full_type</span> <span class="o">=</span> <span class="n">APLUS_JSON_TYPE</span>
+                <span class="n">mt</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="c1"># ignore version for generic json types</span>
+                <span class="n">accept</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+            <span class="n">accepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accept</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">accepts</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,852 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>diploma package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">diploma package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-diploma.admin">diploma.admin module</a><ul>
+<li><a class="reference internal" href="#diploma.admin.CourseDiplomaDesignAdmin"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesignAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.admin.CourseDiplomaDesignAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesignAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.CourseDiplomaDesignAdmin.list_display_links"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesignAdmin.list_display_links</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.CourseDiplomaDesignAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesignAdmin.list_filter</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.CourseDiplomaDesignAdmin.media"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesignAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.CourseDiplomaDesignAdmin.raw_id_fields"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesignAdmin.raw_id_fields</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.CourseDiplomaDesignAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesignAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin.list_display_links"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin.list_display_links</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin.list_filter</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin.media"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin.raw_id_fields"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin.raw_id_fields</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin.readonly_fields"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin.readonly_fields</span></code></a></li>
+<li><a class="reference internal" href="#diploma.admin.StudentDiplomaAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">StudentDiplomaAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-diploma.grade">diploma.grade module</a><ul>
+<li><a class="reference internal" href="#diploma.grade.assign_grade"><code class="docutils literal notranslate"><span class="pre">assign_grade()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.grade.calculate_grade"><code class="docutils literal notranslate"><span class="pre">calculate_grade()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-diploma.models">diploma.models module</a><ul>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.USERGROUP"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.USERGROUP</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.availability"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.availability</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.body"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.body</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.course"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.course</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.course_id"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.course_id</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.date"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.date</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.exercises_to_pass"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.exercises_to_pass</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.get_availability_display"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.get_availability_display()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.id"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.id</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.logo"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.logo</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.modules_to_pass"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.modules_to_pass</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.objects"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.objects</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.pad_points"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.pad_points</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.point_limits"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.point_limits</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.signature_name"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.signature_name</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.signature_title"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.signature_title</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.small_print"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.small_print</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.studentdiploma_set"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.studentdiploma_set</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.CourseDiplomaDesign.title"><code class="docutils literal notranslate"><span class="pre">CourseDiplomaDesign.title</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma"><code class="docutils literal notranslate"><span class="pre">StudentDiploma</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.ABSOLUTE_URL_NAME"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.ABSOLUTE_URL_NAME</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.created"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.created</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.design"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.design</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.design_id"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.design_id</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.generate_hashkey"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.generate_hashkey()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.get_next_by_created"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.get_next_by_created()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.get_previous_by_created"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.get_previous_by_created()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.get_url_kwargs"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.get_url_kwargs()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.grade"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.grade</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.hashkey"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.hashkey</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.id"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.id</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.name"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.name</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.objects"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.objects</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.profile"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.profile</span></code></a></li>
+<li><a class="reference internal" href="#diploma.models.StudentDiploma.profile_id"><code class="docutils literal notranslate"><span class="pre">StudentDiploma.profile_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#diploma.models.build_upload_dir"><code class="docutils literal notranslate"><span class="pre">build_upload_dir()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-diploma.pdf">diploma.pdf module</a><ul>
+<li><a class="reference internal" href="#diploma.pdf.render_diploma"><code class="docutils literal notranslate"><span class="pre">render_diploma()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.pdf.text_lines"><code class="docutils literal notranslate"><span class="pre">text_lines()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-diploma.tests">diploma.tests module</a><ul>
+<li><a class="reference internal" href="#diploma.tests.GradeTest"><code class="docutils literal notranslate"><span class="pre">GradeTest</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.DIFFICULTY_BOUNDS"><code class="docutils literal notranslate"><span class="pre">GradeTest.DIFFICULTY_BOUNDS</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.GRADE_0"><code class="docutils literal notranslate"><span class="pre">GradeTest.GRADE_0</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.GRADE_1"><code class="docutils literal notranslate"><span class="pre">GradeTest.GRADE_1</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.GRADE_2"><code class="docutils literal notranslate"><span class="pre">GradeTest.GRADE_2</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.GRADE_3"><code class="docutils literal notranslate"><span class="pre">GradeTest.GRADE_3</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.GRADE_4"><code class="docutils literal notranslate"><span class="pre">GradeTest.GRADE_4</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.GRADE_5"><code class="docutils literal notranslate"><span class="pre">GradeTest.GRADE_5</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.NORMAL_BOUNDS"><code class="docutils literal notranslate"><span class="pre">GradeTest.NORMAL_BOUNDS</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.TotalsMock"><code class="docutils literal notranslate"><span class="pre">GradeTest.TotalsMock</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.test_difficulty_points"><code class="docutils literal notranslate"><span class="pre">GradeTest.test_difficulty_points()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.test_normal_points"><code class="docutils literal notranslate"><span class="pre">GradeTest.test_normal_points()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.tests.GradeTest.test_padded_difficulty_points"><code class="docutils literal notranslate"><span class="pre">GradeTest.test_padded_difficulty_points()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-diploma.urls">diploma.urls module</a></li>
+<li><a class="reference internal" href="#module-diploma.views">diploma.views module</a><ul>
+<li><a class="reference internal" href="#diploma.views.DiplomaCreateView"><code class="docutils literal notranslate"><span class="pre">DiplomaCreateView</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.views.DiplomaCreateView.access_mode"><code class="docutils literal notranslate"><span class="pre">DiplomaCreateView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#diploma.views.DiplomaCreateView.post"><code class="docutils literal notranslate"><span class="pre">DiplomaCreateView.post()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#diploma.views.DiplomaListView"><code class="docutils literal notranslate"><span class="pre">DiplomaListView</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.views.DiplomaListView.access_mode"><code class="docutils literal notranslate"><span class="pre">DiplomaListView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#diploma.views.DiplomaListView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">DiplomaListView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.views.DiplomaListView.template_name"><code class="docutils literal notranslate"><span class="pre">DiplomaListView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#diploma.views.DiplomaMixin"><code class="docutils literal notranslate"><span class="pre">DiplomaMixin</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.views.DiplomaMixin.diploma_kw"><code class="docutils literal notranslate"><span class="pre">DiplomaMixin.diploma_kw</span></code></a></li>
+<li><a class="reference internal" href="#diploma.views.DiplomaMixin.get_course_instance_object"><code class="docutils literal notranslate"><span class="pre">DiplomaMixin.get_course_instance_object()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.views.DiplomaMixin.get_profile_object"><code class="docutils literal notranslate"><span class="pre">DiplomaMixin.get_profile_object()</span></code></a></li>
+<li><a class="reference internal" href="#diploma.views.DiplomaMixin.userprofile_kw"><code class="docutils literal notranslate"><span class="pre">DiplomaMixin.userprofile_kw</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#diploma.views.DiplomaPdfView"><code class="docutils literal notranslate"><span class="pre">DiplomaPdfView</span></code></a><ul>
+<li><a class="reference internal" href="#diploma.views.DiplomaPdfView.get"><code class="docutils literal notranslate"><span class="pre">DiplomaPdfView.get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-diploma">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">diploma package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/diploma.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="diploma-package">
+<h1>diploma package<a class="headerlink" href="#diploma-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="diploma.migrations.html">diploma.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="diploma.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diploma.migrations.html#module-diploma.migrations.0001_initial">diploma.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diploma.migrations.html#module-diploma.migrations.0002_coursediplomadesign_availability">diploma.migrations.0002_coursediplomadesign_availability module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0002_coursediplomadesign_availability.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0002_coursediplomadesign_availability.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0002_coursediplomadesign_availability.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diploma.migrations.html#module-diploma.migrations.0003_alter_coursediplomadesign_availability">diploma.migrations.0003_alter_coursediplomadesign_availability module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0003_alter_coursediplomadesign_availability.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0003_alter_coursediplomadesign_availability.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0003_alter_coursediplomadesign_availability.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diploma.migrations.html#module-diploma.migrations.0004_auto_20210812_1536">diploma.migrations.0004_auto_20210812_1536 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0004_auto_20210812_1536.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0004_auto_20210812_1536.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="diploma.migrations.html#diploma.migrations.0004_auto_20210812_1536.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diploma.migrations.html#module-diploma.migrations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="diploma.templatetags.html">diploma.templatetags package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="diploma.templatetags.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="diploma.templatetags.html#module-diploma.templatetags.diploma">diploma.templatetags.diploma module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="diploma.templatetags.html#diploma.templatetags.diploma.diploma_button"><code class="docutils literal notranslate"><span class="pre">diploma_button()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="diploma.templatetags.html#module-diploma.templatetags">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-diploma.admin">
+<span id="diploma-admin-module"></span><h2>diploma.admin module<a class="headerlink" href="#module-diploma.admin" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.admin.CourseDiplomaDesignAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.admin.</span></span><span class="sig-name descname"><span class="pre">CourseDiplomaDesignAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/admin.html#CourseDiplomaDesignAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.admin.CourseDiplomaDesignAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.CourseDiplomaDesignAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course',</span> <span class="pre">'availability',</span> <span class="pre">'title',</span> <span class="pre">'date')</span></em><a class="headerlink" href="#diploma.admin.CourseDiplomaDesignAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.CourseDiplomaDesignAdmin.list_display_links">
+<span class="sig-name descname"><span class="pre">list_display_links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course',</span> <span class="pre">'title')</span></em><a class="headerlink" href="#diploma.admin.CourseDiplomaDesignAdmin.list_display_links" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.CourseDiplomaDesignAdmin.list_filter">
+<span class="sig-name descname"><span class="pre">list_filter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('course',</span> <span class="pre">&lt;class</span> <span class="pre">'django.contrib.admin.filters.RelatedOnlyFieldListFilter'&gt;),)</span></em><a class="headerlink" href="#diploma.admin.CourseDiplomaDesignAdmin.list_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="diploma.admin.CourseDiplomaDesignAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#diploma.admin.CourseDiplomaDesignAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.CourseDiplomaDesignAdmin.raw_id_fields">
+<span class="sig-name descname"><span class="pre">raw_id_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course',</span> <span class="pre">'exercises_to_pass',</span> <span class="pre">'modules_to_pass')</span></em><a class="headerlink" href="#diploma.admin.CourseDiplomaDesignAdmin.raw_id_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.CourseDiplomaDesignAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course__instance_name',</span> <span class="pre">'course__course__code',</span> <span class="pre">'course__course__name',</span> <span class="pre">'title')</span></em><a class="headerlink" href="#diploma.admin.CourseDiplomaDesignAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.admin.</span></span><span class="sig-name descname"><span class="pre">StudentDiplomaAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/admin.html#StudentDiplomaAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('design',</span> <span class="pre">'profile',</span> <span class="pre">'created',</span> <span class="pre">'grade')</span></em><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin.list_display_links">
+<span class="sig-name descname"><span class="pre">list_display_links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('profile',)</span></em><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin.list_display_links" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin.list_filter">
+<span class="sig-name descname"><span class="pre">list_filter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(('design__course',</span> <span class="pre">&lt;class</span> <span class="pre">'django.contrib.admin.filters.RelatedOnlyFieldListFilter'&gt;),)</span></em><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin.list_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin.raw_id_fields">
+<span class="sig-name descname"><span class="pre">raw_id_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('design',</span> <span class="pre">'profile')</span></em><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin.raw_id_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin.readonly_fields">
+<span class="sig-name descname"><span class="pre">readonly_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('created',)</span></em><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin.readonly_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.admin.StudentDiplomaAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('name',</span> <span class="pre">'profile__student_id',</span> <span class="pre">'profile__user__username',</span> <span class="pre">'profile__user__first_name',</span> <span class="pre">'profile__user__last_name',</span> <span class="pre">'profile__user__email',</span> <span class="pre">'design__course__instance_name',</span> <span class="pre">'design__course__course__code',</span> <span class="pre">'design__course__course__name')</span></em><a class="headerlink" href="#diploma.admin.StudentDiplomaAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-diploma.grade">
+<span id="diploma-grade-module"></span><h2>diploma.grade module<a class="headerlink" href="#module-diploma.grade" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="diploma.grade.assign_grade">
+<span class="sig-prename descclassname"><span class="pre">diploma.grade.</span></span><span class="sig-name descname"><span class="pre">assign_grade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cached_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.cache.html#exercise.cache.points.CachedPoints" title="exercise.cache.points.CachedPoints"><span class="pre">CachedPoints</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">diploma_design</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#diploma.models.CourseDiplomaDesign" title="diploma.models.CourseDiplomaDesign"><span class="pre">CourseDiplomaDesign</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/diploma/grade.html#assign_grade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.grade.assign_grade" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diploma.grade.calculate_grade">
+<span class="sig-prename descclassname"><span class="pre">diploma.grade.</span></span><span class="sig-name descname"><span class="pre">calculate_grade</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.cache.html#exercise.cache.points.Totals" title="exercise.cache.points.Totals"><span class="pre">Totals</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_limits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/diploma/grade.html#calculate_grade"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.grade.calculate_grade" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-diploma.models">
+<span id="diploma-models-module"></span><h2>diploma.models module<a class="headerlink" href="#module-diploma.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.models.</span></span><span class="sig-name descname"><span class="pre">CourseDiplomaDesign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">availability</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signature_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signature_title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">small_print</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_limits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/models.html#CourseDiplomaDesign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.models.CourseDiplomaDesign" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.USERGROUP">
+<span class="sig-name descname"><span class="pre">USERGROUP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;lib.helpers.Enum</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.USERGROUP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.availability">
+<span class="sig-name descname"><span class="pre">availability</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.availability" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.body">
+<span class="sig-name descname"><span class="pre">body</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.body" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.course">
+<span class="sig-name descname"><span class="pre">course</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.course" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.course_id">
+<span class="sig-name descname"><span class="pre">course_id</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.course_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.date">
+<span class="sig-name descname"><span class="pre">date</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.date" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.exercises_to_pass">
+<span class="sig-name descname"><span class="pre">exercises_to_pass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">models.ManyToManyField</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.html#exercise.exercise_models.BaseExercise" title="exercise.exercise_models.BaseExercise"><span class="pre">BaseExercise</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'CourseDiplomaDesign'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.exercises_to_pass" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.get_availability_display">
+<span class="sig-name descname"><span class="pre">get_availability_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.IntegerField:</span> <span class="pre">availability&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.get_availability_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.logo">
+<span class="sig-name descname"><span class="pre">logo</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.logo" title="Link to this definition"></a></dt>
+<dd><p>Just like the FileDescriptor, but for ImageFields. The only difference is
+assigning the width/height to the width_field/height_field, if appropriate.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.modules_to_pass">
+<span class="sig-name descname"><span class="pre">modules_to_pass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">models.ManyToManyField</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="course.html#course.models.CourseModule" title="course.models.CourseModule"><span class="pre">CourseModule</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'CourseDiplomaDesign'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.modules_to_pass" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.pad_points">
+<span class="sig-name descname"><span class="pre">pad_points</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.pad_points" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.point_limits">
+<span class="sig-name descname"><span class="pre">point_limits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.point_limits" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.signature_name">
+<span class="sig-name descname"><span class="pre">signature_name</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.signature_name" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.signature_title">
+<span class="sig-name descname"><span class="pre">signature_title</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.signature_title" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.small_print">
+<span class="sig-name descname"><span class="pre">small_print</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.small_print" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.studentdiploma_set">
+<span class="sig-name descname"><span class="pre">studentdiploma_set</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.studentdiploma_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.CourseDiplomaDesign.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#diploma.models.CourseDiplomaDesign.title" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.models.</span></span><span class="sig-name descname"><span class="pre">StudentDiploma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">design</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hashkey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grade</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/models.html#StudentDiploma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.models.StudentDiploma" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.models.UrlMixin" title="lib.models.UrlMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">UrlMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.ABSOLUTE_URL_NAME">
+<span class="sig-name descname"><span class="pre">ABSOLUTE_URL_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'diploma-view'</span></em><a class="headerlink" href="#diploma.models.StudentDiploma.ABSOLUTE_URL_NAME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.created">
+<span class="sig-name descname"><span class="pre">created</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.created" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.design">
+<span class="sig-name descname"><span class="pre">design</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.design" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.design_id">
+<span class="sig-name descname"><span class="pre">design_id</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.design_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.generate_hashkey">
+<span class="sig-name descname"><span class="pre">generate_hashkey</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/diploma/models.html#StudentDiploma.generate_hashkey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.models.StudentDiploma.generate_hashkey" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.get_next_by_created">
+<span class="sig-name descname"><span class="pre">get_next_by_created</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">created&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diploma.models.StudentDiploma.get_next_by_created" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.get_previous_by_created">
+<span class="sig-name descname"><span class="pre">get_previous_by_created</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">created&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#diploma.models.StudentDiploma.get_previous_by_created" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.get_url_kwargs">
+<span class="sig-name descname"><span class="pre">get_url_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/models.html#StudentDiploma.get_url_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.models.StudentDiploma.get_url_kwargs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.grade">
+<span class="sig-name descname"><span class="pre">grade</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.grade" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.hashkey">
+<span class="sig-name descname"><span class="pre">hashkey</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.hashkey" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.name" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.models.StudentDiploma.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.profile">
+<span class="sig-name descname"><span class="pre">profile</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.profile" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.models.StudentDiploma.profile_id">
+<span class="sig-name descname"><span class="pre">profile_id</span></span><a class="headerlink" href="#diploma.models.StudentDiploma.profile_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diploma.models.build_upload_dir">
+<span class="sig-prename descclassname"><span class="pre">diploma.models.</span></span><span class="sig-name descname"><span class="pre">build_upload_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/models.html#build_upload_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.models.build_upload_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-diploma.pdf">
+<span id="diploma-pdf-module"></span><h2>diploma.pdf module<a class="headerlink" href="#module-diploma.pdf" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="diploma.pdf.render_diploma">
+<span class="sig-prename descclassname"><span class="pre">diploma.pdf.</span></span><span class="sig-name descname"><span class="pre">render_diploma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diploma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/pdf.html#render_diploma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.pdf.render_diploma" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="diploma.pdf.text_lines">
+<span class="sig-prename descclassname"><span class="pre">diploma.pdf.</span></span><span class="sig-name descname"><span class="pre">text_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_map</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/pdf.html#text_lines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.pdf.text_lines" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-diploma.tests">
+<span id="diploma-tests-module"></span><h2>diploma.tests module<a class="headerlink" href="#module-diploma.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.tests.</span></span><span class="sig-name descname"><span class="pre">GradeTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/tests.html#GradeTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.tests.GradeTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.DIFFICULTY_BOUNDS">
+<span class="sig-name descname"><span class="pre">DIFFICULTY_BOUNDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[[['A',</span> <span class="pre">1800],</span> <span class="pre">['B',</span> <span class="pre">0],</span> <span class="pre">['C',</span> <span class="pre">0]],</span> <span class="pre">[['A',</span> <span class="pre">1900],</span> <span class="pre">['B',</span> <span class="pre">400],</span> <span class="pre">['C',</span> <span class="pre">0]],</span> <span class="pre">[['A',</span> <span class="pre">1900],</span> <span class="pre">['B',</span> <span class="pre">875],</span> <span class="pre">['C',</span> <span class="pre">0]],</span> <span class="pre">[['A',</span> <span class="pre">1900],</span> <span class="pre">['B',</span> <span class="pre">875],</span> <span class="pre">['C',</span> <span class="pre">350]],</span> <span class="pre">[['A',</span> <span class="pre">1900],</span> <span class="pre">['B',</span> <span class="pre">875],</span> <span class="pre">['C',</span> <span class="pre">600]]]</span></em><a class="headerlink" href="#diploma.tests.GradeTest.DIFFICULTY_BOUNDS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.GRADE_0">
+<span class="sig-name descname"><span class="pre">GRADE_0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;diploma.tests.GradeTest.TotalsMock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.tests.GradeTest.GRADE_0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.GRADE_1">
+<span class="sig-name descname"><span class="pre">GRADE_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;diploma.tests.GradeTest.TotalsMock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.tests.GradeTest.GRADE_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.GRADE_2">
+<span class="sig-name descname"><span class="pre">GRADE_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;diploma.tests.GradeTest.TotalsMock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.tests.GradeTest.GRADE_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.GRADE_3">
+<span class="sig-name descname"><span class="pre">GRADE_3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;diploma.tests.GradeTest.TotalsMock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.tests.GradeTest.GRADE_3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.GRADE_4">
+<span class="sig-name descname"><span class="pre">GRADE_4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;diploma.tests.GradeTest.TotalsMock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.tests.GradeTest.GRADE_4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.GRADE_5">
+<span class="sig-name descname"><span class="pre">GRADE_5</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;diploma.tests.GradeTest.TotalsMock</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#diploma.tests.GradeTest.GRADE_5" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.NORMAL_BOUNDS">
+<span class="sig-name descname"><span class="pre">NORMAL_BOUNDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[10,</span> <span class="pre">20,</span> <span class="pre">30,</span> <span class="pre">40,</span> <span class="pre">50]</span></em><a class="headerlink" href="#diploma.tests.GradeTest.NORMAL_BOUNDS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.TotalsMock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TotalsMock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/tests.html#GradeTest.TotalsMock"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.tests.GradeTest.TotalsMock" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.test_difficulty_points">
+<span class="sig-name descname"><span class="pre">test_difficulty_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/tests.html#GradeTest.test_difficulty_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.tests.GradeTest.test_difficulty_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.test_normal_points">
+<span class="sig-name descname"><span class="pre">test_normal_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/tests.html#GradeTest.test_normal_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.tests.GradeTest.test_normal_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.tests.GradeTest.test_padded_difficulty_points">
+<span class="sig-name descname"><span class="pre">test_padded_difficulty_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/tests.html#GradeTest.test_padded_difficulty_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.tests.GradeTest.test_padded_difficulty_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-diploma.urls">
+<span id="diploma-urls-module"></span><h2>diploma.urls module<a class="headerlink" href="#module-diploma.urls" title="Link to this heading"></a></h2>
+</section>
+<section id="module-diploma.views">
+<span id="diploma-views-module"></span><h2>diploma.views module<a class="headerlink" href="#module-diploma.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.views.DiplomaCreateView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.views.</span></span><span class="sig-name descname"><span class="pre">DiplomaCreateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/views.html#DiplomaCreateView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaCreateView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#diploma.views.DiplomaMixin" title="diploma.views.DiplomaMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiplomaMixin</span></code></a>, <a class="reference internal" href="lib.html#lib.viewbase.BaseRedirectView" title="lib.viewbase.BaseRedirectView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRedirectView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.views.DiplomaCreateView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#diploma.views.DiplomaCreateView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.views.DiplomaCreateView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HttpRequest</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">HttpResponse</span></span></span><a class="reference internal" href="_modules/diploma/views.html#DiplomaCreateView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaCreateView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.views.DiplomaListView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.views.</span></span><span class="sig-name descname"><span class="pre">DiplomaListView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/views.html#DiplomaListView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaListView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#diploma.views.DiplomaMixin" title="diploma.views.DiplomaMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiplomaMixin</span></code></a>, <a class="reference internal" href="lib.html#lib.viewbase.BaseTemplateView" title="lib.viewbase.BaseTemplateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTemplateView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.views.DiplomaListView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#diploma.views.DiplomaListView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.views.DiplomaListView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/diploma/views.html#DiplomaListView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaListView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.views.DiplomaListView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'diploma/list.html'</span></em><a class="headerlink" href="#diploma.views.DiplomaListView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.views.DiplomaMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.views.</span></span><span class="sig-name descname"><span class="pre">DiplomaMixin</span></span><a class="reference internal" href="_modules/diploma/views.html#DiplomaMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="course.html#course.viewbase.CourseInstanceMixin" title="course.viewbase.CourseInstanceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseInstanceMixin</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.views.DiplomaMixin.diploma_kw">
+<span class="sig-name descname"><span class="pre">diploma_kw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'coursediploma_id'</span></em><a class="headerlink" href="#diploma.views.DiplomaMixin.diploma_kw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.views.DiplomaMixin.get_course_instance_object">
+<span class="sig-name descname"><span class="pre">get_course_instance_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/views.html#DiplomaMixin.get_course_instance_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaMixin.get_course_instance_object" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.views.DiplomaMixin.get_profile_object">
+<span class="sig-name descname"><span class="pre">get_profile_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/views.html#DiplomaMixin.get_profile_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaMixin.get_profile_object" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="diploma.views.DiplomaMixin.userprofile_kw">
+<span class="sig-name descname"><span class="pre">userprofile_kw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile_id'</span></em><a class="headerlink" href="#diploma.views.DiplomaMixin.userprofile_kw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="diploma.views.DiplomaPdfView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">diploma.views.</span></span><span class="sig-name descname"><span class="pre">DiplomaPdfView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/views.html#DiplomaPdfView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaPdfView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">View</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="diploma.views.DiplomaPdfView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/diploma/views.html#DiplomaPdfView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#diploma.views.DiplomaPdfView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-diploma">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-diploma" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

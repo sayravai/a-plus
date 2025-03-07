@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.staff_views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.staff_views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.staff_views</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ngettext_lazy</span> <span class="k">as</span> <span class="n">ngettext</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings_text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseFormView</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">,</span> <span class="n">BaseRedirectMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.pseudonymize</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_user</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.students</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedStudent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnrollStudentsForm</span><span class="p">,</span> <span class="n">GroupEditForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Enrollment</span><span class="p">,</span>
+    <span class="n">USERTAG_EXTERNAL</span><span class="p">,</span>
+    <span class="n">USERTAG_INTERNAL</span><span class="p">,</span>
+    <span class="n">StudentGroup</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstanceBaseView</span><span class="p">,</span> <span class="n">CourseInstanceMixin</span>
+
+
+<div class="viewcode-block" id="format_group">
+<a class="viewcode-back" href="../../course.html#course.staff_views.format_group">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_group</span><span class="p">(</span><span class="n">group</span><span class="p">:</span> <span class="n">StudentGroup</span><span class="p">,</span> <span class="n">pseudonymized</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">pseudonymized</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">group</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">format_user</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">group</span></div>
+
+
+
+<div class="viewcode-block" id="ParticipantsView">
+<a class="viewcode-back" href="../../course.html#course.staff_views.ParticipantsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParticipantsView</span><span class="p">(</span><span class="n">CourseInstanceBaseView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/staff/participants.html&quot;</span>
+
+<div class="viewcode-block" id="ParticipantsView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.staff_views.ParticipantsView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">USERTAG_INTERNAL</span><span class="p">,</span> <span class="n">USERTAG_EXTERNAL</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">usertags</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="c1"># Maps enum name (e.g. &quot;ACTIVE&quot;) to string (e.g. &quot;Active&quot;).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrollment_statuses</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="p">[</span><span class="nb">getattr</span><span class="p">(</span><span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="p">,</span> <span class="n">k</span><span class="p">)])</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrollment_statuses_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enrollment_statuses</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">participants</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_students_with_tags</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">internal_user_label</span> <span class="o">=</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;INTERNAL_USER_LABEL&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_user_label</span> <span class="o">=</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;EXTERNAL_USER_LABEL&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span>
+            <span class="s1">&#39;participants&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;enrollment_statuses&#39;</span><span class="p">,</span> <span class="s1">&#39;enrollment_statuses_json&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;internal_user_label&#39;</span><span class="p">,</span> <span class="s1">&#39;external_user_label&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_students_with_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="n">ci</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="n">fake</span> <span class="o">=</span> <span class="s1">&#39;10&#39;</span> <span class="o">*</span> <span class="mi">32</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;user-results&#39;</span><span class="p">,</span>
+                         <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">fake</span><span class="p">,</span> <span class="o">**</span><span class="n">ci</span><span class="o">.</span><span class="n">get_url_kwargs</span><span class="p">()})</span>
+                <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">fake</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">{</span><span class="n">t</span><span class="o">.</span><span class="n">slug</span><span class="p">:</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">}</span>
+        <span class="c1"># Maps enum value (e.g. 1) to name (e.g. &quot;ACTIVE&quot;).</span>
+        <span class="n">statuses</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">k</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">participants</span> <span class="o">=</span> <span class="n">ci</span><span class="o">.</span><span class="n">all_students</span><span class="o">.</span><span class="n">prefetch_tags</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">participant</span> <span class="ow">in</span> <span class="n">participants</span><span class="p">:</span>
+            <span class="n">format_user</span><span class="p">(</span><span class="n">participant</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span><span class="p">,</span> <span class="n">participant</span><span class="p">)</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">participant</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">user_tags</span> <span class="o">=</span> <span class="n">CachedStudent</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">participant</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+            <span class="n">user_tags_html</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="n">slug</span><span class="p">]</span><span class="o">.</span><span class="n">html_label</span> <span class="k">for</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">user_tags</span><span class="p">[</span><span class="s1">&#39;tag_slugs&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">slug</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">participant</span><span class="o">.</span><span class="n">student_id</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+                <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="n">participant</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="n">participant</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="n">participant</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">participant</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;external&#39;</span><span class="p">:</span> <span class="n">participant</span><span class="o">.</span><span class="n">is_external</span><span class="p">,</span>
+                <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">link</span> <span class="o">%</span> <span class="p">(</span><span class="n">user_id</span><span class="p">,),</span>
+                <span class="o">**</span><span class="n">user_tags</span><span class="p">,</span>
+                <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="n">user_tags_html</span><span class="p">,</span>
+                <span class="s1">&#39;enrollment_status&#39;</span><span class="p">:</span> <span class="n">statuses</span><span class="p">[</span><span class="n">participant</span><span class="o">.</span><span class="n">enrollment_status</span><span class="p">],</span>
+            <span class="p">})</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="GroupsView">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GroupsView</span><span class="p">(</span><span class="n">CourseInstanceBaseView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/staff/groups.html&quot;</span>
+
+<div class="viewcode-block" id="GroupsView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+                <span class="n">models</span><span class="o">.</span><span class="n">Prefetch</span><span class="p">(</span><span class="s1">&#39;members&#39;</span><span class="p">,</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_tags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
+            <span class="n">format_group</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s1">&#39;groups&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GroupsEditView">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsEditView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GroupsEditView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">GroupEditForm</span>
+    <span class="n">group_kw</span> <span class="o">=</span> <span class="s2">&quot;group_id&quot;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/staff/group_edit.html&quot;</span>
+
+<div class="viewcode-block" id="GroupsEditView.get_resource_objects">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsEditView.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="n">gid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_kw</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">gid</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">StudentGroup</span><span class="p">,</span>
+                <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+                <span class="nb">id</span><span class="o">=</span><span class="n">gid</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">StudentGroup</span><span class="p">(</span><span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span></div>
+
+
+<div class="viewcode-block" id="GroupsEditView.get_form_kwargs">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsEditView.get_form_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_form_kwargs</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;instance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="GroupsEditView.get_success_url">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsEditView.get_success_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;groups-list&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupsEditView.form_valid">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsEditView.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;SUCCESS_SAVING_CHANGES&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupsEditView.form_invalid">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsEditView.form_invalid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;FAILURE_SAVING_CHANGES&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_invalid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GroupsDeleteView">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsDeleteView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GroupsDeleteView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseRedirectMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span>
+    <span class="n">group_kw</span> <span class="o">=</span> <span class="s2">&quot;group_id&quot;</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/staff/group_delete.html&quot;</span>
+
+<div class="viewcode-block" id="GroupsDeleteView.get_resource_objects">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsDeleteView.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="n">StudentGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+                <span class="n">models</span><span class="o">.</span><span class="n">Prefetch</span><span class="p">(</span><span class="s1">&#39;members&#39;</span><span class="p">,</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_tags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">))</span>
+            <span class="p">),</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group_kw</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">format_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupsDeleteView.post">
+<a class="viewcode-back" href="../../course.html#course.staff_views.GroupsDeleteView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;groups-list&#39;</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EnrollStudentsView">
+<a class="viewcode-back" href="../../course.html#course.staff_views.EnrollStudentsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnrollStudentsView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">EnrollStudentsForm</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/staff/enroll_students.html&quot;</span>
+
+<div class="viewcode-block" id="EnrollStudentsView.get_form_kwargs">
+<a class="viewcode-back" href="../../course.html#course.staff_views.EnrollStudentsView.get_form_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_form_kwargs</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;instance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="EnrollStudentsView.form_valid">
+<a class="viewcode-back" href="../../course.html#course.staff_views.EnrollStudentsView.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sis_id</span> <span class="ow">and</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;sis&quot;</span><span class="p">]):</span>
+            <span class="n">addcount</span><span class="p">,</span> <span class="n">delcount</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">enroll_from_sis</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">addcount</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># ngettext works only with one parameter at a time, hence the complicated setup.</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+                    <span class="n">format_lazy</span><span class="p">(</span>
+                        <span class="n">ngettext</span><span class="p">(</span>
+                            <span class="s1">&#39;STUDENT_ENROLLED_FROM_SIS -- </span><span class="si">{addcount}</span><span class="s1">&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;STUDENTS_ENROLLED_FROM_SIS -- </span><span class="si">{addcount}</span><span class="s1">&#39;</span><span class="p">,</span>
+                            <span class="n">addcount</span>
+                        <span class="p">),</span>
+                        <span class="n">addcount</span><span class="o">=</span><span class="n">addcount</span><span class="p">,</span>
+                    <span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">format_lazy</span><span class="p">(</span>
+                        <span class="n">ngettext</span><span class="p">(</span>
+                            <span class="s1">&#39;STUDENT_REMOVED_FROM_SIS -- </span><span class="si">{delcount}</span><span class="s1">&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;STUDENTS_REMOVED_FROM_SIS -- </span><span class="si">{delcount}</span><span class="s1">&#39;</span><span class="p">,</span>
+                            <span class="n">delcount</span>
+                        <span class="p">),</span>
+                        <span class="n">delcount</span><span class="o">=</span><span class="n">delcount</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COULD_NOT_ACCESS_SIS&#39;</span><span class="p">))</span>
+
+        <span class="n">failed_already_enrolled</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">failed_course_staff</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;user_profiles&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+                <span class="c1"># Course staff cannot be demoted into students by enrolling</span>
+                <span class="c1"># them via this view.</span>
+                <span class="n">failed_course_staff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+                <span class="c1"># If the selected student was already enrolled,</span>
+                <span class="c1"># we can show a warning here.</span>
+                <span class="n">failed_already_enrolled</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">failed_already_enrolled</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+                <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ENROLLMENTS_FAILED_WARNING_USERS_ALREADY_ENROLLED -- </span><span class="si">{users}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">users</span><span class="o">=</span><span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">profile</span><span class="o">.</span><span class="n">name_with_student_id</span> <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">failed_already_enrolled</span><span class="p">]),</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">failed_course_staff</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+                <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ENROLLMENTS_FAILED_WARNING_COURSE_STAFF -- </span><span class="si">{users}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">users</span><span class="o">=</span><span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">failed_course_staff</span><span class="p">]),</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnrollStudentsView.get_success_url">
+<a class="viewcode-back" href="../../course.html#course.staff_views.EnrollStudentsView.get_success_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;participants&#39;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,865 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.api.views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.api.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.api.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">filters</span><span class="p">,</span> <span class="n">viewsets</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">mixins</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">action</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParseError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">api_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework_extensions.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedViewSetMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IsAdminUser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span><span class="p">,</span> <span class="n">QuerySet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">api_reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">edit_course.operations.configure</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_from_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModuleContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">REGEX_INT</span><span class="p">,</span> <span class="n">REGEX_INT_ME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.filters</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldValuesFilter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListSerializerMixin</span><span class="p">,</span> <span class="n">MeUserMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseStatisticsView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.email_messages</span><span class="w"> </span><span class="kn">import</span> <span class="n">email_course_instance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_aplus_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">news.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">News</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Enrollment</span><span class="p">,</span>
+    <span class="n">USERTAG_EXTERNAL</span><span class="p">,</span>
+    <span class="n">USERTAG_INTERNAL</span><span class="p">,</span>
+    <span class="n">CourseInstance</span><span class="p">,</span>
+    <span class="n">CourseModule</span><span class="p">,</span>
+    <span class="n">StudentGroup</span><span class="p">,</span>
+    <span class="n">UserTag</span><span class="p">,</span>
+    <span class="n">UserTagging</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseResourceMixin</span><span class="p">,</span>
+    <span class="n">CourseModuleResourceMixin</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..permissions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">JWTInstanceWritePermission</span><span class="p">,</span>
+    <span class="n">OnlyCourseTeacherPermission</span><span class="p">,</span>
+    <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="n">OnlyEnrolledStudentOrCourseStaffPermission</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseBriefSerializer</span><span class="p">,</span> <span class="n">CourseStudentGroupBriefSerializer</span><span class="p">,</span> <span class="n">StudentBriefSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.full_serializers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseNewsSerializer</span><span class="p">,</span>
+    <span class="n">CourseSerializer</span><span class="p">,</span>
+    <span class="n">CourseStatisticsSerializer</span><span class="p">,</span>
+    <span class="n">CourseStudentGroupSerializer</span><span class="p">,</span>
+    <span class="n">CourseUsertagSerializer</span><span class="p">,</span>
+    <span class="n">CourseUsertaggingsSerializer</span><span class="p">,</span>
+    <span class="n">CourseWriteSerializer</span><span class="p">,</span>
+    <span class="n">TreeCourseModuleSerializer</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="CourseViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseViewSet</span><span class="p">(</span><span class="n">ListSerializerMixin</span><span class="p">,</span>
+                    <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                    <span class="n">viewsets</span><span class="o">.</span><span class="n">ModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `courses` endpoint returns information about all course instances.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/`:</span>
+<span class="sd">        returns a list of all courses.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/`:</span>
+<span class="sd">        returns the details of a specific course.</span>
+
+<span class="sd">    `POST /courses/`:</span>
+<span class="sd">        creates a new course instance. Requires admin privileges. Following attributes can be given:</span>
+
+<span class="sd">    * `name`: Name of the course.</span>
+<span class="sd">    * `code`: Course code. If a course with this code does not exist, it will be created.</span>
+<span class="sd">    * `course_url`: URL slug for the course</span>
+<span class="sd">    * `instance_name`</span>
+<span class="sd">    * `url`: course instance URL. If this is not given, the URL will be generated from instance_name.</span>
+<span class="sd">    * `language`</span>
+<span class="sd">    * `starting_time`</span>
+<span class="sd">    * `ending_time`</span>
+<span class="sd">    * `visible_to_students`</span>
+<span class="sd">    * `configure_url`: the configuration URL for MOOC grader.</span>
+<span class="sd">    * `teachers`: list of teacher usernames on the course.</span>
+<span class="sd">      If given user does not exist, the user will be created.</span>
+<span class="sd">      Only the username of created user is set.</span>
+<span class="sd">      If user logs in using external authentication service such as Haka,</span>
+<span class="sd">      the other user attributes will be updated on first login.</span>
+
+<span class="sd">    `PUT /courses/&lt;course_id&gt;/`:</span>
+<span class="sd">        modifies the attributes of a specific course. Attributes that are modified:</span>
+<span class="sd">        `instance_name`, `url`, `language`, `starting_time`, `ending_time`,</span>
+<span class="sd">        `visible_to_students`, `configure_url`, `teachers`.</span>
+<span class="sd">        Only the course instance data can be modified. Course code, name, or URL</span>
+<span class="sd">        cannot be modified using this API. Requires admin privileges.</span>
+
+<span class="sd">    `POST /courses/&lt;course_id&gt;/notify_update/`:</span>
+<span class="sd">        triggers a course update and returns JSON {errors: &lt;error list&gt;, success: &lt;bool&gt;}.</span>
+<span class="sd">        Following attributes can be given:</span>
+
+<span class="sd">    * `email_on_error`: whether to send an email to instance staff on error</span>
+
+<span class="sd">    `POST /courses/&lt;course_id&gt;/send_mail/`:</span>
+<span class="sd">        sends an email to course instance&#39;s technical contacts (or teachers if</span>
+<span class="sd">        there are no technical contacts). Empty response on success, otherwise</span>
+<span class="sd">        returns the error. Following attributes can be given:</span>
+
+<span class="sd">    * `subject`: email subject</span>
+<span class="sd">    * `message`: email body</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;course_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT</span>
+    <span class="n">listserializer_class</span> <span class="o">=</span> <span class="n">CourseBriefSerializer</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CourseSerializer</span>
+
+<div class="viewcode-block" id="CourseViewSet.get_queryset">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span>
+                 <span class="o">.</span><span class="n">get_visible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                 <span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseViewSet.get_object">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseViewSet.get_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_member_object</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="s1">&#39;Course&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseViewSet.get_permissions">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseViewSet.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span><span class="n">IsAdminUser</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseViewSet.get_serializer_class">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseViewSet.get_serializer_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_serializer_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="s1">&#39;PUT&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">CourseWriteSerializer</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_serializer_class</span><span class="p">()</span></div>
+
+
+    <span class="c1"># get_permissions lambda overwrites the normal version used for the above methods</span>
+<div class="viewcode-block" id="CourseViewSet.notify_update">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseViewSet.notify_update">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;post&quot;</span><span class="p">],</span> <span class="n">get_permissions</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">JWTInstanceWritePermission</span><span class="p">()])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notify_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">success</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">configure_from_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">configure_url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_lazy</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR -- </span><span class="si">{error!s}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+            <span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">errors</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email_on_error&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">subject</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;COURSE_UPDATE_WARNINGS_SUBJECT -- </span><span class="si">{instance}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">subject</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;COURSE_UPDATE_ERRORS_SUBJECT -- </span><span class="si">{instance}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="n">email_course_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">subject</span><span class="p">),</span> <span class="n">message</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;ERROR_EMAIL_FAILED&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;ERROR_EMAIL_FAILED&quot;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">({</span>
+            <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="n">errors</span><span class="p">,</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span>
+        <span class="p">})</span></div>
+
+
+    <span class="c1"># get_permissions lambda overwrites the normal version used for the above methods</span>
+<div class="viewcode-block" id="CourseViewSet.send_mail">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseViewSet.send_mail">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;post&quot;</span><span class="p">],</span> <span class="n">get_permissions</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">JWTInstanceWritePermission</span><span class="p">()])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_mail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">subject</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="n">email_course_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;SEND_EMAIL_FAILED&quot;</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseExercisesViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseExercisesViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseExercisesViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                             <span class="n">CourseModuleResourceMixin</span><span class="p">,</span>
+                             <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                             <span class="n">viewsets</span><span class="o">.</span><span class="n">ViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `exercises` endpoint returns information about the course modules</span>
+<span class="sd">    defined in the course instance, and the exercises defined in those modules.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/exercises/`:</span>
+<span class="sd">        returns a list of all modules and their exercises.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/exercises/&lt;exercisemodule_id&gt;/`:</span>
+<span class="sd">        returns the details and exercises of a specific module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;exercisemodule_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;course_instance.id&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__recurse_exercises</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">module</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ModuleContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span><span class="p">],</span>
+            <span class="n">exercises</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">submittable</span><span class="p">:</span>
+                <span class="n">exercise_dictionary</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">build_aplus_url</span><span class="p">(</span>
+                        <span class="n">api_reverse</span><span class="p">(</span><span class="s1">&#39;exercise-detail&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span><span class="p">}),</span>
+                        <span class="kc">True</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;html_url&#39;</span><span class="p">:</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+                    <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s1">&#39;max_points&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">max_points</span><span class="p">,</span>
+                    <span class="s1">&#39;max_submissions&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">max_submissions</span><span class="p">,</span>
+                    <span class="s1">&#39;hierarchical_name&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">hierarchical_name</span><span class="p">,</span>
+                    <span class="s1">&#39;difficulty&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">difficulty</span><span class="p">,</span>
+                    <span class="s1">&#39;has_submittable_files&#39;</span><span class="p">:</span> <span class="n">child</span><span class="o">.</span><span class="n">has_submittable_files</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">exercises</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exercise_dictionary</span><span class="p">)</span>
+
+            <span class="c1"># Both exercises and chapters may have children.</span>
+            <span class="c1"># (Chapters are &quot;non-submittable exercises&quot; in the cache.)</span>
+            <span class="n">exercises</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recurse_exercises</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">exercises</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">exercises</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__module_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">ModuleContent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;exercisemodule_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">module_dictionary</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="n">api_reverse</span><span class="p">(</span><span class="s2">&quot;course-exercises-detail&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">),</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="s1">&#39;html_url&#39;</span><span class="p">:</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">link</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="s1">&#39;display_name&#39;</span><span class="p">:</span> <span class="n">module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;is_open&#39;</span><span class="p">:</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">check_is_open</span><span class="p">(</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">reading_opening_time</span><span class="p">,</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span><span class="p">,</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;reading_opening_time&#39;</span><span class="p">:</span> <span class="n">module</span><span class="o">.</span><span class="n">reading_opening_time</span><span class="p">,</span>
+            <span class="s1">&#39;opening_time&#39;</span><span class="p">:</span> <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span><span class="p">,</span>
+            <span class="s1">&#39;closing_time&#39;</span><span class="p">:</span> <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">module_dictionary</span><span class="p">[</span><span class="s1">&#39;exercises&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recurse_exercises</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="n">module_dictionary</span>
+
+<div class="viewcode-block" id="CourseExercisesViewSet.list">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseExercisesViewSet.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">is_visible</span><span class="p">():</span>
+                <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__module_to_dict</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">),</span> <span class="s2">&quot;next&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;previous&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;results&#39;</span><span class="p">:</span> <span class="n">modules</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="CourseExercisesViewSet.retrieve">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseExercisesViewSet.retrieve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="c1"># try to get the module list index</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">module_index</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;exercisemodule_id&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__module_to_dict</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseExerciseTreeViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseExerciseTreeViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseExerciseTreeViewSet</span><span class="p">(</span><span class="n">CourseResourceMixin</span><span class="p">,</span>
+                                <span class="n">viewsets</span><span class="o">.</span><span class="n">ViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `tree` endpoint returns the modules, chapters and exercises of the</span>
+<span class="sd">    course in a sorted tree-like structure.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/tree/`:</span>
+<span class="sd">        returns the tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># To build the tree, this viewset uses the `CachedContent` class, which</span>
+    <span class="c1"># contains the course&#39;s chapters and exercises in a hierarchical structure.</span>
+    <span class="c1"># The CachedContent instance is accessed through the `self.content`</span>
+    <span class="c1"># attribute, which is defined in the `CourseInstanceBaseMixin` base class.</span>
+
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">TreeCourseModuleSerializer</span>
+
+<div class="viewcode-block" id="CourseExerciseTreeViewSet.list">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseExerciseTreeViewSet.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer_class</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">modules</span><span class="p">,</span>
+            <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span> <span class="s1">&#39;request&#39;</span><span class="p">:</span> <span class="n">request</span> <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">response_data</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;modules&#39;</span><span class="p">:</span> <span class="n">serializer</span><span class="o">.</span><span class="n">data</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">response_data</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseStudentsViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseStudentsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseStudentsViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                            <span class="n">MeUserMixin</span><span class="p">,</span>
+                            <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                            <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `students` endpoint returns information about the students that have</span>
+<span class="sd">    enrolled in the course.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/students/`:</span>
+<span class="sd">        returns a list of all students.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/students/&lt;user_id&gt;/`:</span>
+<span class="sd">        returns the details of a specific student.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/students/me/`:</span>
+<span class="sd">        returns the details of the current user.</span>
+
+<span class="sd">    `DELETE /courses/&lt;course_id&gt;/students/&lt;user_id&gt;/`:</span>
+<span class="sd">        removes the enrollment. Students cannot unenroll themselves.</span>
+
+<span class="sd">    - URL parameters:</span>
+<span class="sd">        - `status`: the new status for the enrollment. `REMOVED` and `BANNED`</span>
+<span class="sd">            are currently supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">filter_backends</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+        <span class="n">filters</span><span class="o">.</span><span class="n">SearchFilter</span><span class="p">,</span>
+        <span class="n">FieldValuesFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;user__first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;user__last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;student_id&#39;</span><span class="p">,</span> <span class="s1">&#39;user__email&#39;</span><span class="p">]</span>
+    <span class="n">field_values_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;student_id&#39;</span><span class="p">:</span> <span class="s1">&#39;student_id&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;user__email&#39;</span><span class="p">}</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span> <span class="c1"># UserPofile.user.id</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">StudentBriefSerializer</span>
+
+<div class="viewcode-block" id="CourseStudentsViewSet.get_queryset">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseStudentsViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span></div>
+
+
+<div class="viewcode-block" id="CourseStudentsViewSet.destroy">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseStudentsViewSet.destroy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+                <span class="s1">&#39;Student self-unenrollment is not allowed. Contact course &#39;</span>
+                <span class="s1">&#39;staff if you wish to remove your enrollment.&#39;</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span>
+            <span class="p">)</span>
+
+        <span class="n">status_arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">status_arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+                <span class="s1">&#39;Invalid status&#39;</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+            <span class="p">)</span>
+        <span class="n">status_code</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="p">,</span> <span class="n">status_arg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">status_code</span> <span class="o">==</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+                <span class="s1">&#39;Enrollments cannot be activated via this API&#39;</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+            <span class="p">)</span>
+        <span class="c1"># if status_code != Enrollment.ENROLLMENT_STATUS.REMOVED and not self.is_course_staff:</span>
+        <span class="c1">#     return Response(</span>
+        <span class="c1">#         &#39;Students can only unenroll themselves (status=REMOVED) via this API&#39;,</span>
+        <span class="c1">#         status=status.HTTP_403_FORBIDDEN</span>
+        <span class="c1">#     )</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">enrollment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_enrollment_for</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">enrollment</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status_code</span>
+        <span class="n">enrollment</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_204_NO_CONTENT</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseUsertagsViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseUsertagsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseUsertagsViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                            <span class="n">CourseModuleResourceMixin</span><span class="p">,</span>
+                            <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                            <span class="n">mixins</span><span class="o">.</span><span class="n">CreateModelMixin</span><span class="p">,</span>
+                            <span class="n">mixins</span><span class="o">.</span><span class="n">RetrieveModelMixin</span><span class="p">,</span>
+                            <span class="n">mixins</span><span class="o">.</span><span class="n">DestroyModelMixin</span><span class="p">,</span>
+                            <span class="n">mixins</span><span class="o">.</span><span class="n">ListModelMixin</span><span class="p">,</span>
+                            <span class="n">viewsets</span><span class="o">.</span><span class="n">GenericViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `usertags` endpoint returns information about the student tags defined</span>
+<span class="sd">    in the course, and can also create and delete student tags.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/usertags/`:</span>
+<span class="sd">        returns a list of all student tags.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/usertags/&lt;usertag_id&gt;/`:</span>
+<span class="sd">        returns the details of a specific student tag.</span>
+
+<span class="sd">    `POST /courses/&lt;course_id&gt;/usertags/`:</span>
+<span class="sd">        creates a new student tag.</span>
+
+<span class="sd">    - Body data:</span>
+<span class="sd">        - `slug`</span>
+<span class="sd">        - `name`</span>
+<span class="sd">        - `description`</span>
+<span class="sd">        - `visible_to_students`</span>
+<span class="sd">        - `color`</span>
+
+<span class="sd">    `DELETE /courses/&lt;course_id&gt;/usertags/&lt;usertag_id&gt;/`:</span>
+<span class="sd">        deletes a specific student tag.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">OnlyCourseTeacherPermission</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;usertag_id&#39;</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CourseUsertagSerializer</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">UserTag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;course_instance_id&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="CourseUsertagsViewSet.list">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseUsertagsViewSet.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">())</span>
+        <span class="n">tags</span> <span class="o">=</span> <span class="p">[</span><span class="n">USERTAG_INTERNAL</span><span class="p">,</span> <span class="n">USERTAG_EXTERNAL</span><span class="p">]</span>
+        <span class="n">tags</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">queryset</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">paginate_queryset</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">page</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">serializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_serializer</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_paginated_response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_serializer</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseUsertagsViewSet.get_serializer_context">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseUsertagsViewSet.get_serializer_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_serializer_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_serializer_context</span><span class="p">()</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_id&#39;</span><span class="p">]</span> <span class="p">})</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseUsertaggingsViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseUsertaggingsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseUsertaggingsViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                                <span class="n">CourseModuleResourceMixin</span><span class="p">,</span>
+                                <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                                <span class="n">mixins</span><span class="o">.</span><span class="n">CreateModelMixin</span><span class="p">,</span>
+                                <span class="n">mixins</span><span class="o">.</span><span class="n">RetrieveModelMixin</span><span class="p">,</span>
+                                <span class="n">mixins</span><span class="o">.</span><span class="n">DestroyModelMixin</span><span class="p">,</span>
+                                <span class="n">mixins</span><span class="o">.</span><span class="n">ListModelMixin</span><span class="p">,</span>
+                                <span class="n">viewsets</span><span class="o">.</span><span class="n">GenericViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `taggings` endpoint returns information about the student tags applied</span>
+<span class="sd">    to the student of the course, and can also apply tags to users and remove</span>
+<span class="sd">    them.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/taggings/`:</span>
+<span class="sd">        returns a list of all student taggings.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/taggings/&lt;usertag_id&gt;/`:</span>
+<span class="sd">        returns the details of a specific student tagging.</span>
+
+<span class="sd">    `POST /courses/&lt;course_id&gt;/taggings/`:</span>
+<span class="sd">        creates a new student tagging.</span>
+
+<span class="sd">    - Body data:</span>
+<span class="sd">        - `tag.slug`</span>
+<span class="sd">        - One of:</span>
+<span class="sd">            - `user.id`</span>
+<span class="sd">            - `user.student_id`</span>
+<span class="sd">            - `user.username`</span>
+<span class="sd">            - `user.email`</span>
+
+<span class="sd">    `DELETE /courses/&lt;course_id&gt;/taggings/`:</span>
+<span class="sd">        deletes a user tag from one or more students.</span>
+
+<span class="sd">    - URL parameters:</span>
+<span class="sd">        - `tag_id`: id of the tag to be deleted</span>
+<span class="sd">        - `user_id`: id of the student from which the tag will be deleted</span>
+<span class="sd">            (repeated for each student)</span>
+
+<span class="sd">    `DELETE /courses/&lt;course_id&gt;/taggings/&lt;usertag_id&gt;/`:</span>
+<span class="sd">        deletes a specific student tagging.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">OnlyCourseTeacherPermission</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;usertag_id&#39;</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CourseUsertaggingsSerializer</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">UserTagging</span><span class="o">.</span><span class="n">objects</span>
+        <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;tag&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;user__user&#39;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s1">&#39;tag__id&#39;</span><span class="p">,</span> <span class="s1">&#39;tag__course_instance&#39;</span><span class="p">,</span> <span class="s1">&#39;tag__name&#39;</span><span class="p">,</span> <span class="s1">&#39;tag__slug&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;user__user__id&#39;</span><span class="p">,</span> <span class="s1">&#39;user__user__email&#39;</span><span class="p">,</span> <span class="s1">&#39;user__user__username&#39;</span><span class="p">,</span> <span class="s1">&#39;user__student_id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;user__user__first_name&#39;</span><span class="p">,</span> <span class="s1">&#39;user__user__last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;user__organization&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;course_instance__id&#39;</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;user__user__id&#39;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;course_instance_id&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="CourseUsertaggingsViewSet.get_serializer_context">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseUsertaggingsViewSet.get_serializer_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_serializer_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_serializer_context</span><span class="p">()</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_id&#39;</span><span class="p">]</span> <span class="p">})</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+
+<div class="viewcode-block" id="CourseUsertaggingsViewSet.filter_queryset">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseUsertaggingsViewSet.filter_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queryset</span><span class="p">):</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">filter_queryset</span><span class="p">(</span><span class="n">queryset</span><span class="p">)</span>
+        <span class="n">tag_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tag_id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tag_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">tag__id</span><span class="o">=</span><span class="n">tag_id</span><span class="p">)</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user__user__id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryset</span></div>
+
+
+<div class="viewcode-block" id="CourseUsertaggingsViewSet.destroy_many">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseUsertaggingsViewSet.destroy_many">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">destroy_many</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Destroy taggings based on GET query parameters.</span>
+
+<span class="sd">        The detail view requires the ID of the tagging, but this method can</span>
+<span class="sd">        search for the tagging with other parameters.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">filter_args</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">tag_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tag_id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tag_id</span><span class="p">:</span>
+            <span class="n">filter_args</span><span class="p">[</span><span class="s1">&#39;tag__id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tag_slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tag_slug&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">tag_slug</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="s1">&#39;Either &quot;tag_id&quot; or &quot;tag_slug&quot; query parameter must be supplied.&#39;</span><span class="p">)</span>
+            <span class="n">filter_args</span><span class="p">[</span><span class="s1">&#39;tag__slug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_slug</span>
+        <span class="n">user_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;user_id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user_ids</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="s1">&#39;One or more user IDs must be supplied with the &quot;user_id&quot; query parameter.&#39;</span><span class="p">)</span>
+        <span class="n">filter_args</span><span class="p">[</span><span class="s1">&#39;user__user__id__in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_ids</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_args</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_204_NO_CONTENT</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseOwnStudentGroupsViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseOwnStudentGroupsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseOwnStudentGroupsViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                                    <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                                    <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `mygroups` endpoint returns information about the user&#39;s own student</span>
+<span class="sd">    groups defined in the course. Teachers receive only their own groups as</span>
+<span class="sd">    well.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/mygroups/`:</span>
+<span class="sd">        returns a list of all groups.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/mygroups/&lt;id&gt;/`:</span>
+<span class="sd">        returns the details of a specific group.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">OnlyEnrolledStudentOrCourseStaffPermission</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CourseStudentGroupBriefSerializer</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;course_instance.id&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="CourseOwnStudentGroupsViewSet.get_queryset">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseOwnStudentGroupsViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">StudentGroup</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">StudentGroup</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+                <span class="n">members</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;course_instance&#39;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseStudentGroupsViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseStudentGroupsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseStudentGroupsViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                                 <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                                 <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `mygroups` endpoint returns information about all student groups</span>
+<span class="sd">    defined in the course.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/groups/`:</span>
+<span class="sd">        returns a list of all groups.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/groups/&lt;id&gt;/`:</span>
+<span class="sd">        returns the details of a specific group.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">OnlyCourseTeacherPermission</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CourseStudentGroupSerializer</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">StudentGroup</span><span class="o">.</span><span class="n">objects</span>
+        <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;course_instance&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;course_instance.id&#39;</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="CourseNewsViewSet">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseNewsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseNewsViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                        <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                        <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `news` endpoint returns information about course news.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/news/`:</span>
+<span class="sd">        returns a list of all news items.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/news/&lt;id&gt;/`:</span>
+<span class="sd">        returns the details of a specific news.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">OnlyEnrolledStudentOrCourseStaffPermission</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CourseNewsSerializer</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;course_instance.id&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="CourseNewsViewSet.get_queryset">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseNewsViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">News</span><span class="p">]:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">AUDIENCE</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">News</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;course_instance&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+            <span class="c1"># Filter out unpublished news based on the publish date</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">publish__lte</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">is_external</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">Q</span><span class="p">(</span><span class="n">audience</span><span class="o">=</span><span class="n">AUDIENCE</span><span class="o">.</span><span class="n">ALL_USERS</span><span class="p">)</span> <span class="o">|</span>
+                    <span class="n">Q</span><span class="p">(</span><span class="n">audience</span><span class="o">=</span><span class="n">AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">audience</span><span class="o">=</span><span class="n">AUDIENCE</span><span class="o">.</span><span class="n">ALL_USERS</span><span class="p">)</span> <span class="o">|</span>
+                <span class="n">Q</span><span class="p">(</span><span class="n">audience</span><span class="o">=</span><span class="n">AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryset</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseStatisticsView">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseStatisticsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseStatisticsView</span><span class="p">(</span><span class="n">BaseStatisticsView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns submission statistics for a course, over a given time window.</span>
+
+<span class="sd">    Returns the following attributes:</span>
+
+<span class="sd">    - `submission_count`: total number of submissions.</span>
+<span class="sd">    - `submitters`: number of users submitting.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/statistics/`:</span>
+<span class="sd">        returns the statistics for the given course.</span>
+
+<span class="sd">    - URL parameters:</span>
+<span class="sd">        - `endtime`: date and time in ISO 8601 format indicating the end point</span>
+<span class="sd">          of time window we are interested in. Default: now.</span>
+<span class="sd">        - `starttime`: date and time in ISO 8601 format indicating the start point</span>
+<span class="sd">          of time window we are interested in. Default: one day before endtime</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">CourseStatisticsSerializer</span>
+
+<div class="viewcode-block" id="CourseStatisticsView.get_queryset">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseStatisticsView.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span>
+        <span class="n">course_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_id&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise__course_module__course_instance</span><span class="o">=</span><span class="n">course_id</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseStatisticsView.get_object">
+<a class="viewcode-back" href="../../../course.api.html#course.api.views.CourseStatisticsView.get_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_id&#39;</span><span class="p">]</span> <span class="p">})</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

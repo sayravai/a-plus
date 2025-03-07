@@ -1,0 +1,605 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edit_course.operations package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">edit_course.operations package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-edit_course.operations.batch">edit_course.operations.batch module</a><ul>
+<li><a class="reference internal" href="#edit_course.operations.batch.create_submissions"><code class="docutils literal notranslate"><span class="pre">create_submissions()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-edit_course.operations.clone">edit_course.operations.clone module</a><ul>
+<li><a class="reference internal" href="#edit_course.operations.clone.clone"><code class="docutils literal notranslate"><span class="pre">clone()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.clone.set_sis"><code class="docutils literal notranslate"><span class="pre">set_sis()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-edit_course.operations.configure">edit_course.operations.configure module</a><ul>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts"><code class="docutils literal notranslate"><span class="pre">ConfigParts</span></code></a><ul>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.categories"><code class="docutils literal notranslate"><span class="pre">ConfigParts.categories</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.category_key_map"><code class="docutils literal notranslate"><span class="pre">ConfigParts.category_key_map</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.category_names"><code class="docutils literal notranslate"><span class="pre">ConfigParts.category_names</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.config"><code class="docutils literal notranslate"><span class="pre">ConfigParts.config</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.diff"><code class="docutils literal notranslate"><span class="pre">ConfigParts.diff()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.from_config"><code class="docutils literal notranslate"><span class="pre">ConfigParts.from_config()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.module_keys"><code class="docutils literal notranslate"><span class="pre">ConfigParts.module_keys</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.module_lobject_keys"><code class="docutils literal notranslate"><span class="pre">ConfigParts.module_lobject_keys</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.module_lobjects"><code class="docutils literal notranslate"><span class="pre">ConfigParts.module_lobjects</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.ConfigParts.modules"><code class="docutils literal notranslate"><span class="pre">ConfigParts.modules</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#edit_course.operations.configure.configure"><code class="docutils literal notranslate"><span class="pre">configure()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.configure_from_url"><code class="docutils literal notranslate"><span class="pre">configure_from_url()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.get_build_log"><code class="docutils literal notranslate"><span class="pre">get_build_log()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.get_config_changes"><code class="docutils literal notranslate"><span class="pre">get_config_changes()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.get_lobject_changes"><code class="docutils literal notranslate"><span class="pre">get_lobject_changes()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.lobject_class"><code class="docutils literal notranslate"><span class="pre">lobject_class()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_bool"><code class="docutils literal notranslate"><span class="pre">parse_bool()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_choices"><code class="docutils literal notranslate"><span class="pre">parse_choices()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_date"><code class="docutils literal notranslate"><span class="pre">parse_date()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_duration"><code class="docutils literal notranslate"><span class="pre">parse_duration()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_float"><code class="docutils literal notranslate"><span class="pre">parse_float()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_int"><code class="docutils literal notranslate"><span class="pre">parse_int()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_model_solution_chapter"><code class="docutils literal notranslate"><span class="pre">parse_model_solution_chapter()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.parse_reveal_rule"><code class="docutils literal notranslate"><span class="pre">parse_reveal_rule()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.remove_newlines"><code class="docutils literal notranslate"><span class="pre">remove_newlines()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.set_order_information"><code class="docutils literal notranslate"><span class="pre">set_order_information()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.update_learning_objects"><code class="docutils literal notranslate"><span class="pre">update_learning_objects()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.configure.validate_lobject"><code class="docutils literal notranslate"><span class="pre">validate_lobject()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-edit_course.operations.tests">edit_course.operations.tests module</a><ul>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest"><code class="docutils literal notranslate"><span class="pre">ConfigureTest</span></code></a><ul>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.check_categories_config"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.check_categories_config()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.check_fields"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.check_fields()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.check_instance_config"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.check_instance_config()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.check_lobject_config"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.check_lobject_config()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.check_module_config"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.check_module_config()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.config"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.config</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.configure_and_test"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.configure_and_test()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.course"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.course</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.get_category_by_key"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.get_category_by_key()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.get_category_by_name"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.get_category_by_name()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.get_exercise_config"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.get_exercise_config()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.get_lti_service"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.get_lti_service()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.get_module_config"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.get_module_config()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.insert_exercise"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.insert_exercise()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.insert_module"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.insert_module()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.instance"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.instance</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.remove_category"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.remove_category()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.remove_exercise"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.remove_exercise()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.remove_module"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.remove_module()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.setUp"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.set_category"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.set_category()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.tearDown"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.tearDown()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.test_categories"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.test_categories()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.test_changing_type"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.test_changing_type()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.test_exercises"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.test_exercises()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.test_field_defined_by_dict"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.test_field_defined_by_dict()</span></code></a></li>
+<li><a class="reference internal" href="#edit_course.operations.tests.ConfigureTest.test_modules"><code class="docutils literal notranslate"><span class="pre">ConfigureTest.test_modules()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-edit_course.operations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">edit_course.operations package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/edit_course.operations.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="edit-course-operations-package">
+<h1>edit_course.operations package<a class="headerlink" href="#edit-course-operations-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-edit_course.operations.batch">
+<span id="edit-course-operations-batch-module"></span><h2>edit_course.operations.batch module<a class="headerlink" href="#module-edit_course.operations.batch" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.batch.create_submissions">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.batch.</span></span><span class="sig-name descname"><span class="pre">create_submissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/batch.html#create_submissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.batch.create_submissions" title="Link to this definition"></a></dt>
+<dd><p>Batch creates submissions and feedback from formatted JSON.</p>
+</dd></dl>
+
+</section>
+<section id="module-edit_course.operations.clone">
+<span id="edit-course-operations-clone-module"></span><h2>edit_course.operations.clone module<a class="headerlink" href="#module-edit_course.operations.clone" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.clone.clone">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.clone.</span></span><span class="sig-name descname"><span class="pre">clone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cloner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone_teachers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone_assistants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone_usertags</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clone_menuitems</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">siskey</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sisenroll</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/clone.html#clone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.clone.clone" title="Link to this definition"></a></dt>
+<dd><p>Clones the course instance and returns the new saved instance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.clone.set_sis">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.clone.</span></span><span class="sig-name descname"><span class="pre">set_sis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enroll</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/clone.html#set_sis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.clone.set_sis" title="Link to this definition"></a></dt>
+<dd><p>Set teachers, starting time and ending based on Student Information System.</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt>instance</dt><dd><p>The course instance to be modified</p>
+</dd>
+<dt>id</dt><dd><p>Course realisation identifier used by the SIS system</p>
+</dd>
+<dt>enroll</dt><dd><p>Boolean value indicating whether or not students
+from the local organization must enroll through SIS</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+<section id="module-edit_course.operations.configure">
+<span id="edit-course-operations-configure-module"></span><h2>edit_course.operations.configure module<a class="headerlink" href="#module-edit_course.operations.configure" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">ConfigParts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_key_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modules</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_lobjects</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_lobject_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#ConfigParts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.ConfigParts" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains the course config split into separate fields for easier handling.</p>
+<p>The version returned by ConfigParts.diff has a few specialties:
+- categories, modules, and module_lobjects only contain the changed fields
+and some supplemental fields that are required elsewhere. E.g. to identify
+the lobject class type.
+- <a href="#id1"><span class="problematic" id="id2">*</span></a>_names and <a href="#id3"><span class="problematic" id="id4">*</span></a>_keys fields contain whatever the &lt;new&gt; config contained. I.e. they
+contain the set of all such keys. E.g. module_keys contains the keys of
+all modules in the &lt;new&gt; config. They can be used to determined whether
+a module, exercise, etc. still exists in the course config even if nothing
+has changed (e.g. module config disappears from the modules field in the
+.diff() result if it had no changes).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.categories">
+<span class="sig-name descname"><span class="pre">categories</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.categories" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.category_key_map">
+<span class="sig-name descname"><span class="pre">category_key_map</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.category_key_map" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.category_names">
+<span class="sig-name descname"><span class="pre">category_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.category_names" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.diff">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#edit_course.operations.configure.ConfigParts" title="edit_course.operations.configure.ConfigParts"><span class="pre">ConfigParts</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#edit_course.operations.configure.ConfigParts" title="edit_course.operations.configure.ConfigParts"><span class="pre">ConfigParts</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#edit_course.operations.configure.ConfigParts" title="edit_course.operations.configure.ConfigParts"><span class="pre">ConfigParts</span></a></span></span><a class="reference internal" href="_modules/edit_course/operations/configure.html#ConfigParts.diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.diff" title="Link to this definition"></a></dt>
+<dd><p>Return a new ConfigParts object containing the differences between the old and new configs</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.from_config">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#ConfigParts.from_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.from_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.module_keys">
+<span class="sig-name descname"><span class="pre">module_keys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.module_keys" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.module_lobject_keys">
+<span class="sig-name descname"><span class="pre">module_lobject_keys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.module_lobject_keys" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.module_lobjects">
+<span class="sig-name descname"><span class="pre">module_lobjects</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.module_lobjects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.configure.ConfigParts.modules">
+<span class="sig-name descname"><span class="pre">modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#edit_course.operations.configure.ConfigParts.modules" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.configure">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/edit_course/operations/configure.html#configure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.configure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.configure_from_url">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">configure_from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/edit_course/operations/configure.html#configure_from_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.configure_from_url" title="Link to this definition"></a></dt>
+<dd><p>Configures course content by trusted remote URL.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.get_build_log">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">get_build_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#get_build_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.get_build_log" title="Link to this definition"></a></dt>
+<dd><p>Request latest build log from the build log URL defined for instance.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.get_config_changes">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">get_config_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recurser</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_unchanged</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/configure.html#get_config_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.get_config_changes" title="Link to this definition"></a></dt>
+<dd><p>Gets changes between configs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old</strong> – old config</p></li>
+<li><p><strong>new</strong> – new config</p></li>
+</ul>
+</dd>
+</dl>
+<p>Keyword-only parameters:
+:param keep: fields in &lt;new&gt; to add to output as-is (unless no changes were detected,
+see the &lt;keep_unchanged&gt; param).
+:param keep_unchanged: whether to add fields in &lt;keep&gt; to output even when they
+have no changes. Fields in &lt;keep&gt; are normally not added to output
+if there were no changes in the dict itself. E.g. comparison of {“field”: “value”} to
+itself will return None no matter what is in &lt;keep&gt; if &lt;keep_unchanged&gt; is False. If
+instead &lt;keep&gt; = “field” and &lt;keep_unchanged&gt; = True, the function returns
+{“field”: “value”}.</p>
+<p>Returns None if &lt;new&gt; == &lt;old&gt; (and &lt;keep_unchanged&gt; is False). Otherwise:
+Finds the differences in dicts &lt;new&gt; and &lt;old&gt; where &lt;recurser&gt; is used to find differences
+between dict values. If the values for a key differ, the value in &lt;new&gt; is added to output.
+If the values are the same, the key is removed from the output.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.get_lobject_changes">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">get_lobject_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">old:</span> <span class="pre">~typing.Dict[str,</span> <span class="pre">~typing.Any],</span> <span class="pre">new:</span> <span class="pre">~typing.Dict[str,</span> <span class="pre">~typing.Any],</span> <span class="pre">*,</span> <span class="pre">recurser:</span> <span class="pre">~typing.Callable[[dict,</span> <span class="pre">dict],</span> <span class="pre">dict</span> <span class="pre">|</span> <span class="pre">None]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">functools.partial(&lt;function</span> <span class="pre">get_config_changes&gt;,</span> <span class="pre">keep=['children',</span> <span class="pre">'category',</span> <span class="pre">'target_category',</span> <span class="pre">'target_url',</span> <span class="pre">'max_submissions',</span> <span class="pre">'lti']),</span> <span class="pre">keep:</span> <span class="pre">~typing.List[str]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">keep_unchanged:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#edit_course.operations.configure.get_lobject_changes" title="Link to this definition"></a></dt>
+<dd><p>Gets changes between configs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old</strong> – old config</p></li>
+<li><p><strong>new</strong> – new config</p></li>
+</ul>
+</dd>
+</dl>
+<p>Keyword-only parameters:
+:param keep: fields in &lt;new&gt; to add to output as-is (unless no changes were detected,
+see the &lt;keep_unchanged&gt; param).
+:param keep_unchanged: whether to add fields in &lt;keep&gt; to output even when they
+have no changes. Fields in &lt;keep&gt; are normally not added to output
+if there were no changes in the dict itself. E.g. comparison of {“field”: “value”} to
+itself will return None no matter what is in &lt;keep&gt; if &lt;keep_unchanged&gt; is False. If
+instead &lt;keep&gt; = “field” and &lt;keep_unchanged&gt; = True, the function returns
+{“field”: “value”}.</p>
+<p>Returns None if &lt;new&gt; == &lt;old&gt; (and &lt;keep_unchanged&gt; is False). Otherwise:
+Finds the differences in dicts &lt;new&gt; and &lt;old&gt; where &lt;recurser&gt; is used to find differences
+between dict values. If the values for a key differ, the value in &lt;new&gt; is added to output.
+If the values are the same, the key is removed from the output.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.lobject_class">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">lobject_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.html#exercise.exercise_models.LearningObject" title="exercise.exercise_models.LearningObject"><span class="pre">LearningObject</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/edit_course/operations/configure.html#lobject_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.lobject_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_bool">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_bool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_bool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_bool" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_choices">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_choices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_choices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_choices" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_date">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_null</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_date"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_date" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_duration">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">begin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_duration" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_float">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_float</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_float"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_float" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_int">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_int" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_model_solution_chapter">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_model_solution_chapter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseModule" title="course.models.CourseModule"><span class="pre">CourseModule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_model_solution_chapter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_model_solution_chapter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.parse_reveal_rule">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">parse_reveal_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_rule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.html#exercise.reveal_models.RevealRule" title="exercise.reveal_models.RevealRule"><span class="pre">RevealRule</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#parse_reveal_rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.parse_reveal_rule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.remove_newlines">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">remove_newlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#remove_newlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.remove_newlines" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.set_order_information">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">set_order_information</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/edit_course/operations/configure.html#set_order_information"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.set_order_information" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.update_learning_objects">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">update_learning_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="course.html#course.models.LearningObjectCategory" title="course.models.LearningObjectCategory"><span class="pre">LearningObjectCategory</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_objects</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="exercise.html#exercise.exercise_models.LearningObject" title="exercise.exercise_models.LearningObject"><span class="pre">LearningObject</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/configure.html#update_learning_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.update_learning_objects" title="Link to this definition"></a></dt>
+<dd><p>Configures learning objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>category_map</strong> – maps category keys to LearningObjectCategory objects</p></li>
+<li><p><strong>configs</strong> – maps lobject keys to their configs</p></li>
+<li><p><strong>learning_objects</strong> – maps lobject keys to LearningObject objects</p></li>
+<li><p><strong>errors</strong> – list to append errors to</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edit_course.operations.configure.validate_lobject">
+<span class="sig-prename descclassname"><span class="pre">edit_course.operations.configure.</span></span><span class="sig-name descname"><span class="pre">validate_lobject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_key_to_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/configure.html#validate_lobject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.configure.validate_lobject" title="Link to this definition"></a></dt>
+<dd><p>Check that config is valid.</p>
+<p>Only checks attributes that prevent saving.</p>
+</dd></dl>
+
+</section>
+<section id="module-edit_course.operations.tests">
+<span id="edit-course-operations-tests-module"></span><h2>edit_course.operations.tests module<a class="headerlink" href="#module-edit_course.operations.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">edit_course.operations.tests.</span></span><span class="sig-name descname"><span class="pre">ConfigureTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.check_categories_config">
+<span class="sig-name descname"><span class="pre">check_categories_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">categories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="course.html#course.models.LearningObjectCategory" title="course.models.LearningObjectCategory"><span class="pre">LearningObjectCategory</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.check_categories_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.check_categories_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.check_fields">
+<span class="sig-name descname"><span class="pre">check_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mapping</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.check_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.check_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.check_instance_config">
+<span class="sig-name descname"><span class="pre">check_instance_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.check_instance_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.check_instance_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.check_lobject_config">
+<span class="sig-name descname"><span class="pre">check_lobject_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lobject</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.html#exercise.exercise_models.LearningObject" title="exercise.exercise_models.LearningObject"><span class="pre">LearningObject</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.check_lobject_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.check_lobject_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.check_module_config">
+<span class="sig-name descname"><span class="pre">check_module_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseModule" title="course.models.CourseModule"><span class="pre">CourseModule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.check_module_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.check_module_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.configure_and_test">
+<span class="sig-name descname"><span class="pre">configure_and_test</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.configure_and_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.configure_and_test" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.course">
+<span class="sig-name descname"><span class="pre">course</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="course.html#course.models.Course" title="course.models.Course"><span class="pre">Course</span></a></em><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.course" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.get_category_by_key">
+<span class="sig-name descname"><span class="pre">get_category_by_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.get_category_by_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.get_category_by_key" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.get_category_by_name">
+<span class="sig-name descname"><span class="pre">get_category_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">category_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.get_category_by_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.get_category_by_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.get_exercise_config">
+<span class="sig-name descname"><span class="pre">get_exercise_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typ</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.get_exercise_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.get_exercise_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.get_lti_service">
+<span class="sig-name descname"><span class="pre">get_lti_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lti_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.get_lti_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.get_lti_service" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.get_module_config">
+<span class="sig-name descname"><span class="pre">get_module_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.get_module_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.get_module_config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.insert_exercise">
+<span class="sig-name descname"><span class="pre">insert_exercise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lobject_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.insert_exercise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.insert_exercise" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.insert_module">
+<span class="sig-name descname"><span class="pre">insert_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.insert_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.insert_module" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.instance">
+<span class="sig-name descname"><span class="pre">instance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></em><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.instance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.remove_category">
+<span class="sig-name descname"><span class="pre">remove_category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.remove_category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.remove_category" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.remove_exercise">
+<span class="sig-name descname"><span class="pre">remove_exercise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.remove_exercise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.remove_exercise" title="Link to this definition"></a></dt>
+<dd><p>Remove exercise from the &lt;config&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indices</strong> – a list of child indices to access the correct chapter. If the
+exercise to be removed is at the top-level of the module, leave empty. If
+it is under a chapter that is at the top-level of the module, include the
+index of the chapter in the module.</p></li>
+<li><p><strong>index</strong> – the index of the exercise to be removed. Can be a tuple to
+indicate a range of indices, or None to remove the last exercise.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.remove_module">
+<span class="sig-name descname"><span class="pre">remove_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.remove_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.remove_module" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.set_category">
+<span class="sig-name descname"><span class="pre">set_category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.set_category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.set_category" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.tearDown">
+<span class="sig-name descname"><span class="pre">tearDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.tearDown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.tearDown" title="Link to this definition"></a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.test_categories">
+<span class="sig-name descname"><span class="pre">test_categories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.test_categories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.test_categories" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.test_changing_type">
+<span class="sig-name descname"><span class="pre">test_changing_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.test_changing_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.test_changing_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.test_exercises">
+<span class="sig-name descname"><span class="pre">test_exercises</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.test_exercises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.test_exercises" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.test_field_defined_by_dict">
+<span class="sig-name descname"><span class="pre">test_field_defined_by_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.test_field_defined_by_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.test_field_defined_by_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edit_course.operations.tests.ConfigureTest.test_modules">
+<span class="sig-name descname"><span class="pre">test_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/edit_course/operations/tests.html#ConfigureTest.test_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edit_course.operations.tests.ConfigureTest.test_modules" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-edit_course.operations">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-edit_course.operations" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

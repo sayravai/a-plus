@@ -1,0 +1,424 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>apps.models &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">apps.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for apps.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Plugins and tabs make it possible to customize the behavior and appearance of pages in this</span>
+<span class="sd">system. Plugins are rendered as small &quot;boxes&quot; on the side of a page, where tabs have their own</span>
+<span class="sd">pages which can be accessed through a tab-like user interface.</span>
+
+<span class="sd">Any model can be related to a Plugin or Tab using a django.contrib.contenttypes.GenericRelation</span>
+<span class="sd">field and naming AbstractApp fields container_pk &amp; container_type for the link.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericForeignKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">loader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.safestring</span><span class="w"> </span><span class="kn">import</span> <span class="n">mark_safe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">feedparser</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">apps.app_renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExternalIFramePluginRenderer</span><span class="p">,</span> \
+    <span class="n">ExternalIFrameTabRenderer</span><span class="p">,</span> <span class="n">TabRenderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inheritance.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelWithInheritance</span>
+
+
+<div class="viewcode-block" id="AbstractApp">
+<a class="viewcode-back" href="../../apps.html#apps.models.AbstractApp">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AbstractApp</span><span class="p">(</span><span class="n">ModelWithInheritance</span><span class="p">):</span>
+
+    <span class="c1"># Generic foreign key implementation from Django contenttypes framework.</span>
+    <span class="n">container_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">ContentType</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONTAINER_TYPE&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">container_pk</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONTAINER_PK&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">container</span> <span class="o">=</span> <span class="n">GenericForeignKey</span><span class="p">(</span><span class="n">ct_field</span><span class="o">=</span><span class="s2">&quot;container_type&quot;</span><span class="p">,</span> <span class="n">fk_field</span><span class="o">=</span><span class="s2">&quot;container_pk&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Apps used to have an oembed reference which was removed in migration to Python 3</span>
+    <span class="c1"># in favor of future implementations, for example LTI.</span>
+
+<div class="viewcode-block" id="AbstractApp.Meta">
+<a class="viewcode-back" href="../../apps.html#apps.models.AbstractApp.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_ABSTRACT_APP&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_ABSTRACT_APP_PLURAL&#39;</span><span class="p">)</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BaseTab">
+<a class="viewcode-back" href="../../apps.html#apps.models.BaseTab">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseTab</span><span class="p">(</span><span class="n">AbstractApp</span><span class="p">):</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_LABEL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;TAB_LABEL_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TITLE&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;TAB_TITLE_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ORDER&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># A Tab can be opened in a new window, in the same window?</span>
+    <span class="n">opening_method</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_OPENING_METHOD&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="BaseTab.render">
+<a class="viewcode-back" href="../../apps.html#apps.models.BaseTab.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TAB_NO_CONTENT&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseTab.get_label">
+<a class="viewcode-back" href="../../apps.html#apps.models.BaseTab.get_label">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span></div>
+
+
+<div class="viewcode-block" id="BaseTab.get_container">
+<a class="viewcode-back" href="../../apps.html#apps.models.BaseTab.get_container">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_container</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="p">,</span> <span class="n">ModelWithInheritance</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">as_leaf_class</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span></div>
+
+
+<div class="viewcode-block" id="BaseTab.get_renderer_class">
+<a class="viewcode-back" href="../../apps.html#apps.models.BaseTab.get_renderer_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Missing method implementation!&#39;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_BASE_TAB&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_BASE_TAB_PLURAL&#39;</span><span class="p">)</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="HTMLTab">
+<a class="viewcode-back" href="../../apps.html#apps.models.HTMLTab">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HTMLTab</span><span class="p">(</span><span class="n">BaseTab</span><span class="p">):</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONTENT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="HTMLTab.render">
+<a class="viewcode-back" href="../../apps.html#apps.models.HTMLTab.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
+
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_HTML_TAB&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_HTML_TAB_PLURAL&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExternalEmbeddedTab">
+<a class="viewcode-back" href="../../apps.html#apps.models.ExternalEmbeddedTab">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExternalEmbeddedTab</span><span class="p">(</span><span class="n">BaseTab</span><span class="p">):</span>
+    <span class="n">content_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONTENT_URL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">element_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ELEMENT_ID&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalEmbeddedTab.get_renderer_class">
+<a class="viewcode-back" href="../../apps.html#apps.models.ExternalEmbeddedTab.get_renderer_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">TabRenderer</span></div>
+
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXTERNAL_EMBEDDED_TAB&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXTERNAL_EMBEDDED_TAB_PLURAL&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExternalIFrameTab">
+<a class="viewcode-back" href="../../apps.html#apps.models.ExternalIFrameTab">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExternalIFrameTab</span><span class="p">(</span><span class="n">BaseTab</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An ExternalIFrameTab gets its content from an external url resource through</span>
+<span class="sd">    an iframe which has the content_url as its src, possibly with additional</span>
+<span class="sd">    url parameters.</span>
+
+<span class="sd">    ExternalIFrameTab uses ExternalIFrameTabRenderer for rendering. Refer to</span>
+<span class="sd">    its documentation for more information about the available url parameters.</span>
+
+<span class="sd">    Iframes&#39; width and height are fixed in the html document flow and thus they</span>
+<span class="sd">    should be given explicitly and they should be the size of the expected</span>
+<span class="sd">    content html.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">content_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONTENT_URL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Desired width and height</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_WIDTH&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_HEIGHT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalIFrameTab.get_renderer_class">
+<a class="viewcode-back" href="../../apps.html#apps.models.ExternalIFrameTab.get_renderer_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ExternalIFrameTabRenderer</span></div>
+
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXTERNAL_IFRAME_TAB&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXTERNAL_IFRAME_TAB_PLURAL&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BasePlugin">
+<a class="viewcode-back" href="../../apps.html#apps.models.BasePlugin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BasePlugin</span><span class="p">(</span><span class="n">AbstractApp</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TITLE&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span>
+    <span class="p">)</span>
+    <span class="n">views</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_VIEWS&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="BasePlugin.render">
+<a class="viewcode-back" href="../../apps.html#apps.models.BasePlugin.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">leaf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_leaf_class</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">leaf</span> <span class="o">!=</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">leaf</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;BASE_PLUGIN_MISSING_RENDER-METHOD&#39;</span><span class="p">)</span></div>
+
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_BASE_PLUGIN&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_BASE_PLUGIN_PLURAL&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="RSSPlugin">
+<a class="viewcode-back" href="../../apps.html#apps.models.RSSPlugin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RSSPlugin</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">):</span>
+    <span class="n">feed_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_FEED_URL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="RSSPlugin.render">
+<a class="viewcode-back" href="../../apps.html#apps.models.RSSPlugin.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feed_url</span><span class="p">)</span>
+        <span class="n">feed</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">feed</span>
+
+        <span class="n">sorted_entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">],</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">entry</span><span class="p">:</span> <span class="n">entry</span><span class="o">.</span><span class="n">published_parsed</span><span class="p">)</span>
+        <span class="n">sorted_entries</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+        <span class="n">sorted_entries</span> <span class="o">=</span> <span class="n">sorted_entries</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+
+        <span class="c1"># Set timestamps in a format that Django knows how to handle in templates</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">sorted_entries</span><span class="p">:</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">django_timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="o">*</span><span class="n">entry</span><span class="o">.</span><span class="n">published_parsed</span><span class="p">[:</span><span class="mi">7</span><span class="p">])</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">render_to_string</span><span class="p">(</span><span class="s2">&quot;plugins/rss.html&quot;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="n">sorted_entries</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+            <span class="s2">&quot;feed&quot;</span><span class="p">:</span> <span class="n">feed</span><span class="p">,</span>
+            <span class="s2">&quot;plugin&quot;</span><span class="p">:</span> <span class="bp">self</span>
+        <span class="p">})</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_RSS_PLUGIN&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_RSS_PLUGIN_PLURAL&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="HTMLPlugin">
+<a class="viewcode-back" href="../../apps.html#apps.models.HTMLPlugin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HTMLPlugin</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">):</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONTENT&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="HTMLPlugin.render">
+<a class="viewcode-back" href="../../apps.html#apps.models.HTMLPlugin.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
+
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_HTML_PLUGIN&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_HTML_PLUGIN_PLURAL&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExternalIFramePlugin">
+<a class="viewcode-back" href="../../apps.html#apps.models.ExternalIFramePlugin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExternalIFramePlugin</span><span class="p">(</span><span class="n">BasePlugin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An ExternalIFramePlugin gets its content from an external url resource</span>
+<span class="sd">    through an iframe which has the content_url as its src, possibly with</span>
+<span class="sd">    additional url parameters.</span>
+
+<span class="sd">    ExternalIFramePlugin uses ExternalIFramePluginRenderer for rendering. Refer</span>
+<span class="sd">    to its documentation for more information about the available url</span>
+<span class="sd">    parameters and its view behaviour.</span>
+
+<span class="sd">    Iframes&#39; width and height are fixed in the html document flow and thus they</span>
+<span class="sd">    should be given explicitly and they should be at least the size of the</span>
+<span class="sd">    expected content html but at maximum the size available for the plugin in</span>
+<span class="sd">    each view which varies among the views. The size of the rendered iframe</span>
+<span class="sd">    will thus be the given width and height but at maximum the width and height</span>
+<span class="sd">    available in the view.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">service_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SERVICE_URL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Desired width and height</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_WIDTH&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_HEIGHT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalIFramePlugin.get_renderer_class">
+<a class="viewcode-back" href="../../apps.html#apps.models.ExternalIFramePlugin.get_renderer_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ExternalIFramePluginRenderer</span></div>
+
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXTERNAL_IFRAME_PLUGIN&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXTERNAL_IFRAME_PLUGIN_PLURAL&#39;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

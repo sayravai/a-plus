@@ -1,0 +1,725 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.api.csv package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">exercise.api.csv package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-exercise.api.csv.aggregate_points">exercise.api.csv.aggregate_points module</a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.aggregate_points.aggregate_points"><code class="docutils literal notranslate"><span class="pre">aggregate_points()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.api.csv.aggregate_sheet">exercise.api.csv.aggregate_sheet module</a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.aggregate_sheet.aggregate_sheet"><code class="docutils literal notranslate"><span class="pre">aggregate_sheet()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.api.csv.submission_sheet">exercise.api.csv.submission_sheet module</a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.submission_sheet.filter_best_submissions"><code class="docutils literal notranslate"><span class="pre">filter_best_submissions()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.submission_sheet.submissions_sheet"><code class="docutils literal notranslate"><span class="pre">submissions_sheet()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.api.csv.tests">exercise.api.csv.tests module</a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.tests.CourseResultsDataViewSetTest"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSetTest</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.tests.CourseResultsDataViewSetTest.setUpTestData"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSetTest.setUpTestData()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.tests.CourseResultsDataViewSetTest.test_get_submissions_query_unconfirmed_points"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSetTest.test_get_submissions_query_unconfirmed_points()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.api.csv.views">exercise.api.csv.views module</a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.basename"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.basename</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.description"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.description</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.detail"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.detail</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.filter_backends"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.filter_backends</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.get_queryset"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.get_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.get_renderer_context"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.get_renderer_context()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.get_search_args"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.get_search_args()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.list"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.list()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.lookup_field"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.lookup_field</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.lookup_url_kwarg"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.lookup_url_kwarg</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.lookup_value_regex"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.lookup_value_regex</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.name"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.name</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.parent_lookup_map"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.parent_lookup_map</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.permission_classes"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.permission_classes</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.renderer_classes"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.renderer_classes</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.retrieve"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.retrieve()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.serialize_profiles"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.serialize_profiles()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseAggregateDataViewSet.suffix"><code class="docutils literal notranslate"><span class="pre">CourseAggregateDataViewSet.suffix</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseBestResultsDataViewSet"><code class="docutils literal notranslate"><span class="pre">CourseBestResultsDataViewSet</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.basename"><code class="docutils literal notranslate"><span class="pre">CourseBestResultsDataViewSet.basename</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.description"><code class="docutils literal notranslate"><span class="pre">CourseBestResultsDataViewSet.description</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.detail"><code class="docutils literal notranslate"><span class="pre">CourseBestResultsDataViewSet.detail</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.name"><code class="docutils literal notranslate"><span class="pre">CourseBestResultsDataViewSet.name</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.point_annotator"><code class="docutils literal notranslate"><span class="pre">CourseBestResultsDataViewSet.point_annotator</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.suffix"><code class="docutils literal notranslate"><span class="pre">CourseBestResultsDataViewSet.suffix</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.basename"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.basename</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.description"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.description</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.detail"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.detail</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.filter_backends"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.filter_backends</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_queryset"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.get_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_renderer_context"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.get_renderer_context()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_search_args"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.get_search_args()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_submissions_query"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.get_submissions_query()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.list"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.list()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.lookup_field"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.lookup_field</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.lookup_url_kwarg"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.lookup_url_kwarg</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.lookup_value_regex"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.lookup_value_regex</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.name"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.name</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.parent_lookup_map"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.parent_lookup_map</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.permission_classes"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.permission_classes</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.point_annotator"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.point_annotator</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.renderer_classes"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.renderer_classes</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.retrieve"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.retrieve()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.serialize_profiles"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.serialize_profiles()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet.suffix"><code class="docutils literal notranslate"><span class="pre">CourseResultsDataViewSet.suffix</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.basename"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.basename</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.description"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.description</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.detail"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.detail</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.filter_backends"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.filter_backends</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.get_queryset"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.get_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.get_renderer_context"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.get_renderer_context()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.get_search_args"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.get_search_args()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.list"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.list()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_field"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.lookup_field</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_url_kwarg"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.lookup_url_kwarg</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_value_regex"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.lookup_value_regex</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.name"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.name</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.parent_lookup_map"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.parent_lookup_map</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.permission_classes"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.permission_classes</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.renderer_classes"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.renderer_classes</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.retrieve"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.retrieve()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.serialize_submissions"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.serialize_submissions()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.suffix"><code class="docutils literal notranslate"><span class="pre">CourseSubmissionDataViewSet.suffix</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exercise.api.csv.views.get_revealed_exercise_ids"><code class="docutils literal notranslate"><span class="pre">get_revealed_exercise_ids()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.api.csv.views.int_or_none"><code class="docutils literal notranslate"><span class="pre">int_or_none()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.api.csv">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">exercise.api.csv package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/exercise.api.csv.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="exercise-api-csv-package">
+<h1>exercise.api.csv package<a class="headerlink" href="#exercise-api-csv-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-exercise.api.csv.aggregate_points">
+<span id="exercise-api-csv-aggregate-points-module"></span><h2>exercise.api.csv.aggregate_points module<a class="headerlink" href="#module-exercise.api.csv.aggregate_points" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.api.csv.aggregate_points.aggregate_points">
+<span class="sig-prename descclassname"><span class="pre">exercise.api.csv.aggregate_points.</span></span><span class="sig-name descname"><span class="pre">aggregate_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taggings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercises</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.cache.html#exercise.cache.content.LearningObjectContent" title="exercise.cache.content.LearningObjectContent"><span class="pre">LearningObjectContent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/aggregate_points.html#aggregate_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.aggregate_points.aggregate_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-exercise.api.csv.aggregate_sheet">
+<span id="exercise-api-csv-aggregate-sheet-module"></span><h2>exercise.api.csv.aggregate_sheet module<a class="headerlink" href="#module-exercise.api.csv.aggregate_sheet" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.api.csv.aggregate_sheet.aggregate_sheet">
+<span class="sig-prename descclassname"><span class="pre">exercise.api.csv.aggregate_sheet.</span></span><span class="sig-name descname"><span class="pre">aggregate_sheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">profiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taggings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercises</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.cache.html#exercise.cache.basetypes.ModuleEntryBase" title="exercise.cache.basetypes.ModuleEntryBase"><span class="pre">ModuleEntryBase</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.cache.html#exercise.cache.content.LearningObjectContent" title="exercise.cache.content.LearningObjectContent"><span class="pre">LearningObjectContent</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.cache.html#exercise.cache.content.LearningObjectContent" title="exercise.cache.content.LearningObjectContent"><span class="pre">LearningObjectContent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/aggregate_sheet.html#aggregate_sheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.aggregate_sheet.aggregate_sheet" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-exercise.api.csv.submission_sheet">
+<span id="exercise-api-csv-submission-sheet-module"></span><h2>exercise.api.csv.submission_sheet module<a class="headerlink" href="#module-exercise.api.csv.submission_sheet" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.api.csv.submission_sheet.filter_best_submissions">
+<span class="sig-prename descclassname"><span class="pre">exercise.api.csv.submission_sheet.</span></span><span class="sig-name descname"><span class="pre">filter_best_submissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.html#exercise.submission_models.Submission" title="exercise.submission_models.Submission"><span class="pre">Submission</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revealed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.html#exercise.submission_models.Submission" title="exercise.submission_models.Submission"><span class="pre">Submission</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/exercise/api/csv/submission_sheet.html#filter_best_submissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.submission_sheet.filter_best_submissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.api.csv.submission_sheet.submissions_sheet">
+<span class="sig-prename descclassname"><span class="pre">exercise.api.csv.submission_sheet.</span></span><span class="sig-name descname"><span class="pre">submissions_sheet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.html#exercise.submission_models.Submission" title="exercise.submission_models.Submission"><span class="pre">Submission</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revealed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/exercise/api/csv/submission_sheet.html#submissions_sheet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.submission_sheet.submissions_sheet" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-exercise.api.csv.tests">
+<span id="exercise-api-csv-tests-module"></span><h2>exercise.api.csv.tests module<a class="headerlink" href="#module-exercise.api.csv.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.api.csv.tests.CourseResultsDataViewSetTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.api.csv.tests.</span></span><span class="sig-name descname"><span class="pre">CourseResultsDataViewSetTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/tests.html#CourseResultsDataViewSetTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.tests.CourseResultsDataViewSetTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.tests.CourseResultsDataViewSetTest.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/tests.html#CourseResultsDataViewSetTest.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.tests.CourseResultsDataViewSetTest.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.tests.CourseResultsDataViewSetTest.test_get_submissions_query_unconfirmed_points">
+<span class="sig-name descname"><span class="pre">test_get_submissions_query_unconfirmed_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/tests.html#CourseResultsDataViewSetTest.test_get_submissions_query_unconfirmed_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.tests.CourseResultsDataViewSetTest.test_get_submissions_query_unconfirmed_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-exercise.api.csv.views">
+<span id="exercise-api-csv-views-module"></span><h2>exercise.api.csv.views module<a class="headerlink" href="#module-exercise.api.csv.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.api.csv.views.</span></span><span class="sig-name descname"><span class="pre">CourseAggregateDataViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseAggregateDataViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NestedViewSetMixin</span></code>, <a class="reference internal" href="lib.api.html#lib.api.mixins.MeUserMixin" title="lib.api.mixins.MeUserMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeUserMixin</span></code></a>, <a class="reference internal" href="course.api.html#course.api.mixins.CourseResourceMixin" title="course.api.mixins.CourseResourceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseResourceMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadOnlyModelViewSet</span></code></p>
+<p>The <cite>aggregatedata</cite> endpoint returns aggregate information in CSV format
+about the users’ submissions in exercises in the course.</p>
+<section id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><cite>GET /courses/&lt;course_id&gt;/aggregatedata/</cite>:</dt><dd><p>returns the aggregate submission data of all users as CSV.</p>
+</dd>
+<dt><cite>GET /courses/&lt;course_id&gt;/aggregatedata/&lt;user_id&gt;</cite>:</dt><dd><p>returns the aggregate submission data of a specific user as CSV.</p>
+</dd>
+<dt><cite>GET /courses/&lt;course_id&gt;/aggregatedata/me</cite>:</dt><dd><p>returns the aggregate submission data of the current user as CSV.</p>
+</dd>
+</dl>
+<p>All operations support the following URL parameters for filtering:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><cite>filter</cite>: the exercise number as a string, including module and chapter numbers</dt><dd><p>(format N.N.N)</p>
+</dd>
+</dl>
+</li>
+<li><p><cite>category_id</cite>: id of the exercise category</p></li>
+<li><p><cite>module_id</cite>: id of the course module</p></li>
+<li><p><cite>exercise_id</cite>: id of the exercise</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.basename">
+<span class="sig-name descname"><span class="pre">basename</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.basename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.detail">
+<span class="sig-name descname"><span class="pre">detail</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.detail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.filter_backends">
+<span class="sig-name descname"><span class="pre">filter_backends</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'course.permissions.IsCourseAdminOrUserObjIsSelf'&gt;,)</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.filter_backends" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseAggregateDataViewSet.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.get_queryset" title="Link to this definition"></a></dt>
+<dd><p>Get the list of items for this view.
+This must be an iterable, and may be a queryset.
+Defaults to using <cite>self.queryset</cite>.</p>
+<p>This method should always be used rather than accessing <cite>self.queryset</cite>
+directly, as <cite>self.queryset</cite> gets evaluated only once, and those results
+are cached for all subsequent requests.</p>
+<p>You may want to override this if you need to provide different
+querysets depending on the incoming request.</p>
+<p>(Eg. return a list of items that is specific to the user)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.get_renderer_context">
+<span class="sig-name descname"><span class="pre">get_renderer_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseAggregateDataViewSet.get_renderer_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.get_renderer_context" title="Link to this definition"></a></dt>
+<dd><p>Returns a dict that is passed through to Renderer.render(),
+as the <cite>renderer_context</cite> keyword argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.get_search_args">
+<span class="sig-name descname"><span class="pre">get_search_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseAggregateDataViewSet.get_search_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.get_search_args" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.list">
+<span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseAggregateDataViewSet.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.lookup_field">
+<span class="sig-name descname"><span class="pre">lookup_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.lookup_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.lookup_url_kwarg">
+<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.lookup_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.lookup_value_regex">
+<span class="sig-name descname"><span class="pre">lookup_value_regex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'([0-9]+|me)'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.lookup_value_regex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.parent_lookup_map">
+<span class="sig-name descname"><span class="pre">parent_lookup_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'course_id':</span> <span class="pre">'enrollment.course_instance.id'}</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.parent_lookup_map" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'rest_framework.permissions.IsAuthenticated'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'userprofile.permissions.GraderUserCanOnlyRead'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'course.permissions.IsCourseAdminOrUserObjIsSelf'&gt;]</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.permission_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.renderer_classes">
+<span class="sig-name descname"><span class="pre">renderer_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'rest_framework_csv.renderers.CSVRenderer'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'lib.api.core.APlusJSONRenderer'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'rest_framework.renderers.BrowsableAPIRenderer'&gt;]</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.renderer_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.retrieve">
+<span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseAggregateDataViewSet.retrieve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.retrieve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.serialize_profiles">
+<span class="sig-name descname"><span class="pre">serialize_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuerySet</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseAggregateDataViewSet.serialize_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.serialize_profiles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseAggregateDataViewSet.suffix">
+<span class="sig-name descname"><span class="pre">suffix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseAggregateDataViewSet.suffix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseBestResultsDataViewSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.api.csv.views.</span></span><span class="sig-name descname"><span class="pre">CourseBestResultsDataViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseBestResultsDataViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseBestResultsDataViewSet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#exercise.api.csv.views.CourseResultsDataViewSet" title="exercise.api.csv.views.CourseResultsDataViewSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseResultsDataViewSet</span></code></a></p>
+<p>This is only a temporary experiment to fix the <cite>resultdata</cite> endpoint’s performance problems.
+External applications should not depend on this API endpoint
+as this will be eventually removed.</p>
+<p>This is similar to the <cite>resultsdata</cite> endpoint,
+but this endpoint ignores the exercise grading mode.
+The results are returned as if all exercises used the BEST mode
+and the LAST mode is ignored.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseBestResultsDataViewSet.basename">
+<span class="sig-name descname"><span class="pre">basename</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.basename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseBestResultsDataViewSet.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseBestResultsDataViewSet.detail">
+<span class="sig-name descname"><span class="pre">detail</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.detail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseBestResultsDataViewSet.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseBestResultsDataViewSet.point_annotator">
+<span class="sig-name descname"><span class="pre">point_annotator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'annotate_best_submitter_points'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.point_annotator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseBestResultsDataViewSet.suffix">
+<span class="sig-name descname"><span class="pre">suffix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseBestResultsDataViewSet.suffix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.api.csv.views.</span></span><span class="sig-name descname"><span class="pre">CourseResultsDataViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NestedViewSetMixin</span></code>, <a class="reference internal" href="course.api.html#course.api.mixins.CourseResourceMixin" title="course.api.mixins.CourseResourceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseResourceMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadOnlyModelViewSet</span></code></p>
+<p>The <cite>resultsdata</cite> endpoint returns the students’ points in the course
+in CSV format.</p>
+<section id="id1">
+<h3>Operations<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><cite>GET /courses/&lt;course_id&gt;/resultsdata/</cite>:</dt><dd><p>returns the points of all users as CSV.</p>
+</dd>
+<dt><cite>GET /courses/&lt;course_id&gt;/resultsdata/&lt;user_id&gt;</cite>:</dt><dd><p>returns the points of a specific user as CSV.</p>
+</dd>
+</dl>
+<p>All operations support the following URL parameters for filtering:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><cite>filter</cite>: the exercise number as a string, including module and chapter numbers</dt><dd><p>(format N.N.N)</p>
+</dd>
+</dl>
+</li>
+<li><p><cite>category_id</cite>: id of the exercise category</p></li>
+<li><p><cite>module_id</cite>: id of the course module</p></li>
+<li><p><cite>exercise_id</cite>: id of the exercise</p></li>
+<li><p><cite>show_unofficial</cite>: if “true”, unofficial submissions are included in the results</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.basename">
+<span class="sig-name descname"><span class="pre">basename</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.basename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.detail">
+<span class="sig-name descname"><span class="pre">detail</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.detail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.filter_backends">
+<span class="sig-name descname"><span class="pre">filter_backends</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'course.permissions.IsCourseAdminOrUserObjIsSelf'&gt;,)</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.filter_backends" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_queryset" title="Link to this definition"></a></dt>
+<dd><p>Get the list of items for this view.
+This must be an iterable, and may be a queryset.
+Defaults to using <cite>self.queryset</cite>.</p>
+<p>This method should always be used rather than accessing <cite>self.queryset</cite>
+directly, as <cite>self.queryset</cite> gets evaluated only once, and those results
+are cached for all subsequent requests.</p>
+<p>You may want to override this if you need to provide different
+querysets depending on the incoming request.</p>
+<p>(Eg. return a list of items that is specific to the user)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.get_renderer_context">
+<span class="sig-name descname"><span class="pre">get_renderer_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet.get_renderer_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_renderer_context" title="Link to this definition"></a></dt>
+<dd><p>Returns a dict that is passed through to Renderer.render(),
+as the <cite>renderer_context</cite> keyword argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.get_search_args">
+<span class="sig-name descname"><span class="pre">get_search_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet.get_search_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_search_args" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.get_submissions_query">
+<span class="sig-name descname"><span class="pre">get_submissions_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuerySet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revealed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_unofficial</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_unconfirmed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="exercise.html#exercise.submission_models.SubmissionQuerySet" title="exercise.submission_models.SubmissionQuerySet"><span class="pre">SubmissionQuerySet</span></a></span></span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet.get_submissions_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.get_submissions_query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.list">
+<span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.lookup_field">
+<span class="sig-name descname"><span class="pre">lookup_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.lookup_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.lookup_url_kwarg">
+<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.lookup_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.lookup_value_regex">
+<span class="sig-name descname"><span class="pre">lookup_value_regex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'([0-9]+|me)'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.lookup_value_regex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.parent_lookup_map">
+<span class="sig-name descname"><span class="pre">parent_lookup_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'course_id':</span> <span class="pre">'enrollment.course_instance.id'}</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.parent_lookup_map" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'rest_framework.permissions.IsAuthenticated'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'userprofile.permissions.GraderUserCanOnlyRead'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'course.permissions.IsCourseAdminOrUserObjIsSelf'&gt;]</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.permission_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.point_annotator">
+<span class="sig-name descname"><span class="pre">point_annotator</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'annotate_submitter_points'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.point_annotator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.renderer_classes">
+<span class="sig-name descname"><span class="pre">renderer_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'rest_framework_csv.renderers.CSVRenderer'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'lib.api.core.APlusJSONRenderer'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'rest_framework.renderers.BrowsableAPIRenderer'&gt;]</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.renderer_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.retrieve">
+<span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet.retrieve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.retrieve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.serialize_profiles">
+<span class="sig-name descname"><span class="pre">serialize_profiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuerySet</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseResultsDataViewSet.serialize_profiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.serialize_profiles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseResultsDataViewSet.suffix">
+<span class="sig-name descname"><span class="pre">suffix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseResultsDataViewSet.suffix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.api.csv.views.</span></span><span class="sig-name descname"><span class="pre">CourseSubmissionDataViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseSubmissionDataViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NestedViewSetMixin</span></code>, <a class="reference internal" href="lib.api.html#lib.api.mixins.MeUserMixin" title="lib.api.mixins.MeUserMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeUserMixin</span></code></a>, <a class="reference internal" href="course.api.html#course.api.mixins.CourseResourceMixin" title="course.api.mixins.CourseResourceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseResourceMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadOnlyModelViewSet</span></code></p>
+<p>The <cite>submissiondata</cite> endpoint returns information in CSV format about the
+users’ submissions in exercises in the course.</p>
+<section id="id2">
+<h3>Operations<a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><cite>GET /courses/&lt;course_id&gt;/submissiondata/</cite>:</dt><dd><p>returns the submission data of all users as CSV.</p>
+</dd>
+<dt><cite>GET /courses/&lt;course_id&gt;/submissiondata/&lt;user_id&gt;</cite>:</dt><dd><p>returns the submission data of a specific user as CSV.</p>
+</dd>
+<dt><cite>GET /courses/&lt;course_id&gt;/submissiondata/me</cite>:</dt><dd><p>returns the submission data of the current user as CSV.</p>
+</dd>
+</dl>
+<p>All operations support the following URL parameters for filtering:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><cite>filter</cite>: the exercise number as a string, including module and chapter numbers</dt><dd><p>(format N.N.N)</p>
+</dd>
+</dl>
+</li>
+<li><p><cite>category_id</cite>: id of the exercise category</p></li>
+<li><p><cite>module_id</cite>: id of the course module</p></li>
+<li><p><cite>exercise_id</cite>: id of the exercise</p></li>
+<li><p><cite>best</cite>: “yes” or “no”; “no” includes all different submissions from same submitters</p></li>
+<li><p><cite>field</cite>: return submission data only for the given field, e.g., “field_0”</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.basename">
+<span class="sig-name descname"><span class="pre">basename</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.basename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.detail">
+<span class="sig-name descname"><span class="pre">detail</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.detail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.filter_backends">
+<span class="sig-name descname"><span class="pre">filter_backends</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'course.permissions.IsCourseAdminOrUserObjIsSelf'&gt;,)</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.filter_backends" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseSubmissionDataViewSet.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.get_queryset" title="Link to this definition"></a></dt>
+<dd><p>Get the list of items for this view.
+This must be an iterable, and may be a queryset.
+Defaults to using <cite>self.queryset</cite>.</p>
+<p>This method should always be used rather than accessing <cite>self.queryset</cite>
+directly, as <cite>self.queryset</cite> gets evaluated only once, and those results
+are cached for all subsequent requests.</p>
+<p>You may want to override this if you need to provide different
+querysets depending on the incoming request.</p>
+<p>(Eg. return a list of items that is specific to the user)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.get_renderer_context">
+<span class="sig-name descname"><span class="pre">get_renderer_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseSubmissionDataViewSet.get_renderer_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.get_renderer_context" title="Link to this definition"></a></dt>
+<dd><p>Returns a dict that is passed through to Renderer.render(),
+as the <cite>renderer_context</cite> keyword argument.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.get_search_args">
+<span class="sig-name descname"><span class="pre">get_search_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseSubmissionDataViewSet.get_search_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.get_search_args" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.list">
+<span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseSubmissionDataViewSet.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_field">
+<span class="sig-name descname"><span class="pre">lookup_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_url_kwarg">
+<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_value_regex">
+<span class="sig-name descname"><span class="pre">lookup_value_regex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'([0-9]+|me)'</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.lookup_value_regex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.parent_lookup_map">
+<span class="sig-name descname"><span class="pre">parent_lookup_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'course_id':</span> <span class="pre">'enrollment.course_instance.id'}</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.parent_lookup_map" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'rest_framework.permissions.IsAuthenticated'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'userprofile.permissions.GraderUserCanOnlyRead'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'course.permissions.IsCourseAdminOrUserObjIsSelf'&gt;]</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.permission_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.renderer_classes">
+<span class="sig-name descname"><span class="pre">renderer_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'rest_framework_csv.renderers.CSVRenderer'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'lib.api.renderers.CSVExcelRenderer'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'lib.api.core.APlusJSONRenderer'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'rest_framework.renderers.BrowsableAPIRenderer'&gt;]</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.renderer_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.retrieve">
+<span class="sig-name descname"><span class="pre">retrieve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseSubmissionDataViewSet.retrieve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.retrieve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.serialize_submissions">
+<span class="sig-name descname"><span class="pre">serialize_submissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queryset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuerySet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revealed_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">best</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Response</span></span></span><a class="reference internal" href="_modules/exercise/api/csv/views.html#CourseSubmissionDataViewSet.serialize_submissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.serialize_submissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.api.csv.views.CourseSubmissionDataViewSet.suffix">
+<span class="sig-name descname"><span class="pre">suffix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#exercise.api.csv.views.CourseSubmissionDataViewSet.suffix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.api.csv.views.get_revealed_exercise_ids">
+<span class="sig-prename descclassname"><span class="pre">exercise.api.csv.views.</span></span><span class="sig-name descname"><span class="pre">get_revealed_exercise_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.cache.html#exercise.cache.points.CachedPoints" title="exercise.cache.points.CachedPoints"><span class="pre">CachedPoints</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/exercise/api/csv/views.html#get_revealed_exercise_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.get_revealed_exercise_ids" title="Link to this definition"></a></dt>
+<dd><p>Helper function that returns the IDs of the exercises whose feedback has
+been revealed.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.api.csv.views.int_or_none">
+<span class="sig-prename descclassname"><span class="pre">exercise.api.csv.views.</span></span><span class="sig-name descname"><span class="pre">int_or_none</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/api/csv/views.html#int_or_none"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.api.csv.views.int_or_none" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-exercise.api.csv">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-exercise.api.csv" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.viewbase &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.viewbase</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.viewbase</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">translation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_language</span><span class="p">,</span> <span class="n">get_language_info</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedPoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">remove_query_param_from_url</span><span class="p">,</span> <span class="n">update_url_params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTemplateView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfileMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.students</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedStudent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">TranslationNotFound</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseVisiblePermission</span><span class="p">,</span>
+    <span class="n">CourseModulePermission</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Course</span><span class="p">,</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">Enrollment</span>
+
+
+<div class="viewcode-block" id="CourseMixin">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseMixin</span><span class="p">(</span><span class="n">UserProfileMixin</span><span class="p">):</span>
+    <span class="n">course_kw</span> <span class="o">=</span> <span class="s2">&quot;course_slug&quot;</span>
+
+<div class="viewcode-block" id="CourseMixin.get_resource_objects">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseMixin.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="n">Course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_kw</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;course&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseBaseView">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseBaseView</span><span class="p">(</span><span class="n">CourseMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="CourseInstanceBaseMixin">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceBaseMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseInstanceBaseMixin</span><span class="p">:</span>
+    <span class="n">course_kw</span> <span class="o">=</span> <span class="n">CourseMixin</span><span class="o">.</span><span class="n">course_kw</span>
+    <span class="n">instance_kw</span> <span class="o">=</span> <span class="s2">&quot;instance_slug&quot;</span>
+    <span class="n">course_permission_classes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">CourseVisiblePermission</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">context_properties</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;course&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="s2">&quot;user_course_data&quot;</span><span class="p">,</span> <span class="s2">&quot;taggings&quot;</span>
+    <span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">content_bare</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedContent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;CachedContent for the instance but doesn&#39;t necessarily have the</span>
+<span class="sd">        modules/exercises fetched&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;content&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span>
+
+        <span class="k">return</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">prefetch_children</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">content</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedContent</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;content_bare&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content_bare</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">populate_children</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_bare</span>
+
+        <span class="k">return</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedPoints</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">course</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Course</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_course_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_enrollment_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">taggings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">CachedStudent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;tag_slugs&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CourseInstanceBaseMixin.get_permissions">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceBaseMixin.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">Perm</span><span class="p">()</span> <span class="k">for</span> <span class="n">Perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_permission_classes</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+
+
+    <span class="c1"># get_course_instance_object</span>
+
+<div class="viewcode-block" id="CourseInstanceBaseMixin.get_resource_objects">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceBaseMixin.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_course_instance_object</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">instance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># pylint: disable=too-many-nested-blocks</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">instance</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">is_real_user</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_student</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_assistant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_assistant</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_teacher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_teacher</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_assistant</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url_without_language</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get_full_path</span><span class="p">(),</span> <span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url_without_limited</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get_full_path</span><span class="p">(),</span> <span class="s1">&#39;limited&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query_language</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_language</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pseudonymize&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span>
+                <span class="s2">&quot;instance&quot;</span><span class="p">,</span> <span class="s2">&quot;is_student&quot;</span><span class="p">,</span> <span class="s2">&quot;is_assistant&quot;</span><span class="p">,</span> <span class="s2">&quot;is_teacher&quot;</span><span class="p">,</span> <span class="s2">&quot;is_course_staff&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;url_without_language&quot;</span><span class="p">,</span> <span class="s2">&quot;query_language&quot;</span><span class="p">,</span> <span class="s2">&quot;user_language&quot;</span><span class="p">,</span> <span class="s2">&quot;pseudonymize&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Try to find a language that is defined for this course instance</span>
+            <span class="c1"># and apply it</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
+                <span class="n">instance_languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)</span>
+                <span class="n">instance_def_language</span> <span class="o">=</span> <span class="n">instance_languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">instance_languages</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">instance_languages</span><span class="p">)</span>
+
+                <span class="n">languages</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
+                    <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_real_user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">language</span><span class="p">:</span>
+                    <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+                <span class="n">languages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_language</span><span class="p">())</span>
+
+                <span class="n">query_language</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">query_language</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">query_language</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="n">instance_languages</span><span class="p">:</span>
+                        <span class="n">language</span> <span class="o">=</span> <span class="n">query_language</span>
+                        <span class="k">if</span> <span class="n">languages</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">user_language</span> <span class="o">=</span> <span class="n">languages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_language</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">query_language</span><span class="p">[:</span><span class="mi">2</span><span class="p">]:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">query_language</span> <span class="o">=</span> <span class="n">query_language</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">TranslationNotFound</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">languages</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">lang</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="ow">in</span> <span class="n">instance_languages</span><span class="p">:</span>
+                            <span class="n">language</span> <span class="o">=</span> <span class="n">lang</span>
+                            <span class="k">break</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">language</span> <span class="o">=</span> <span class="n">instance_def_language</span>
+
+                <span class="n">language</span> <span class="o">=</span> <span class="n">language</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="c1"># Override request.LANGUAGE_CODE. It is set in lib/middleware.py</span>
+                <span class="c1"># (class LocaleMiddleware) based on the userprofile.language.</span>
+                <span class="c1"># The middleware can not easily access the course context and</span>
+                <span class="c1"># the language from the enrollment. That is fixed here.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">LANGUAGE_CODE</span> <span class="o">=</span> <span class="n">language</span>
+                <span class="n">translation</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="n">language</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseInstanceBaseMixin.get_access_mode">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceBaseMixin.get_access_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_access_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">access_mode</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_access_mode</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;instance&#39;</span><span class="p">):</span>
+            <span class="c1"># Loosen the access mode if instance is public</span>
+            <span class="n">show_for</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">view_content_to</span>
+            <span class="n">is_public</span> <span class="o">=</span> <span class="n">show_for</span> <span class="o">==</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">PUBLIC</span>
+            <span class="n">access_mode_student</span> <span class="o">=</span> <span class="n">access_mode</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span><span class="p">,</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLL</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_public</span> <span class="ow">and</span> <span class="n">access_mode_student</span><span class="p">:</span>
+                <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+
+        <span class="k">return</span> <span class="n">access_mode</span></div>
+
+
+<div class="viewcode-block" id="CourseInstanceBaseMixin.handle_exception">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceBaseMixin.handle_exception">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc</span><span class="p">,</span> <span class="n">TranslationNotFound</span><span class="p">):</span>
+            <span class="n">instance_languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">language</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get_full_path</span><span class="p">(),</span> <span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">lang</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">instance_languages</span><span class="p">):</span>
+                <span class="n">instance_languages</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">get_language_info</span><span class="p">(</span><span class="n">lang</span><span class="p">)[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">update_url_params</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;hl&#39;</span> <span class="p">:</span> <span class="n">lang</span><span class="p">})</span>
+                <span class="p">}</span>
+            <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+                <span class="s1">&#39;404.html&#39;</span><span class="p">,</span>
+                <span class="p">{</span><span class="s1">&#39;error_msg&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span> <span class="s1">&#39;languages&#39;</span><span class="p">:</span> <span class="n">instance_languages</span><span class="p">},</span>
+                <span class="n">status</span><span class="o">=</span><span class="mi">404</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">handle_exception</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CourseInstanceMixin">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseInstanceMixin</span><span class="p">(</span><span class="n">CourseInstanceBaseMixin</span><span class="p">,</span> <span class="n">UserProfileMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="CourseInstanceMixin.get_course_instance_object">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceMixin.get_course_instance_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_instance_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CourseInstance</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;tabs&#39;</span><span class="p">),</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">instance_kw</span><span class="p">],</span>
+            <span class="n">course__url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">course_kw</span><span class="p">],</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseInstanceMixin.handle_no_permission">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceMixin.handle_no_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_no_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_student</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_access_mode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span><span class="p">,</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span><span class="p">]</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">view_content_to</span> <span class="o">==</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span><span class="p">):</span>
+            <span class="c1"># Redirect the user to the enrollment page instead of showing</span>
+            <span class="c1"># a 403 Forbidden error, if:</span>
+            <span class="c1"># - the user is signed in but not enrolled or staff</span>
+            <span class="c1"># - the page is not a teacher page (e.g. edit course)</span>
+            <span class="c1"># - the course is visible only to enrolled students</span>
+            <span class="c1">#</span>
+            <span class="c1"># If SIS enrollment is applied and course requires enrollment questionnaire,</span>
+            <span class="c1"># redirect to the questionnaire instead.</span>
+            <span class="n">enrollment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span>
+            <span class="k">if</span> <span class="n">enrollment</span> <span class="ow">and</span> <span class="n">enrollment</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">PENDING</span><span class="p">:</span>
+                <span class="n">exercise</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">find_enrollment_exercise</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">is_external</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">exercise</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">handle_no_permission</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseInstanceBaseView">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseInstanceBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseInstanceBaseView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="EnrollableViewMixin">
+<a class="viewcode-back" href="../../course.html#course.viewbase.EnrollableViewMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnrollableViewMixin</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLL</span>
+
+<div class="viewcode-block" id="EnrollableViewMixin.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.viewbase.EnrollableViewMixin.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrolled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_student</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrollable</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profile</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_enrollable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s1">&#39;enrolled&#39;</span><span class="p">,</span> <span class="s1">&#39;enrollable&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseModuleBaseMixin">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseModuleBaseMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseModuleBaseMixin</span><span class="p">:</span>
+    <span class="n">module_kw</span> <span class="o">=</span> <span class="s2">&quot;module_slug&quot;</span>
+    <span class="n">module_permissions_classes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">CourseModulePermission</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="CourseModuleBaseMixin.get_permissions">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseModuleBaseMixin.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">Perm</span><span class="p">()</span> <span class="k">for</span> <span class="n">Perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_permissions_classes</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+
+
+    <span class="c1"># get_course_module_object</span>
+
+<div class="viewcode-block" id="CourseModuleBaseMixin.get_resource_objects">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseModuleBaseMixin.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_course_module_object</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;module&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseModuleMixin">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseModuleMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseModuleMixin</span><span class="p">(</span><span class="n">CourseModuleBaseMixin</span><span class="p">,</span> <span class="n">CourseInstanceMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="CourseModuleMixin.get_course_module_object">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseModuleMixin.get_course_module_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_module_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="n">CourseModule</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_kw</span><span class="p">],</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseModuleBaseView">
+<a class="viewcode-back" href="../../course.html#course.viewbase.CourseModuleBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseModuleBaseView</span><span class="p">(</span><span class="n">CourseModuleMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

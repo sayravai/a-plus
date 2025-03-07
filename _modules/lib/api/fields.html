@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.api.fields &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.api.fields</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.api.fields</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImproperlyConfigured</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoReverseMatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.module_loading</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_attribute</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.relations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">HyperlinkedRelatedField</span><span class="p">,</span>
+    <span class="n">HyperlinkedIdentityField</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1"># pylint: disable-next=pointless-string-statement</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">When nested routes are used in DRF extensions, you could use `NestedHyperlinkedIdentityField`.</span>
+
+<span class="sd">#### NestedHyperlinkedRelatedField</span>
+
+<span class="sd">Version of `rest_framework.serializer.HyperlinkedRelatedField` that handles nested routes</span>
+<span class="sd">(nested routes were added to raphendyr/drf-extensions, which is a fork of drf-extensions).</span>
+<span class="sd">You can pass dict that defines how to resolve keyword aguments for reverse url resolving using argument `lookup_map`.</span>
+<span class="sd">If not passed, then the map is resolved from current view or you can pass view as object or string via `lookup_map`.</span>
+<span class="sd">In addition, you need to define `view_name` that points to correct nested route url.</span>
+<span class="sd">Some examples:</span>
+
+<span class="sd">    from lib.api.fields import NestedHyperlinkedRelatedField, NestedHyperlinkedIdentityField</span>
+
+<span class="sd">    class CitySerializer(serializers.ModelSerializer):</span>
+<span class="sd">        resource_uri = NestedHyperlinkedIdentityField(view_name=&#39;city-detail&#39;)</span>
+<span class="sd">        houses = NestedHyperlinkedRelatedField(</span>
+<span class="sd">            many=True,</span>
+<span class="sd">            view_name=&#39;houses-list&#39;,</span>
+<span class="sd">            lookup_map=&#39;yourapp.api_views.HousesViewSet&#39;)</span>
+<span class="sd">        citizens = NestedHyperlinkedRelatedField(</span>
+<span class="sd">            many=True,</span>
+<span class="sd">            view_name=&#39;citizens-detail&#39;,</span>
+<span class="sd">            lookup_map = {</span>
+<span class="sd">                &#39;town_id&#39;: &#39;town.id&#39;,</span>
+<span class="sd">                &#39;citizen_id&#39;: &#39;id&#39;,</span>
+<span class="sd">            })</span>
+
+<span class="sd">        class Meta:</span>
+<span class="sd">            model = City</span>
+<span class="sd">            fields = (&#39;resource_uri&#39;, &#39;houses&#39;, &#39;citizens&#39;)</span>
+
+<span class="sd">If `lookup_map` value is callable, it will be called with selected model object as only argument.</span>
+
+<span class="sd">**This field is read only for now.**</span>
+<span class="sd">Implementation of write support is pending.</span>
+
+<span class="sd">#### NestedHyperlinkedIdentityField</span>
+
+<span class="sd">Same as `NestedHyperlinkedRelatedField` except it always uses object itself (`source=&#39;*&#39;`).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="NestedHyperlinkedRelatedField">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.fields.NestedHyperlinkedRelatedField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NestedHyperlinkedRelatedField</span><span class="p">(</span><span class="n">HyperlinkedRelatedField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles HyperlinkedRelatedField with views that are nested.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        view_name: Name of url rule used for reverse resolving</span>
+<span class="sd">        lookup_map: Item specifig mapping how to resolve url kwargs for named url conf.</span>
+<span class="sd">            If value is dict, it&#39;s used as is.</span>
+<span class="sd">            If value is string, it&#39;s resolved to class using django import_string.</span>
+<span class="sd">            If value is class (e.g. resolved from string above) lookup_map is constructed</span>
+<span class="sd">            member variables `lookup_field`, `lookup_url_kwarg` and `parent_lookup_map`.</span>
+<span class="sd">            If value is ommited, we try look for view from context and do above.</span>
+<span class="sd">            If no value is resolvable by above means, error is raised.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lookup_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__lookup_map</span> <span class="o">=</span> <span class="n">lookup_map</span>
+        <span class="k">assert</span> <span class="s1">&#39;lookup_field&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s2">&quot;Do not use `lookup_field` use `lookup_map` instead.&quot;</span>
+        <span class="k">assert</span> <span class="s1">&#39;lookup_url_kwarg&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">,</span> <span class="s2">&quot;Do not use `lookup_url_kwarg` use `lookup_map` instead.&quot;</span>
+        <span class="c1"># FIXME: implement update operations with related fields</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;read_only&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;queryset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_lookup_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lookup_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__lookup_map</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;view&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">lookup_map</span><span class="p">,</span> <span class="p">(</span>
+            <span class="s2">&quot;Field `</span><span class="si">{field}</span><span class="s2">` of type `</span><span class="si">{type}</span><span class="s2">` in `</span><span class="si">{serializer}</span><span class="s2">` requires `lookup_map` &quot;</span>
+            <span class="s2">&quot;to be able to reverse `view_name`. </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;You can pass that as argument or it can be resolved from view parameters. &quot;</span>
+            <span class="s2">&quot;To resolve from view parameters, you need to pass view as argument &quot;</span>
+            <span class="s2">&quot;(via `lookup_map` as string or reference) or in context by adding &quot;</span>
+            <span class="s2">&quot;`context={{&#39;view&#39;: view}}` when instantiating the serializer. &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">serializer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lookup_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">lookup_map</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lookup_map</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">lookup_map</span> <span class="o">=</span> <span class="n">import_string</span><span class="p">(</span><span class="n">lookup_map</span><span class="p">)</span>
+
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">lookup_map</span><span class="p">,</span> <span class="s1">&#39;lookup_field&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_field</span>
+        <span class="n">lookup_url_kw</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">lookup_map</span><span class="p">,</span> <span class="s1">&#39;lookup_url_kwarg&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">lookup_field</span>
+        <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">lookup_map</span><span class="p">,</span> <span class="s1">&#39;parent_lookup_map&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">map_</span> <span class="o">=</span> <span class="p">{</span><span class="n">lookup_url_kw</span><span class="p">:</span> <span class="n">lookup_field</span><span class="p">}</span>
+        <span class="n">map_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parent_lookup_map</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">map_</span>
+
+<div class="viewcode-block" id="NestedHyperlinkedRelatedField.get_url">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.fields.NestedHyperlinkedRelatedField.get_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">view_name</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="p">):</span> <span class="c1"># pylint: disable=redefined-builtin</span>
+        <span class="c1"># Unsaved objects will not have a valid URL.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;pk&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">obj</span><span class="o">.</span><span class="n">pk</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># get lookup map (will use properties lookup_map and view)</span>
+        <span class="n">lookup_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup_map</span>
+        <span class="c1"># pylint: disable-next=unnecessary-lambda-assignment</span>
+        <span class="n">get</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">get_attribute</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+
+        <span class="c1"># build kwargs for reverse</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">get</span><span class="p">(</span><span class="n">source</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="ow">in</span> <span class="n">lookup_map</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">))</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Got </span><span class="si">{exc_type}</span><span class="s2"> when attempting to create url for field &quot;</span>
+                <span class="s2">&quot;`</span><span class="si">{field}</span><span class="s2">` on serializer `</span><span class="si">{serializer}</span><span class="s2">`. &quot;</span>
+                <span class="s2">&quot;The serializer field lookup_map might be configured incorrectly. &quot;</span>
+                <span class="s2">&quot;We used `</span><span class="si">{instance}</span><span class="s2">` instance with lookup map `</span><span class="si">{lookup_map}</span><span class="s2">`. &quot;</span>
+                <span class="s2">&quot;Original exception text was: </span><span class="si">{exc}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">exc_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                    <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">,</span>
+                    <span class="n">serializer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                    <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                    <span class="n">lookup_map</span><span class="o">=</span><span class="n">lookup_map</span><span class="p">,</span>
+                    <span class="n">exc</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">NoReverseMatch</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span>
+                <span class="c1"># pylint: disable-next=unused-format-string-argument</span>
+                <span class="s2">&quot;Could not resolve URL for hyperlinked relationship in field &quot;</span>
+                <span class="s2">&quot;`</span><span class="si">{field}</span><span class="s2">` on serializer `</span><span class="si">{serializer}</span><span class="s2">`. &quot;</span>
+                <span class="s2">&quot;You may have failed to include the related model in your API, &quot;</span>
+                <span class="s2">&quot;or incorrectly configured `view_name` or `lookup_map` &quot;</span>
+                <span class="s2">&quot;attribute on this field. Original error: </span><span class="si">{exc}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">field</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_name</span><span class="p">,</span>
+                    <span class="n">view_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">view_name</span><span class="p">,</span>
+                    <span class="n">serializer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+                    <span class="n">exc</span><span class="o">=</span><span class="n">exc</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NestedHyperlinkedIdentityField">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.fields.NestedHyperlinkedIdentityField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">NestedHyperlinkedRelatedField</span><span class="p">,</span> <span class="n">HyperlinkedIdentityField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a nested hyperlinked resource itself.</span>
+<span class="sd">    Will get lookup_map from view class in serializer context</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,392 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.admin &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.admin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.admin</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Course</span><span class="p">,</span>
+    <span class="n">CourseInstance</span><span class="p">,</span>
+    <span class="n">Enrollment</span><span class="p">,</span>
+    <span class="n">StudentGroup</span><span class="p">,</span>
+    <span class="n">CourseHook</span><span class="p">,</span>
+    <span class="n">CourseModule</span><span class="p">,</span>
+    <span class="n">LearningObjectCategory</span><span class="p">,</span>
+    <span class="n">UserTag</span><span class="p">,</span>
+    <span class="n">UserTagging</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.admin_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecentCourseInstanceListFilter</span>
+
+
+<div class="viewcode-block" id="instance_url">
+<a class="viewcode-back" href="../../course.html#course.admin.instance_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">instance_url</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the URL for the admin listing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span></div>
+
+
+
+<span class="n">instance_url</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;URL&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CourseAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.CourseAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CourseInstanceAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.CourseInstanceAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseInstanceAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course__code&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;instance_name&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;group_work_allowed&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;starting_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ending_time&#39;</span><span class="p">,</span>
+        <span class="n">instance_url</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;starting_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;ending_time&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;course&#39;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="CourseInstanceAdmin.get_queryset">
+<a class="viewcode-back" href="../../course.html#course.admin.CourseInstanceAdmin.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_teaching</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EnrollmentAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.EnrollmentAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnrollmentAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user_profile__student_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user_profile__user__username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user_profile__user__first_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user_profile__user__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user_profile__user__email&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;user_profile&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user_profile&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;role&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">RecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;selected_group&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user_profile&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="CourseModuleAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.CourseModuleAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseModuleAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__code&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__str__&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;opening_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;reading_opening_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;closing_time&#39;</span><span class="p">,</span>
+        <span class="n">instance_url</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">RecentCourseInstanceListFilter</span><span class="p">,</span>
+        <span class="s1">&#39;opening_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;closing_time&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;course_instance&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="LearningObjectCategoryAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.LearningObjectCategoryAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearningObjectCategoryAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__code&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">RecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ordering</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;course_instance&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="StudentGroupAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.StudentGroupAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StudentGroupAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;members__student_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;members__user__username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;members__user__first_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;members__user__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;members__user__email&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;members_string&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;members_string&#39;</span><span class="p">,)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">RecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;members&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="StudentGroupAdmin.members_string">
+<a class="viewcode-back" href="../../course.html#course.admin.StudentGroupAdmin.members_string">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MEMBERS&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">members_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UserTagAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.UserTagAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserTagAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__code&#39;</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slug&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;slug&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">RecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="UserTaggingAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.UserTaggingAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserTaggingAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;tag__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user__student_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user__user__username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user__user__first_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user__user__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user__user__email&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tag&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;tag&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">RecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tag&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CourseHookAdmin">
+<a class="viewcode-back" href="../../course.html#course.admin.CourseHookAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseHookAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;hook_url&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance__course__code&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;course_instance&#39;</span><span class="p">,)</span></div>
+
+
+
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Course</span><span class="p">,</span> <span class="n">CourseAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseInstanceAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Enrollment</span><span class="p">,</span> <span class="n">EnrollmentAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">StudentGroup</span><span class="p">,</span> <span class="n">StudentGroupAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">CourseHook</span><span class="p">,</span> <span class="n">CourseHookAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">CourseModule</span><span class="p">,</span> <span class="n">CourseModuleAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LearningObjectCategory</span><span class="p">,</span> <span class="n">LearningObjectCategoryAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">UserTag</span><span class="p">,</span> <span class="n">UserTagAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">UserTagging</span><span class="p">,</span> <span class="n">UserTaggingAdmin</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

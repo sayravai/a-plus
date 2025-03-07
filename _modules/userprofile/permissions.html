@@ -1,0 +1,180 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>userprofile.permissions &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">userprofile.permissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for userprofile.permissions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">SAFE_METHODS</span><span class="p">,</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">FilterBackend</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">,</span> <span class="n">LTIServiceUser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span>
+
+<div class="viewcode-block" id="IsAdminOrUserObjIsSelf">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsAdminOrUserObjIsSelf">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IsAdminOrUserObjIsSelf</span><span class="p">(</span><span class="n">Permission</span><span class="p">,</span> <span class="n">FilterBackend</span><span class="p">):</span>
+<div class="viewcode-block" id="IsAdminOrUserObjIsSelf.is_super">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsAdminOrUserObjIsSelf.is_super">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_super</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_staff</span> <span class="ow">or</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span> <span class="ow">or</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">)</span> <span class="c1"># grader is considered admin</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IsAdminOrUserObjIsSelf.has_object_permission">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsAdminOrUserObjIsSelf.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">UserProfile</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">return</span> <span class="n">user</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">obj</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_super</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IsAdminOrUserObjIsSelf.filter_queryset">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsAdminOrUserObjIsSelf.filter_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">queryset</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">UserProfile</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_super</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryset</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="IsTeacherOrAdminOrSelf">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsTeacherOrAdminOrSelf">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IsTeacherOrAdminOrSelf</span><span class="p">(</span><span class="n">IsAdminOrUserObjIsSelf</span><span class="p">):</span>
+<div class="viewcode-block" id="IsTeacherOrAdminOrSelf.is_super">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsTeacherOrAdminOrSelf.is_super">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_super</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_super</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="c1"># FIXME: inefficient database query</span>
+        <span class="c1"># Loop over every course instance in the database to check if the user</span>
+        <span class="c1"># is a teacher on any course instance.</span>
+        <span class="n">every_course</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">course</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">(</span><span class="n">user</span><span class="p">)</span> <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">every_course</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GraderUserCanOnlyRead">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.GraderUserCanOnlyRead">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GraderUserCanOnlyRead</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+<div class="viewcode-block" id="GraderUserCanOnlyRead.has_permission">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.GraderUserCanOnlyRead.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="n">SAFE_METHODS</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="IsLTIServiceUser">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsLTIServiceUser">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IsLTIServiceUser</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+<div class="viewcode-block" id="IsLTIServiceUser.has_permission">
+<a class="viewcode-back" href="../../userprofile.html#userprofile.permissions.IsLTIServiceUser.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">LTIServiceUser</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

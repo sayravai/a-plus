@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.logging &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.logging</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.logging</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnreadablePostError</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">user_logged_in</span><span class="p">,</span> <span class="n">user_logged_out</span><span class="p">,</span> <span class="n">user_login_failed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">receiver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">format_cef</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_cef</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus</span><span class="w"> </span><span class="kn">import</span> <span class="n">VERSION</span>
+
+
+<span class="n">CEF_VENDOR</span> <span class="o">=</span> <span class="s1">&#39;Aalto&#39;</span>
+<span class="n">CEF_PRODUCT</span> <span class="o">=</span> <span class="s1">&#39;aplus&#39;</span>
+
+<div class="viewcode-block" id="skip_unreadable_post">
+<a class="viewcode-back" href="../../lib.html#lib.logging.skip_unreadable_post">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">skip_unreadable_post</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Skips log records of unfinished post requests.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">record</span><span class="o">.</span><span class="n">exc_info</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">exc_info</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">UnreadablePostError</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecurityLog">
+<a class="viewcode-back" href="../../lib.html#lib.logging.SecurityLog">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecurityLog</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Static singleton class used for A+ - wide security logging,</span>
+<span class="sd">    to produce ArcSight Common Event Format (CEF) log.</span>
+<span class="sd">    Django signals are used to track login/logout events.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">seclogger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.security&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SecurityLog.logger">
+<a class="viewcode-back" href="../../lib.html#lib.logging.SecurityLog.logger">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logger</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SecurityLog</span><span class="o">.</span><span class="n">seclogger</span></div>
+
+
+<div class="viewcode-block" id="SecurityLog.logevent">
+<a class="viewcode-back" href="../../lib.html#lib.logging.SecurityLog.logevent">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">logevent</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span>
+            <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="c1"># pylint: disable=redefined-builtin</span>
+            <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">severity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">extensions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Unit tests may not have user or source address defined.</span>
+        <span class="k">if</span> <span class="n">request</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">):</span>
+                <span class="n">extensions</span><span class="p">[</span><span class="s1">&#39;sourceUserName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                <span class="n">extensions</span><span class="p">[</span><span class="s1">&#39;sourceUserId&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">:=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REMOTE_ADDR&#39;</span><span class="p">)):</span>
+                <span class="n">extensions</span><span class="p">[</span><span class="s1">&#39;sourceAddress&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">addr</span>
+
+        <span class="n">SecurityLog</span><span class="o">.</span><span class="n">logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="n">format_cef</span><span class="p">(</span>
+                <span class="n">CEF_VENDOR</span><span class="p">,</span>
+                <span class="n">CEF_PRODUCT</span><span class="p">,</span>
+                <span class="n">VERSION</span><span class="p">,</span>
+                <span class="nb">type</span><span class="p">,</span>
+                <span class="n">message</span><span class="p">,</span>
+                <span class="n">severity</span><span class="p">,</span>
+                <span class="n">extensions</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># This example was used as an inspiration for the following functions:</span>
+<span class="c1"># https://stackoverflow.com/questions/37618473/how-can-i-log-both-successful-and-failed-login-and-logout-attempts-in-django</span>
+<div class="viewcode-block" id="user_logged_in_callback">
+<a class="viewcode-back" href="../../lib.html#lib.logging.user_logged_in_callback">[docs]</a>
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">user_logged_in</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_logged_in_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="n">SecurityLog</span><span class="o">.</span><span class="n">logevent</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;login&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="user_logged_out_callback">
+<a class="viewcode-back" href="../../lib.html#lib.logging.user_logged_out_callback">[docs]</a>
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">user_logged_out</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_logged_out_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="n">SecurityLog</span><span class="o">.</span><span class="n">logevent</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;logout&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># Unfortunately the request object is not passed with this signal,</span>
+<span class="c1"># so we cannot get the IP.</span>
+<div class="viewcode-block" id="user_login_failed_callback">
+<a class="viewcode-back" href="../../lib.html#lib.logging.user_login_failed_callback">[docs]</a>
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">user_login_failed</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_login_failed_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">credentials</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">SecurityLog</span><span class="o">.</span><span class="n">logevent</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;login-failed&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;username: </span><span class="si">{</span><span class="n">credentials</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1"># Unit tests do not have &#39;username&#39; in credentials, let&#39;s not fail them for that</span>
+        <span class="k">pass</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.reveal_models &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.reveal_models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.reveal_models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.reveal_states</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRevealState</span>
+
+
+<div class="viewcode-block" id="RevealRule">
+<a class="viewcode-back" href="../../exercise.html#exercise.reveal_models.RevealRule">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RevealRule</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determines whether some information (e.g. submission feedback, model</span>
+<span class="sd">    solutions) can be revealed to students.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RevealRule.TRIGGER">
+<a class="viewcode-back" href="../../exercise.html#exercise.reveal_models.RevealRule.TRIGGER">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">TRIGGER</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">IntegerChoices</span><span class="p">):</span>
+        <span class="n">MANUAL</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TRIGGER_MANUAL&#39;</span><span class="p">)</span>
+        <span class="n">IMMEDIATE</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TRIGGER_IMMEDIATE&#39;</span><span class="p">)</span>
+        <span class="n">TIME</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TRIGGER_TIME&#39;</span><span class="p">)</span>
+        <span class="n">DEADLINE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TRIGGER_DEADLINE&#39;</span><span class="p">)</span>
+        <span class="n">DEADLINE_ALL</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TRIGGER_DEADLINE_ALL&#39;</span><span class="p">)</span>
+        <span class="n">COMPLETION</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TRIGGER_COMPLETION&#39;</span><span class="p">)</span>
+        <span class="n">DEADLINE_OR_FULL_POINTS</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;TRIGGER_DEADLINE_OR_FULL_POINTS&#39;</span><span class="p">)</span></div>
+
+
+    <span class="n">trigger</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TRIGGER&#39;</span><span class="p">))</span>
+    <span class="n">delay_minutes</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_DELAY_MINUTES&#39;</span><span class="p">))</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TIME&#39;</span><span class="p">))</span>
+    <span class="n">currently_revealed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CURRENTLY_REVEALED&#39;</span><span class="p">))</span>
+    <span class="n">show_zero_points_immediately</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SHOW_ZERO_POINTS_IMMEDIATELY&#39;</span><span class="p">))</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_REVEAL_RULE&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_REVEAL_RULE_PLURAL&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RevealRule.is_revealed">
+<a class="viewcode-back" href="../../exercise.html#exercise.reveal_models.RevealRule.is_revealed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_revealed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="s1">&#39;BaseRevealState&#39;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if, based on the provided state, the information should</span>
+<span class="sd">        be revealed to the student.</span>
+
+<span class="sd">        If a time is provided, visibility is checked for that specific time.</span>
+<span class="sd">        Otherwise, the current time is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">==</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">MANUAL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">currently_revealed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">==</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">IMMEDIATE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">TIME</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_ALL</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_revealed_due_to_time</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">==</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">COMPLETION</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_revealed_due_to_full_points</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_revealed_due_to_max_submissions</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">==</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_OR_FULL_POINTS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_revealed_due_to_full_points</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_revealed_due_to_time</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="RevealRule.get_reveal_time">
+<a class="viewcode-back" href="../../exercise.html#exercise.reveal_models.RevealRule.get_reveal_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_reveal_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="s1">&#39;BaseRevealState&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the time at which `is_reveal` will be true, or `None` if the</span>
+<span class="sd">        time is indeterminate (depends on actions such as the student</span>
+<span class="sd">        completing the exercise).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">==</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">TIME</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">in</span> <span class="p">[</span><span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE</span><span class="p">,</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_OR_FULL_POINTS</span><span class="p">]:</span>
+            <span class="n">deadline</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get_deadline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">deadline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">seconds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delay_minutes</span> <span class="o">*</span> <span class="mi">60</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delay_minutes</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="k">return</span> <span class="n">deadline</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">seconds</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">==</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_ALL</span><span class="p">:</span>
+            <span class="n">latest_deadline</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get_latest_deadline</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">latest_deadline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">seconds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delay_minutes</span> <span class="o">*</span> <span class="mi">60</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delay_minutes</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="k">return</span> <span class="n">latest_deadline</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">seconds</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_revealed_due_to_full_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="s1">&#39;BaseRevealState&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get_points</span><span class="p">()</span>
+        <span class="n">max_points</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get_max_points</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">points</span> <span class="o">&gt;=</span> <span class="n">max_points</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_revealed_due_to_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="s1">&#39;BaseRevealState&#39;</span><span class="p">,</span> <span class="n">time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">reveal_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_reveal_time</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">reveal_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">time</span> <span class="o">&gt;</span> <span class="n">reveal_time</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_revealed_due_to_max_submissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="s1">&#39;BaseRevealState&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">submissions</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get_submissions</span><span class="p">()</span>
+        <span class="n">max_submissions</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">get_max_submissions</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">submissions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_submissions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">max_submissions</span> <span class="o">&lt;=</span> <span class="n">submissions</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

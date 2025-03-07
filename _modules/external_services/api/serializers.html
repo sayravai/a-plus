@@ -1,0 +1,224 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.api.serializers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.api.serializers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.api.serializers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExercisePoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_sourced_id</span><span class="p">,</span> <span class="n">LTIOutcomeXMLParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIOutcomeResponseRenderer</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.external_services.api&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LTIOutcomeSerializer">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.serializers.LTIOutcomeSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTIOutcomeSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
+    <span class="c1"># parameters that are parsed from the XML of the request body</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;1.0&#39;</span><span class="p">)</span>
+    <span class="n">msgid</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">127</span><span class="p">)</span>
+    <span class="n">req_type</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_REPLACE</span><span class="p">,</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_READ</span><span class="p">,</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_DELETE</span>
+    <span class="p">])</span>
+    <span class="n">sourced_id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">FloatField</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LTIOutcomeSerializer.create">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.serializers.LTIOutcomeSerializer.create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validated_data</span><span class="p">):</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;exercise&#39;</span><span class="p">]</span>
+        <span class="n">submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="n">exercise</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span>
+            <span class="n">grade</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">),</span>
+            <span class="c1"># +0.5 for rounding to the nearest integer since int() truncates down</span>
+            <span class="n">grading_time</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="n">grading_data</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;lti_msgid&#39;</span><span class="p">:</span> <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;msgid&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;sourced_id&#39;</span><span class="p">:</span> <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;sourced_id&#39;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="c1"># the submission must be saved before its many-to-many field submitters may be updated</span>
+        <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;submitter&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">submission</span></div>
+
+
+<div class="viewcode-block" id="LTIOutcomeSerializer.to_representation">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.serializers.LTIOutcomeSerializer.to_representation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_representation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Takes the object instance that requires serialization, and should</span>
+<span class="sd">        return a primitive representation. Typically this means returning</span>
+<span class="sd">        a structure of built-in Python datatypes. The exact types that can be</span>
+<span class="sd">        handled will depend on the render classes you have configured for your API.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Don&#39;t use the instance argument here since it is a submission instance</span>
+        <span class="c1"># if a new submission has been created by calling serializer.save()</span>
+        <span class="c1"># This method needs to return the LTI Outcome parameters for the response renderer.</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validated_data</span>
+        <span class="c1"># using self.validated_data here implies that the serializer should always</span>
+        <span class="c1"># be instantiated with the data argument, which is fine for LTI since</span>
+        <span class="c1"># even read requests are posted with a request body</span>
+        <span class="k">if</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;req_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_READ</span><span class="p">:</span>
+            <span class="n">exercise</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;exercise&#39;</span><span class="p">]</span>
+            <span class="n">submitter</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;submitter&#39;</span><span class="p">]</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">exercise</span><span class="p">,</span> <span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">best_submission</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">best_submission</span>
+            <span class="k">if</span> <span class="n">best_submission</span><span class="p">:</span>
+                <span class="c1"># LTI score is a decimal value in the range 0.0 - 1.0. The decimal point must be a period.</span>
+                <span class="k">if</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">best_submission</span><span class="o">.</span><span class="n">points</span> <span class="o">/</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1.0&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="c1"># an empty result score should be returned if no grade has been set or it has been deleted</span>
+
+        <span class="k">elif</span> <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;req_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_DELETE</span><span class="p">:</span>
+            <span class="c1"># we don&#39;t delete any submissions</span>
+            <span class="n">ret</span><span class="p">[</span><span class="s1">&#39;code_major&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">LTIOutcomeResponseRenderer</span><span class="o">.</span><span class="n">CODE_MAJOR_UNSUPPORTED</span>
+
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="LTIOutcomeSerializer.to_internal_value">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.serializers.LTIOutcomeSerializer.to_internal_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_internal_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Takes the unvalidated incoming data as input and should return the</span>
+<span class="sd">        validated data that will be made available as serializer.validated_data.</span>
+<span class="sd">        The return value will also be passed to the .create() or .update() methods</span>
+<span class="sd">        if .save() is called on the serializer class.</span>
+<span class="sd">        If any of the validation fails, then the method should raise</span>
+<span class="sd">        a serializers.ValidationError(errors).</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># this runs the default validators for the defined serializer fields</span>
+        <span class="c1"># it raises serializers.ValidationError if there are errors</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">validated_data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_internal_value</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Validation error in LTI Outcomes request: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">detail</span><span class="p">))</span>
+            <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;req_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_REPLACE</span>
+                <span class="ow">and</span> <span class="s1">&#39;score&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">validated_data</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;LTI Outcomes replaceResultRequest did not contain the result score&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">({</span>
+                <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_REPLACE</span> <span class="o">+</span> <span class="s1">&#39; request must include the new result score.&#39;</span><span class="p">]</span>
+            <span class="p">})</span>
+
+        <span class="c1"># retrieve the exercise and user profile instances</span>
+        <span class="k">if</span> <span class="s1">&#39;exercise&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">or</span> <span class="s1">&#39;submitter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">exercise</span><span class="p">,</span> <span class="n">user_profile</span> <span class="o">=</span> <span class="n">parse_sourced_id</span><span class="p">(</span><span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;sourced_id&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">exercise</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">user_profile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">({</span>
+                    <span class="s1">&#39;sourced_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Invalid sourcedId.&#39;</span><span class="p">]</span>
+                <span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exercise</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;exercise&#39;</span><span class="p">]</span>
+            <span class="n">user_profile</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;submitter&#39;</span><span class="p">]</span>
+        <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;exercise&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exercise</span>
+        <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;submitter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_profile</span>
+
+        <span class="k">return</span> <span class="n">validated_data</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

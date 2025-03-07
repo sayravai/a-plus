@@ -1,0 +1,506 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.lti1p3 &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.lti1p3</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.lti1p3</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">api_reverse</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">jwt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jwcrypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">jwk</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">oauthlib.openid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RequestValidator</span> <span class="k">as</span> <span class="n">OIDCRequestValidator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">oauthlib.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span> <span class="k">as</span> <span class="n">OAuthRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">oauthlib.oauth2.rfc6749.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAuth2Error</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_aplus_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTI1p3Exercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTI1p3Service</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.external_services&#39;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_claim</span><span class="p">(</span><span class="n">id_token</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">id_token</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">})</span>
+
+
+<div class="viewcode-block" id="prepare_lti1p3_initiate_login">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.prepare_lti1p3_initiate_login">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_lti1p3_initiate_login</span><span class="p">(</span>
+        <span class="n">service</span><span class="p">:</span> <span class="n">LTI1p3Service</span><span class="p">,</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span>
+        <span class="n">exercise</span><span class="p">:</span> <span class="n">LTI1p3Exercise</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepares LTI 1.3 initiate login request sent from A+ to LTI Tool, which is expected</span>
+<span class="sd">    to respond by sending an Authentication request back. Returns parameters included in</span>
+<span class="sd">    the request.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_anonymous</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">()</span>
+
+    <span class="c1"># LTI message hint is used to find course instance / exercise at later stages of handshake</span>
+    <span class="k">if</span> <span class="n">exercise</span><span class="p">:</span>
+        <span class="n">hint</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">get_resource_link_id</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hint</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;iss&quot;</span><span class="p">,</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;target_link_uri&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;login_hint&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s2">&quot;client_id&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">client_id</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lti_deployment_id&quot;</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">deployment_id</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;lti_message_hint&quot;</span><span class="p">,</span> <span class="n">hint</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">parameters</span></div>
+
+
+
+<div class="viewcode-block" id="LTI1p3Client">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3Client">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTI1p3Client</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a validated OAuth client (LTI 1.3 tool) interacting with A+ LTI platform.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client_id</span> <span class="o">=</span> <span class="n">client_id</span></div>
+
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTI1p3AuthValidator</span><span class="p">(</span><span class="n">OIDCRequestValidator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of oauthlib Auhtentication request validator for incoming OAuth2</span>
+<span class="sd">    requests used in LTI 1.3.</span>
+
+<span class="sd">    @param user: Django user associated with HTTP requests, when used in login</span>
+<span class="sd">    authorization request triggered by A+ user.</span>
+<span class="sd">    None, if request has originated from LTI tool.</span>
+<span class="sd">    </span>
+<span class="sd">    @param params: URL query parameters from OAuth request.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">message_hint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect_uri</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;redirect_uri&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">login_hint</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;login_hint&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">message_hint</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OAuth2Error</span><span class="p">(</span><span class="s2">&quot;Missing message_hint&quot;</span><span class="p">)</span>
+
+        <span class="n">hint</span> <span class="o">=</span> <span class="n">message_hint</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hint</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">DoesNotExist</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OAuth2Error</span><span class="p">(</span><span class="s2">&quot;Invalid message_hint: cannot find course instance&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hint</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># When accessed from side menu, LTI request is not associated with exercise,</span>
+            <span class="c1"># and then the exercise part of the hint is not defined.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span> <span class="o">=</span> <span class="n">LTI1p3Exercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hint</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">except</span> <span class="n">LTI1p3Exercise</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">client_id</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;client_id&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">client_id</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">LTI1p3Service</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">LTI1p3Service</span><span class="o">.</span><span class="n">DoesNotExist</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OAuth2Error</span><span class="p">(</span><span class="s2">&quot;Invalid client ID&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OAuth2Error</span><span class="p">(</span><span class="s2">&quot;Client ID is not specified&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.validate_client_id">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.validate_client_id">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_client_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">client_id</span> <span class="o">==</span> <span class="n">client_id</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: validate client failed for &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">client_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.validate_redirect_uri">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.validate_redirect_uri">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_redirect_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">redirect_uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># For now we do not have means for better validation, redirect_uri is not preconfigured.</span>
+        <span class="k">if</span> <span class="n">redirect_uri</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: validate redirect_uri failed for client &#39;</span><span class="si">%s</span><span class="s2">&#39;, uri: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">redirect_uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.validate_response_type">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.validate_response_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_response_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">response_type</span> <span class="o">==</span> <span class="s1">&#39;id_token&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: validate response_type failed for client &#39;</span><span class="si">%s</span><span class="s2">&#39;, type: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">response_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.validate_scopes">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.validate_scopes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_scopes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">scopes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">client</span><span class="p">:</span> <span class="n">LTI1p3Client</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># Auth login request, should always be &#39;openid&#39;</span>
+        <span class="k">if</span> <span class="n">scopes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;openid&quot;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: Invalid scope for login request from &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">client_id</span><span class="p">,</span> <span class="n">scopes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.validate_silent_authorization">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.validate_silent_authorization">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_silent_authorization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.validate_silent_login">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.validate_silent_login">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_silent_login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.validate_user_match">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.validate_user_match">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_user_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_token_hint</span><span class="p">,</span> <span class="n">scopes</span><span class="p">,</span> <span class="n">claims</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTT 1.3: Received auth request, but there is no logged in user&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">login_hint</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">login_hint</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: A+ user does not match login hint, user: </span><span class="si">%d</span><span class="s2">, login hint: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">login_hint</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: Login hint is missing from auth request&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.authenticate_client_id">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.authenticate_client_id">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">authenticate_client_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># authenticate_client() checks that we have a valid preconfigured client.</span>
+        <span class="c1"># We do not allow non-preconfigured clients.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: not authenticating client ID: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">client_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_custom_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_token</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">:</span>
+            <span class="n">parsed</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">custom</span><span class="o">.</span><span class="n">split</span><span class="p">():</span>
+                <span class="n">splitted</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">splitted</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">):</span>
+                    <span class="n">parsed</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">splitted</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">]})</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Invalid custom parameter in LTI config: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+            <span class="n">_add_claim</span><span class="p">(</span><span class="n">id_token</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="n">parsed</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_lti_roles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_token</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">roles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;http://purl.imsglobal.org/vocab/lis/v2/membership#Learner&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_assistant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="n">roles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant&quot;</span><span class="p">)</span>
+        <span class="n">_add_claim</span><span class="p">(</span><span class="n">id_token</span><span class="p">,</span> <span class="s2">&quot;roles&quot;</span><span class="p">,</span> <span class="n">roles</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_launch_presentation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_token</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">param</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;locale&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">language</span> <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">open_in_iframe</span><span class="p">:</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="s2">&quot;document_target&quot;</span><span class="p">:</span> <span class="s2">&quot;iframe&quot;</span> <span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="s2">&quot;document_target&quot;</span><span class="p">:</span> <span class="s2">&quot;window&quot;</span> <span class="p">})</span>
+        <span class="n">_add_claim</span><span class="p">(</span><span class="n">id_token</span><span class="p">,</span> <span class="s2">&quot;launch_presentation&quot;</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_service_claim</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">service</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;scope&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;https://purl.imsglobal.org/spec/lti-ags/scope/score&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="s2">&quot;lineitems&quot;</span><span class="p">:</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="n">api_reverse</span><span class="p">(</span>
+                    <span class="s1">&#39;course-lineitems-list&#39;</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span> <span class="s1">&#39;course_id&#39;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span> <span class="p">},</span>
+            <span class="p">)),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">:</span>
+            <span class="n">service</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s2">&quot;lineitem&quot;</span><span class="p">:</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="n">api_reverse</span><span class="p">(</span>
+                    <span class="s1">&#39;course-lineitems-detail&#39;</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span> <span class="s1">&#39;course_id&#39;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">pk</span><span class="p">),</span> <span class="s1">&#39;id&#39;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span> <span class="p">},</span>
+                <span class="p">))</span>
+            <span class="p">})</span>
+        <span class="k">return</span> <span class="n">service</span>
+
+<div class="viewcode-block" id="LTI1p3AuthValidator.finalize_id_token">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3AuthValidator.finalize_id_token">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">finalize_id_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_token</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_token_handler</span><span class="p">,</span> <span class="n">_request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># Resource link ID should be unique within the platform deployment</span>
+        <span class="c1"># Build it based on course instance ID and exercise ID.</span>
+        <span class="c1"># If exercise ID is not defined, the link is likely from the course menu.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">:</span>
+            <span class="n">link_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">get_resource_link_id</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">link_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+
+        <span class="n">id_token</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s2">&quot;iss&quot;</span><span class="p">:</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span>  <span class="c1"># SERVICE_BASE_URL or BASE_URL</span>
+            <span class="s2">&quot;sub&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">),</span>
+            <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">id_token</span><span class="p">[</span><span class="s2">&quot;iat&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">settings</span><span class="o">.</span><span class="n">LTI_TOKEN_LIFETIME</span><span class="p">,</span>
+            <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/deployment_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">deployment_id</span><span class="p">,</span>
+            <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/message_type&quot;</span><span class="p">:</span> <span class="s2">&quot;LtiResourceLinkRequest&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.3.0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/resource_link&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">link_id</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/target_link_uri&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/context&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">link_id</span><span class="p">,</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering&quot;</span><span class="p">]</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;https://purl.imsglobal.org/spec/lti-ags/claim/endpoint&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_service_claim</span><span class="p">(),</span>
+        <span class="p">})</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">share_name</span><span class="p">:</span>
+            <span class="n">id_token</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">(),</span>
+                <span class="s2">&quot;given_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>
+                <span class="s2">&quot;family_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span>
+                <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/ext&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;user_username&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/lis&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;person_sourcedid&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">organization</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_lti_roles</span><span class="p">(</span><span class="n">id_token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_custom_params</span><span class="p">(</span><span class="n">id_token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_launch_presentation</span><span class="p">(</span><span class="n">id_token</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: Finalizind ID Token: iss: </span><span class="si">%s</span><span class="s2">; sub: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">id_token</span><span class="p">[</span><span class="s1">&#39;iss&#39;</span><span class="p">],</span> <span class="n">id_token</span><span class="p">[</span><span class="s1">&#39;sub&#39;</span><span class="p">])</span>
+
+        <span class="n">pem</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">APLUS_AUTH_LOCAL</span><span class="p">[</span><span class="s1">&#39;PRIVATE_KEY&#39;</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">jwk</span><span class="o">.</span><span class="n">JWK</span><span class="o">.</span><span class="n">from_pem</span><span class="p">(</span><span class="n">pem</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
+        <span class="n">kid</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">thumbprint</span><span class="p">()</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">id_token</span><span class="p">,</span> <span class="n">pem</span><span class="p">,</span> <span class="s1">&#39;RS256&#39;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;kid&#39;</span><span class="p">:</span> <span class="n">kid</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">token</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LTI1p3TokenValidator">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3TokenValidator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTI1p3TokenValidator</span><span class="p">(</span><span class="n">OIDCRequestValidator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of oauthlib token request validator for incoming OAuth2</span>
+<span class="sd">    requests used in LTI 1.3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="LTI1p3TokenValidator.validate_grant_type">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3TokenValidator.validate_grant_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_grant_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">client_id</span><span class="p">,</span>
+            <span class="n">grant_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">client</span><span class="p">:</span> <span class="n">LTI1p3Client</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">client</span> <span class="ow">and</span> <span class="n">grant_type</span> <span class="o">==</span> <span class="s1">&#39;client_credentials&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: validate_grant_type failed.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3TokenValidator.authenticate_client">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3TokenValidator.authenticate_client">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">authenticate_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">OAuthRequest</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">decoded_body</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;client_assertion&#39;</span><span class="p">:</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="n">elem</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: authenticate client failed: invalid token&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># We need to do one pass without signature verification to find out client_id</span>
+        <span class="c1"># and subsequent key details.</span>
+        <span class="n">decoded</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;verify_signature&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">decoded</span><span class="p">[</span><span class="s1">&#39;sub&#39;</span><span class="p">]</span>
+        <span class="n">iss</span> <span class="o">=</span> <span class="n">decoded</span><span class="p">[</span><span class="s1">&#39;iss&#39;</span><span class="p">]</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">LTI1p3Client</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="n">LTI1p3Service</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">sub</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">LTI1p3Service</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: Received JWT token for &#39;</span><span class="si">%s</span><span class="s2">&#39; but such client ID does not exist.&quot;</span><span class="p">,</span> <span class="n">sub</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">jwks_client</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">PyJWKClient</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">jwks_url</span><span class="p">)</span>
+        <span class="n">signing_key</span> <span class="o">=</span> <span class="n">jwks_client</span><span class="o">.</span><span class="n">get_signing_key_from_jwt</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="n">token_url</span> <span class="o">=</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;external-services-token&#39;</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: authenticating client: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sub</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">token</span><span class="p">,</span>
+                <span class="n">signing_key</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">algorithms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;RS256&quot;</span><span class="p">],</span>
+                <span class="n">audience</span><span class="o">=</span><span class="n">token_url</span><span class="p">,</span>
+                <span class="n">issuer</span><span class="o">=</span><span class="n">iss</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">jwt</span><span class="o">.</span><span class="n">ExpiredSignatureError</span><span class="p">,</span> <span class="n">jwt</span><span class="o">.</span><span class="n">InvalidAudienceError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: JWT token decoding failed (</span><span class="si">%s</span><span class="s2">): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3TokenValidator.validate_scopes">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3TokenValidator.validate_scopes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_scopes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">scopes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+            <span class="n">client</span><span class="p">:</span> <span class="n">LTI1p3Client</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="n">scopes</span><span class="p">:</span>
+            <span class="c1"># Token request, e.g. for submitting scores</span>
+            <span class="c1"># Currently allowing scores from all registered services.</span>
+            <span class="c1"># Should we have an option for not accepting scores from some tools?</span>
+            <span class="k">if</span> <span class="n">scope</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;https://purl.imsglobal.org/spec/lti-ags/scope/score&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: Invalid scope for token request from &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">client</span><span class="o">.</span><span class="n">client_id</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="LTI1p3TokenValidator.save_bearer_token">
+<a class="viewcode-back" href="../../external_services.html#external_services.lti1p3.LTI1p3TokenValidator.save_bearer_token">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_bearer_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">request</span><span class="p">:</span> <span class="n">OAuthRequest</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># We use JWT tokens, so there is no need to save anything to DB</span>
+        <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

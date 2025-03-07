@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aplus.celery &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">aplus.celery</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for aplus.celery</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">celery</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dateutil.relativedelta</span><span class="w"> </span><span class="kn">import</span> <span class="n">relativedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="kn">import</span> <span class="n">choice</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.celery&#39;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;DJANGO_SETTINGS_MODULE&#39;</span><span class="p">,</span> <span class="s1">&#39;aplus.settings&#39;</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">celery</span><span class="o">.</span><span class="n">Celery</span><span class="p">(</span><span class="s1">&#39;aplus&#39;</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config_from_object</span><span class="p">(</span><span class="s1">&#39;django.conf:settings&#39;</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;CELERY&#39;</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">autodiscover_tasks</span><span class="p">()</span>
+
+<div class="viewcode-block" id="setup_periodic_tasks">
+<a class="viewcode-back" href="../../aplus.html#aplus.celery.setup_periodic_tasks">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">on_after_configure</span><span class="o">.</span><span class="n">connect</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_periodic_tasks</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;SIS_ENROLL_SCHEDULE&#39;</span><span class="p">):</span>
+        <span class="n">sender</span><span class="o">.</span><span class="n">add_periodic_task</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SIS_ENROLL_SCHEDULE</span><span class="p">,</span> <span class="n">enroll</span><span class="o">.</span><span class="n">s</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;enroll&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_EXPIRY_TIMEOUT</span><span class="p">:</span>
+        <span class="c1"># Run timed check twice in timeout period, for more timely retries</span>
+        <span class="n">sender</span><span class="o">.</span><span class="n">add_periodic_task</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_EXPIRY_TIMEOUT</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">retry_submissions</span><span class="o">.</span><span class="n">s</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;retry_submissions&#39;</span><span class="p">)</span></div>
+
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">task</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">enroll</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Traverse the currently open courses that are linked to SIS and update enrollments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span> <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+    <span class="c1"># Enroll students for active courses, or those that will start in 14 days</span>
+    <span class="n">courses</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">ending_time__gt</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+        <span class="n">starting_time__lt</span><span class="o">=</span><span class="n">now</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">14</span><span class="p">),</span>
+        <span class="n">sis_enroll</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
+        <span class="n">i</span><span class="o">.</span><span class="n">enroll_from_sis</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">SIS_ENROLL_DELAY</span><span class="p">:</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SIS_ENROLL_DELAY</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">task</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">retry_submissions</span><span class="p">():</span>
+    <span class="c1"># pylint: disable-next=import-outside-toplevel</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">exercise.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">PendingSubmission</span>
+
+    <span class="c1"># Recovery state: only send one grading request to probe the state of grader</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_grader_stable</span><span class="p">():</span>
+        <span class="c1"># Get ids of all pending submissions and randomly load one to be retried</span>
+        <span class="c1"># (do not load all the submissions objects to save memory)</span>
+        <span class="n">submission_ids</span> <span class="o">=</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span><span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">random_choice</span> <span class="o">=</span> <span class="n">choice</span><span class="p">(</span><span class="n">submission_ids</span><span class="p">)</span>
+        <span class="n">pending</span> <span class="o">=</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">random_choice</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pending</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">&gt;=</span> <span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_RETRY_LIMIT</span> <span class="ow">and</span> <span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_RETRY_LIMIT</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Recovery state: submission retry limit exceeded for submission </span><span class="si">%s</span><span class="s2"> - removing from pending&quot;</span><span class="p">,</span>
+                        <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="p">)</span>
+            <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">set_error</span><span class="p">()</span>
+            <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">pending</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">can_regrade</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Recovery state: retrying expired submission </span><span class="si">%s</span><span class="s2"> (retries: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                            <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="p">,</span> <span class="n">pending</span><span class="o">.</span><span class="n">num_retries</span><span class="p">)</span>
+                <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Stable state: retry all expired submissions</span>
+    <span class="n">expiry_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span>
+        <span class="n">seconds</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_EXPIRY_TIMEOUT</span>
+    <span class="p">)</span>
+    <span class="n">expired</span> <span class="o">=</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">submission_time__lt</span><span class="o">=</span><span class="n">expiry_time</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">pending</span> <span class="ow">in</span> <span class="n">expired</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">can_regrade</span><span class="p">:</span>
+            <span class="c1"># Do not retry submission until SUBMISSION_EXPIRY_TIMEOUT * num_retries has passed</span>
+            <span class="n">pending_timelimit</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span> <span class="o">-</span> <span class="n">relativedelta</span><span class="p">(</span>
+                <span class="n">seconds</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_EXPIRY_TIMEOUT</span><span class="o">*</span><span class="n">pending</span><span class="o">.</span><span class="n">num_retries</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">pending</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">&lt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_RETRY_LIMIT</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pending</span><span class="o">.</span><span class="n">submission_time</span> <span class="o">&lt;</span> <span class="n">pending_timelimit</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrying expired submission </span><span class="si">%s</span><span class="s2"> (retries: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                                <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="p">,</span> <span class="n">pending</span><span class="o">.</span><span class="n">num_retries</span><span class="p">)</span>
+                    <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="p">)</span>
+                    <span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># Delay 500 ms to avoid choking grader</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Not yet retrying submission </span><span class="si">%s</span><span class="s2"> (retries: </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                                <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="p">,</span> <span class="n">pending</span><span class="o">.</span><span class="n">num_retries</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Could not grade submission </span><span class="si">%s</span><span class="s2"> (maximum retries exceeded).&quot;</span><span class="p">,</span> <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="p">)</span>
+                <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">set_error</span><span class="p">()</span>
+                <span class="n">pending</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">pending</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

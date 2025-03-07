@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.crypto package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">lib.crypto package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-lib.crypto.signed_messages">lib.crypto.signed_messages module</a><ul>
+<li><a class="reference internal" href="#lib.crypto.signed_messages.get_signed_message"><code class="docutils literal notranslate"><span class="pre">get_signed_message()</span></code></a></li>
+<li><a class="reference internal" href="#lib.crypto.signed_messages.get_valid_message"><code class="docutils literal notranslate"><span class="pre">get_valid_message()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.crypto.tests">lib.crypto.tests module</a><ul>
+<li><a class="reference internal" href="#lib.crypto.tests.SignedMessagesTest"><code class="docutils literal notranslate"><span class="pre">SignedMessagesTest</span></code></a><ul>
+<li><a class="reference internal" href="#lib.crypto.tests.SignedMessagesTest.setUp"><code class="docutils literal notranslate"><span class="pre">SignedMessagesTest.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#lib.crypto.tests.SignedMessagesTest.test_broken_messages"><code class="docutils literal notranslate"><span class="pre">SignedMessagesTest.test_broken_messages()</span></code></a></li>
+<li><a class="reference internal" href="#lib.crypto.tests.SignedMessagesTest.test_decrypting_known_messages"><code class="docutils literal notranslate"><span class="pre">SignedMessagesTest.test_decrypting_known_messages()</span></code></a></li>
+<li><a class="reference internal" href="#lib.crypto.tests.SignedMessagesTest.test_encrypting_known_messages"><code class="docutils literal notranslate"><span class="pre">SignedMessagesTest.test_encrypting_known_messages()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.crypto">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">lib.crypto package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lib.crypto.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lib-crypto-package">
+<h1>lib.crypto package<a class="headerlink" href="#lib-crypto-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lib.crypto.signed_messages">
+<span id="lib-crypto-signed-messages-module"></span><h2>lib.crypto.signed_messages module<a class="headerlink" href="#module-lib.crypto.signed_messages" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.crypto.signed_messages.get_signed_message">
+<span class="sig-prename descclassname"><span class="pre">lib.crypto.signed_messages.</span></span><span class="sig-name descname"><span class="pre">get_signed_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/crypto/signed_messages.html#get_signed_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.crypto.signed_messages.get_signed_message" title="Link to this definition"></a></dt>
+<dd><p>Sign message with random nonce (salt),
+pack into: nonce_len + nonce + sign_len + sign + message_utf8
+and return base64 encoded value</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.crypto.signed_messages.get_valid_message">
+<span class="sig-prename descclassname"><span class="pre">lib.crypto.signed_messages.</span></span><span class="sig-name descname"><span class="pre">get_valid_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/crypto/signed_messages.html#get_valid_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.crypto.signed_messages.get_valid_message" title="Link to this definition"></a></dt>
+<dd><p>Cehck and return real message from signed.
+Base64 unencode message,
+unpack from: nonce_len + nonce + sign_len + sign + message_utf8
+and return message</p>
+</dd></dl>
+
+</section>
+<section id="module-lib.crypto.tests">
+<span id="lib-crypto-tests-module"></span><h2>lib.crypto.tests module<a class="headerlink" href="#module-lib.crypto.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.crypto.tests.SignedMessagesTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.crypto.tests.</span></span><span class="sig-name descname"><span class="pre">SignedMessagesTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/crypto/tests.html#SignedMessagesTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.crypto.tests.SignedMessagesTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleTestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.crypto.tests.SignedMessagesTest.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/crypto/tests.html#SignedMessagesTest.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.crypto.tests.SignedMessagesTest.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.crypto.tests.SignedMessagesTest.test_broken_messages">
+<span class="sig-name descname"><span class="pre">test_broken_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_random</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/crypto/tests.html#SignedMessagesTest.test_broken_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.crypto.tests.SignedMessagesTest.test_broken_messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.crypto.tests.SignedMessagesTest.test_decrypting_known_messages">
+<span class="sig-name descname"><span class="pre">test_decrypting_known_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_random</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/crypto/tests.html#SignedMessagesTest.test_decrypting_known_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.crypto.tests.SignedMessagesTest.test_decrypting_known_messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.crypto.tests.SignedMessagesTest.test_encrypting_known_messages">
+<span class="sig-name descname"><span class="pre">test_encrypting_known_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mock_random</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/crypto/tests.html#SignedMessagesTest.test_encrypting_known_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.crypto.tests.SignedMessagesTest.test_encrypting_known_messages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.crypto">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-lib.crypto" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

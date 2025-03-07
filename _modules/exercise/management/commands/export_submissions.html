@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.management.commands.export_submissions &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.management.commands.export_submissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.management.commands.export_submissions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.management.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCommand</span><span class="p">,</span> <span class="n">CommandError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Count</span><span class="p">,</span> <span class="n">Max</span><span class="p">,</span> <span class="n">Min</span><span class="p">,</span> <span class="n">Prefetch</span><span class="p">,</span> <span class="n">Q</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">deviations.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeadlineRuleDeviation</span><span class="p">,</span> <span class="n">MaxSubmissionsRuleDeviation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span><span class="p">,</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+
+
+<div class="viewcode-block" id="Command">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.export_submissions.Command">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Exports submission and exercise data from given course instances into CSV files&#39;</span>
+
+<div class="viewcode-block" id="Command.add_arguments">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.export_submissions.Command.add_arguments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;course_instance_id&#39;</span><span class="p">,</span>
+            <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Course instance id (from model CourseInstance) whose data is exported&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-f&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--include-exercises-file&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Include only exercises (and their submissions) whose BaseExercise ids &#39;</span>
+                 <span class="s1">&#39;are listed in the given file (comma separated). &#39;</span>
+                 <span class="s1">&#39;The parameter &quot;course_instance_id&quot; may not be used with this option.&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-e&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--exercise-output-file&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Exercises are written to this CSV file. The file is created or overwritten. &#39;</span>
+                 <span class="s1">&#39;If you do not set any value, then no exercise file is written.&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-s&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--submission-output-file&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Submissions are written to this CSV file. The file is created or overwritten. &#39;</span>
+                 <span class="s1">&#39;If you do not set any value, then no submission file is written.&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-o&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--submission-results-format&#39;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If set, changes the format of the output submissions CSV file. &quot;</span>
+                 <span class="s2">&quot;The output contains only aggregate results, one row per exercise per student: &quot;</span>
+                 <span class="s2">&quot;final grade, number of submissions, timestamps of the first and last submissions.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-b&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--limit-submissions-start&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Limit the number of submissions that are written to the CSV file. &#39;</span>
+                 <span class="s1">&#39;This is the start index of the submissions. &#39;</span>
+                 <span class="s1">&#39;By default, all submissions starting from index zero are included.&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-l&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--limit-submissions-end&#39;</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Limit the number of submissions that are written to the CSV file. &#39;</span>
+                 <span class="s1">&#39;This is the end index of the submissions. &#39;</span>
+                 <span class="s1">&#39;By default, all submissions up to the last index are included.&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-d&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--include-deadline-deviations&#39;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If set, students&#39; personal deadline deviations are included in the submissions CSV file.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-m&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--include-max-submission-deviations&#39;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;If set, students&#39; personal max submission attempt deviations are &quot;</span>
+                <span class="s2">&quot;included in the submissions CSV file.&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-i&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--include-student-ids&#39;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If set, submitters&#39; student ids are included in the submissions CSV file.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-u&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--exclude-user-ids&#39;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;If set, submitters&#39; user ids are excluded from the submissions CSV (included by default).&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-x&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--exclude-exercises-file&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Exclude these exercises. This should be used with the &quot;course_instance_id&quot; parameter. &#39;</span>
+                 <span class="s1">&#39;The BaseExercise ids are defined as a comma-separated list in the given file.&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s1">&#39;-r&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--include-users-file&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Include submissions only from these users whose User ids &quot;</span>
+                 <span class="s2">&quot;are listed in the given file (comma separated).&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Command.parse_comma_list_file">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.export_submissions.Command.parse_comma_list_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_comma_list_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CommandError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error in reading the file &quot;</span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="Command.handle">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.export_submissions.Command.handle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span> <span class="c1"># pylint: disable=too-many-locals # noqa: MC0001</span>
+        <span class="n">course_instance_ids</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;course_instance_id&#39;</span><span class="p">]</span>
+
+        <span class="n">exercise_file_path</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;exercise_output_file&#39;</span><span class="p">]</span>
+        <span class="n">submission_file_path</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;submission_output_file&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise_file_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">submission_file_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="s1">&#39;At least one of the options &quot;--exercise-output-file&quot; or &#39;</span>
+                <span class="s1">&#39;&quot;--submission-output-file&quot; must be given in order to output anything.&#39;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Aborting...&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">limit_submissions_start</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;limit_submissions_start&#39;</span><span class="p">]</span>
+        <span class="n">limit_submissions_end</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;limit_submissions_end&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">limit_submissions_start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">limit_submissions_start</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;--limit-submissions-start must be a non-negative integer.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">limit_submissions_end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">limit_submissions_end</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;--limit-submissions-end must be a non-negative integer.&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">submissions_slice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">limit_submissions_start</span><span class="p">,</span> <span class="n">limit_submissions_end</span><span class="p">)</span>
+
+        <span class="n">exercise_filters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">course_instance_ids</span><span class="p">:</span>
+            <span class="n">exercise_filters</span><span class="p">[</span><span class="s1">&#39;course_module__course_instance__pk__in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">course_instance_ids</span>
+
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_exercises_file&#39;</span><span class="p">]:</span>
+            <span class="n">exercise_filters</span><span class="p">[</span><span class="s1">&#39;pk__in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_comma_list_file</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_exercises_file&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise_filters</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CommandError</span><span class="p">(</span>
+                <span class="s1">&#39;Either the &quot;course_instance_id&quot; parameter &#39;</span>
+                <span class="s1">&#39;or the &quot;include_exercises_file&quot; option must be specified.&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exercise_filters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CommandError</span><span class="p">(</span><span class="s1">&#39;Only one of &quot;course_instance_id&quot; or &quot;include_exercises_file&quot; may be specified.&#39;</span><span class="p">)</span>
+
+        <span class="n">exercise_q_filters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;exclude_exercises_file&#39;</span><span class="p">]:</span>
+            <span class="n">exercise_q_filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">~</span><span class="n">Q</span><span class="p">(</span><span class="n">pk__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_comma_list_file</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;exclude_exercises_file&#39;</span><span class="p">])))</span>
+
+        <span class="c1"># Fetch all exercises from the given course instances.</span>
+        <span class="n">exercises</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="o">*</span><span class="n">exercise_q_filters</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">exercise_filters</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+            <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+            <span class="n">Prefetch</span><span class="p">(</span>
+                <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+                <span class="n">queryset</span><span class="o">=</span><span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+                    <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span>
+                    <span class="s1">&#39;order&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;points_to_pass&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;closing_time&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;late_submissions_allowed&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;late_submission_deadline&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;late_submission_penalty&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;course_module__course_instance__url&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;service_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise_info&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;model_answers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;templates&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;category__status&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;category__description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;category__course_instance&#39;</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+            <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Fetch all submissions for the exercises.</span>
+        <span class="k">if</span> <span class="n">submission_file_path</span><span class="p">:</span>
+            <span class="n">include_user_ids</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_users_file&#39;</span><span class="p">]:</span>
+                <span class="n">include_user_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_comma_list_file</span><span class="p">(</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_users_file&#39;</span><span class="p">])</span>
+
+            <span class="n">submission_filters</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;exercise__in&#39;</span><span class="p">:</span> <span class="n">exercises</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">include_user_ids</span><span class="p">:</span>
+                <span class="n">submission_filters</span><span class="p">[</span><span class="s1">&#39;submitters__user_id__in&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">include_user_ids</span>
+
+            <span class="n">user_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;user__id&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_student_ids&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;submission_results_format&#39;</span><span class="p">]:</span>
+                <span class="n">user_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;student_id&#39;</span><span class="p">)</span>
+
+            <span class="n">submissions</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="o">**</span><span class="n">submission_filters</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;exclude_user_ids&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_student_ids&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">include_user_ids</span><span class="p">:</span>
+                <span class="n">submissions</span> <span class="o">=</span> <span class="n">submissions</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+                    <span class="n">Prefetch</span><span class="p">(</span>
+                        <span class="s1">&#39;submitters&#39;</span><span class="p">,</span>
+                        <span class="n">queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="o">*</span><span class="n">user_fields</span><span class="p">),</span>
+                        <span class="n">to_attr</span><span class="o">=</span><span class="s1">&#39;submitter_userprofiles&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;submission_results_format&#39;</span><span class="p">]:</span>
+                <span class="c1"># Aggregate exercise results.</span>
+                <span class="n">submissions</span> <span class="o">=</span> <span class="n">submissions</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status__in</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">,</span>
+                    <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+                    <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">REJECTED</span><span class="p">,</span>
+                <span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="p">(</span>
+                    <span class="s1">&#39;submitters__user_id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;exercise_id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;submitters__student_id&#39;</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                    <span class="n">count</span><span class="o">=</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span>
+                    <span class="n">first_timestamp</span><span class="o">=</span><span class="n">Min</span><span class="p">(</span><span class="s1">&#39;submission_time&#39;</span><span class="p">),</span>
+                    <span class="n">last_timestamp</span><span class="o">=</span><span class="n">Max</span><span class="p">(</span><span class="s1">&#39;submission_time&#39;</span><span class="p">),</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">annotate_submitter_points</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">submissions</span> <span class="o">=</span> <span class="n">submissions</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span>
+                    <span class="s1">&#39;hash&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;grader&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;feedback&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;assistant_feedback&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;submission_data&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;grading_data&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;meta_data&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">submissions</span> <span class="o">=</span> <span class="n">submissions</span><span class="o">.</span><span class="n">order_by</span><span class="p">()[</span><span class="n">submissions_slice</span><span class="p">]</span>
+
+            <span class="n">all_deadline_deviations</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_deadline_deviations&#39;</span><span class="p">]:</span>
+                <span class="c1"># Fetch all deadline deviations in the course instances.</span>
+                <span class="c1"># TODO: this does not use the &quot;include_exercises_file&quot; or &quot;exclude_exercises_file&quot; options at all.</span>
+                <span class="n">all_deadline_deviations_queryset</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">exercise__course_module__course_instance__id__in</span><span class="o">=</span><span class="n">course_instance_ids</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+                    <span class="n">Prefetch</span><span class="p">(</span>
+                        <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+                        <span class="n">queryset</span><span class="o">=</span><span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+                            <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span>
+                            <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;course_module__id&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;course_module__closing_time&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;course_module__course_instance__id&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;course_module__course_instance__course__id&#39;</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">),</span>
+                    <span class="n">Prefetch</span><span class="p">(</span>
+                        <span class="s1">&#39;submitter&#39;</span><span class="p">,</span>
+                        <span class="n">queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s1">&#39;user__id&#39;</span><span class="p">),</span>
+                    <span class="p">),</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span>
+                    <span class="s1">&#39;exercise__id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;exercise__course_module__closing_time&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;exercise__course_module__course_instance__id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;submitter__user__id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;extra_seconds&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">dl_dev</span> <span class="ow">in</span> <span class="n">all_deadline_deviations_queryset</span><span class="p">:</span>
+                    <span class="n">all_deadline_deviations</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                        <span class="n">dl_dev</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="p">{}</span>
+                    <span class="p">)[</span><span class="n">dl_dev</span><span class="o">.</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">dl_dev</span><span class="o">.</span><span class="n">get_new_deadline</span><span class="p">()</span>
+
+            <span class="n">all_max_submissions_deviations</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_max_submission_deviations&#39;</span><span class="p">]:</span>
+                <span class="c1"># Fetch all max submissions deviations in the course instances.</span>
+                <span class="c1"># TODO: this does not use the &quot;include_exercises_file&quot; or &quot;exclude_exercises_file&quot; options at all.</span>
+                <span class="n">all_max_submissions_deviations_queryset</span> <span class="o">=</span> <span class="n">MaxSubmissionsRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">exercise__course_module__course_instance__id__in</span><span class="o">=</span><span class="n">course_instance_ids</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+                    <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+                    <span class="n">Prefetch</span><span class="p">(</span>
+                        <span class="s1">&#39;submitter&#39;</span><span class="p">,</span>
+                        <span class="n">queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s1">&#39;user__id&#39;</span><span class="p">),</span>
+                    <span class="p">),</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span>
+                    <span class="s1">&#39;exercise__id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;exercise__max_submissions&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;submitter__user__id&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;extra_submissions&#39;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">sbms_dev</span> <span class="ow">in</span> <span class="n">all_max_submissions_deviations_queryset</span><span class="p">:</span>
+                    <span class="n">all_max_submissions_deviations</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+                        <span class="n">sbms_dev</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="p">{},</span>
+                    <span class="p">)[</span><span class="n">sbms_dev</span><span class="o">.</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">sbms_dev</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_submissions</span> <span class="o">+</span> <span class="n">sbms_dev</span><span class="o">.</span><span class="n">extra_submissions</span>
+
+        <span class="c1"># Create the CSV output files.</span>
+        <span class="c1"># One CSV file for all exercises.</span>
+        <span class="k">if</span> <span class="n">exercise_file_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_exercise_csv</span><span class="p">(</span><span class="n">exercise_file_path</span><span class="p">,</span> <span class="n">exercises</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Created the exercise file: &quot;</span> <span class="o">+</span> <span class="n">exercise_file_path</span><span class="p">)</span>
+
+        <span class="c1"># One CSV file for all submissions.</span>
+        <span class="k">if</span> <span class="n">submission_file_path</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;submission_results_format&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_results_csv</span><span class="p">(</span>
+                    <span class="n">submission_file_path</span><span class="p">,</span>
+                    <span class="n">submissions</span><span class="p">,</span>
+                    <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_student_ids&#39;</span><span class="p">],</span>
+                    <span class="ow">not</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;exclude_user_ids&#39;</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">write_submission_csv</span><span class="p">(</span>
+                    <span class="n">submission_file_path</span><span class="p">,</span>
+                    <span class="n">submissions</span><span class="p">,</span>
+                    <span class="n">all_deadline_deviations</span><span class="p">,</span>
+                    <span class="n">all_max_submissions_deviations</span><span class="p">,</span>
+                    <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_deadline_deviations&#39;</span><span class="p">],</span>
+                    <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_max_submission_deviations&#39;</span><span class="p">],</span>
+                    <span class="n">options</span><span class="p">[</span><span class="s1">&#39;include_student_ids&#39;</span><span class="p">],</span>
+                    <span class="ow">not</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;exclude_user_ids&#39;</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Created the submission file: &quot;</span> <span class="o">+</span> <span class="n">submission_file_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Command.write_results_csv">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.export_submissions.Command.write_results_csv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_results_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_file_path</span><span class="p">,</span> <span class="n">submissions</span><span class="p">,</span> <span class="n">include_student_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_user_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="c1"># submissions is an iterable of dictionaries, one dict per exercise per submitter.</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">csv_file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s1">&#39;exercise_id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;num_submissions&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;final_points&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;first_timestamp&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;last_timestamp&#39;</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">include_student_ids</span><span class="p">:</span>
+                <span class="n">fieldnames</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;student_id&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">include_user_ids</span><span class="p">:</span>
+                <span class="n">fieldnames</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;user_id&#39;</span><span class="p">)</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">fieldnames</span><span class="p">,</span> <span class="n">extrasaction</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">submission</span> <span class="ow">in</span> <span class="n">submissions</span><span class="p">:</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">({</span>
+                    <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">[</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">[</span><span class="s1">&#39;submitters__user_id&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;student_id&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">[</span><span class="s1">&#39;submitters__student_id&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;num_submissions&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;final_points&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;first_timestamp&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">[</span><span class="s1">&#39;first_timestamp&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;last_timestamp&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">[</span><span class="s1">&#39;last_timestamp&#39;</span><span class="p">],</span>
+                <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="Command.write_exercise_csv">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.export_submissions.Command.write_exercise_csv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_exercise_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exercise_file_path</span><span class="p">,</span> <span class="n">exercises</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">exercise_file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="p">(</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;deadline&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;late_submissions_allowed&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;late_submission_deadline&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;late_submission_penalty&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;max_submissions&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="c1"># the name of the category</span>
+                <span class="s1">&#39;difficulty&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;points_to_pass&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+            <span class="p">))</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">:</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">({</span>
+                    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="c1"># NB: this does not include any hierarchical numbering 1.2.3</span>
+                    <span class="s1">&#39;course_instance&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">instance_name</span><span class="p">,</span>
+                    <span class="s1">&#39;deadline&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">,</span>
+                    <span class="s1">&#39;late_submissions_allowed&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">late_submissions_allowed</span><span class="p">,</span>
+                    <span class="s1">&#39;late_submission_deadline&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">late_submission_deadline</span><span class="p">,</span>
+                    <span class="s1">&#39;late_submission_penalty&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">late_submission_penalty</span><span class="p">,</span>
+                    <span class="s1">&#39;max_points&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">,</span>
+                    <span class="s1">&#39;max_submissions&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_submissions</span><span class="p">,</span>
+                    <span class="s1">&#39;category&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s1">&#39;difficulty&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">difficulty</span><span class="p">,</span>
+                    <span class="s1">&#39;points_to_pass&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">points_to_pass</span><span class="p">,</span>
+                    <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="Command.write_submission_csv">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.export_submissions.Command.write_submission_csv">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_submission_csv</span><span class="p">(</span> <span class="c1"># pylint: disable=too-many-locals too-many-arguments</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">submission_file_path</span><span class="p">,</span>
+            <span class="n">submissions</span><span class="p">,</span>
+            <span class="n">all_deadline_deviations</span><span class="p">,</span>
+            <span class="n">all_max_submissions_deviations</span><span class="p">,</span>
+            <span class="n">include_deadline_deviations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_max_submission_deviations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_student_ids</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_user_ids</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">fieldnames</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;submission_id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise_id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;submission_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;grade&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;service_points&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;service_max_points&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;late_penalty_applied&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;grading_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;marked_as_final&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">include_user_ids</span><span class="p">:</span>
+            <span class="n">fieldnames</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;submitter_user_ids&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_student_ids</span><span class="p">:</span>
+            <span class="n">fieldnames</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;student_ids&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_max_submission_deviations</span><span class="p">:</span>
+            <span class="n">fieldnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;personal_max_submissions&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">include_deadline_deviations</span><span class="p">:</span>
+            <span class="n">fieldnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;personal_deadline&#39;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">submission_file_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictWriter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">fieldnames</span><span class="o">=</span><span class="n">fieldnames</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">writeheader</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">submission</span> <span class="ow">in</span> <span class="n">submissions</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;submission_id&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                    <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+                    <span class="s1">&#39;submission_time&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">submission_time</span><span class="p">,</span>
+                    <span class="s1">&#39;grade&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span>
+                    <span class="s1">&#39;service_points&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">service_points</span><span class="p">,</span>
+                    <span class="s1">&#39;service_max_points&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">service_max_points</span><span class="p">,</span>
+                    <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                    <span class="s1">&#39;late_penalty_applied&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">late_penalty_applied</span><span class="p">,</span>
+                    <span class="s1">&#39;grading_time&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">grading_time</span><span class="p">,</span>
+                    <span class="s1">&#39;marked_as_final&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">force_exercise_points</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="n">include_user_ids</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s1">&#39;submitter_user_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitter_userprofiles</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">include_student_ids</span><span class="p">:</span>
+                    <span class="n">d</span><span class="p">[</span><span class="s1">&#39;student_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">student_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitter_userprofiles</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">include_deadline_deviations</span><span class="p">:</span>
+                    <span class="n">dl_deviations</span> <span class="o">=</span> <span class="n">all_deadline_deviations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="n">personal_deadline</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitter_userprofiles</span><span class="p">:</span>
+                        <span class="n">dl</span> <span class="o">=</span> <span class="n">dl_deviations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">dl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+                                <span class="n">personal_deadline</span> <span class="ow">is</span> <span class="kc">None</span>
+                                <span class="ow">or</span> <span class="n">dl</span> <span class="o">&gt;</span> <span class="n">personal_deadline</span>
+                        <span class="p">):</span>
+                            <span class="n">personal_deadline</span> <span class="o">=</span> <span class="n">dl</span>
+
+                    <span class="n">d</span><span class="p">[</span><span class="s1">&#39;personal_deadline&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">personal_deadline</span>
+
+                <span class="k">if</span> <span class="n">include_max_submission_deviations</span><span class="p">:</span>
+                    <span class="n">max_submissions_deviations</span> <span class="o">=</span> <span class="n">all_max_submissions_deviations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="n">personal_max_submissions</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitter_userprofiles</span><span class="p">:</span>
+                        <span class="n">max_sbms</span> <span class="o">=</span> <span class="n">max_submissions_deviations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">max_sbms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+                                <span class="n">personal_max_submissions</span> <span class="ow">is</span> <span class="kc">None</span>
+                                <span class="ow">or</span> <span class="n">max_sbms</span> <span class="o">&gt;</span> <span class="n">personal_max_submissions</span>
+                        <span class="p">):</span>
+                            <span class="n">personal_max_submissions</span> <span class="o">=</span> <span class="n">max_sbms</span>
+
+                    <span class="n">d</span><span class="p">[</span><span class="s1">&#39;personal_max_submissions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">personal_max_submissions</span>
+
+                <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">d</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,647 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.api package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">external_services.api package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-external_services.api.authentication">external_services.api.authentication module</a><ul>
+<li><a class="reference internal" href="#external_services.api.authentication.OAuthBodyHashAuthentication"><code class="docutils literal notranslate"><span class="pre">OAuthBodyHashAuthentication</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.authentication.OAuthBodyHashAuthentication.authenticate"><code class="docutils literal notranslate"><span class="pre">OAuthBodyHashAuthentication.authenticate()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.api.authentication.verify_oauth_body_hash_and_signature"><code class="docutils literal notranslate"><span class="pre">verify_oauth_body_hash_and_signature()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.api.oauth_nonce_cache">external_services.api.oauth_nonce_cache module</a><ul>
+<li><a class="reference internal" href="#external_services.api.oauth_nonce_cache.OAuthNonceCache"><code class="docutils literal notranslate"><span class="pre">OAuthNonceCache</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.oauth_nonce_cache.OAuthNonceCache.CACHE_TIMEOUT_SECONDS"><code class="docutils literal notranslate"><span class="pre">OAuthNonceCache.CACHE_TIMEOUT_SECONDS</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.oauth_nonce_cache.OAuthNonceCache.nonce_used"><code class="docutils literal notranslate"><span class="pre">OAuthNonceCache.nonce_used()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.api.parsers">external_services.api.parsers module</a><ul>
+<li><a class="reference internal" href="#external_services.api.parsers.LTIOutcomeXMLParser"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeXMLParser</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.parsers.LTIOutcomeXMLParser.NS"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeXMLParser.NS</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.parsers.LTIOutcomeXMLParser.TYPE_DELETE"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeXMLParser.TYPE_DELETE</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.parsers.LTIOutcomeXMLParser.TYPE_READ"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeXMLParser.TYPE_READ</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.parsers.LTIOutcomeXMLParser.TYPE_REPLACE"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeXMLParser.TYPE_REPLACE</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.parsers.LTIOutcomeXMLParser.media_type"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeXMLParser.media_type</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.parsers.LTIOutcomeXMLParser.parse"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeXMLParser.parse()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.api.parsers.parse_sourced_id"><code class="docutils literal notranslate"><span class="pre">parse_sourced_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.api.renderers">external_services.api.renderers module</a><ul>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_FAILURE"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.CODE_MAJOR_FAILURE</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_SUCCESS"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.CODE_MAJOR_SUCCESS</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_UNSUPPORTED"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.CODE_MAJOR_UNSUPPORTED</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MINOR_INVALID_SOURCE_DATA"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.CODE_MINOR_INVALID_SOURCE_DATA</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.charset"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.charset</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.format"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.format</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.media_type"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.media_type</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.render"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.render()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.template_name"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeResponseRenderer.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.api.renderers.validation_errors_to_description"><code class="docutils literal notranslate"><span class="pre">validation_errors_to_description()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.api.serializers">external_services.api.serializers module</a><ul>
+<li><a class="reference internal" href="#external_services.api.serializers.LTIOutcomeSerializer"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeSerializer</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.serializers.LTIOutcomeSerializer.create"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeSerializer.create()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.serializers.LTIOutcomeSerializer.to_internal_value"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeSerializer.to_internal_value()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.serializers.LTIOutcomeSerializer.to_representation"><code class="docutils literal notranslate"><span class="pre">LTIOutcomeSerializer.to_representation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.api.tests">external_services.api.tests module</a><ul>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest.BASE_OUTCOMES_REQUEST_XML"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest.BASE_OUTCOMES_REQUEST_XML</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest.BASE_OUTCOMES_RESPONSE_XML"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest.BASE_OUTCOMES_RESPONSE_XML</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest.BASE_RESULT_XML"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest.BASE_RESULT_XML</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest.OUTCOMES_API_URL"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest.OUTCOMES_API_URL</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest.assertLTIOutcomesResponseXMLEqual"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest.assertLTIOutcomesResponseXMLEqual()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest.mk_sourced_id"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest.mk_sourced_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesNoEnrollmentTests</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests.setUpTestData"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesNoEnrollmentTests.setUpTestData()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests.test_replaceResult_after_deadline"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesNoEnrollmentTests.test_replaceResult_after_deadline()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests.test_replaceResult_without_enrollment"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesNoEnrollmentTests.test_replaceResult_without_enrollment()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesPublicServiceTests"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesPublicServiceTests</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesPublicServiceTests.setUpTestData"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesPublicServiceTests.setUpTestData()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesPublicServiceTests.test_public_service_sourced_id"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesPublicServiceTests.test_public_service_sourced_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.setUpTestData"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.setUpTestData()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_deleteResult"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_deleteResult()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_exceed_submission_limit"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_exceed_submission_limit()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_oauth_and_XML"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_oauth_and_XML()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_oauth_req"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_oauth_req()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_XML"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_XML()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_bad_score"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_bad_score()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_empty_msg_id"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_empty_msg_id()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_msg_id"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_no_msg_id()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_score_in_replace"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_no_score_in_replace()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_score_in_replace2"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_no_score_in_replace2()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_sourced_id"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_no_sourced_id()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_unknown_operation"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_unknown_operation()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_unknown_operation2"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_invalid_req_body_unknown_operation2()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_no_auth_header"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_no_auth_header()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_nonce_reuse"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_nonce_reuse()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_readResult"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_readResult()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_readResult_no_result"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_readResult_no_result()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_replaceResult"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_replaceResult()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.tests.LTIOutcomesTests.test_replaceResult2"><code class="docutils literal notranslate"><span class="pre">LTIOutcomesTests.test_replaceResult2()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.api.views">external_services.api.views module</a><ul>
+<li><a class="reference internal" href="#external_services.api.views.LTIExerciseBasicOutcomesView"><code class="docutils literal notranslate"><span class="pre">LTIExerciseBasicOutcomesView</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.api.views.LTIExerciseBasicOutcomesView.authentication_classes"><code class="docutils literal notranslate"><span class="pre">LTIExerciseBasicOutcomesView.authentication_classes</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.views.LTIExerciseBasicOutcomesView.parser_classes"><code class="docutils literal notranslate"><span class="pre">LTIExerciseBasicOutcomesView.parser_classes</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.views.LTIExerciseBasicOutcomesView.permission_classes"><code class="docutils literal notranslate"><span class="pre">LTIExerciseBasicOutcomesView.permission_classes</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.views.LTIExerciseBasicOutcomesView.post"><code class="docutils literal notranslate"><span class="pre">LTIExerciseBasicOutcomesView.post()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.api.views.LTIExerciseBasicOutcomesView.renderer_classes"><code class="docutils literal notranslate"><span class="pre">LTIExerciseBasicOutcomesView.renderer_classes</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">external_services.api package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/external_services.api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="external-services-api-package">
+<h1>external_services.api package<a class="headerlink" href="#external-services-api-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-external_services.api.authentication">
+<span id="external-services-api-authentication-module"></span><h2>external_services.api.authentication module<a class="headerlink" href="#module-external_services.api.authentication" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.authentication.OAuthBodyHashAuthentication">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.authentication.</span></span><span class="sig-name descname"><span class="pre">OAuthBodyHashAuthentication</span></span><a class="reference internal" href="_modules/external_services/api/authentication.html#OAuthBodyHashAuthentication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.authentication.OAuthBodyHashAuthentication" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseAuthentication</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.authentication.OAuthBodyHashAuthentication.authenticate">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/authentication.html#OAuthBodyHashAuthentication.authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.authentication.OAuthBodyHashAuthentication.authenticate" title="Link to this definition"></a></dt>
+<dd><p>Authenticate the request and return a two-tuple of (user, token).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.api.authentication.verify_oauth_body_hash_and_signature">
+<span class="sig-prename descclassname"><span class="pre">external_services.api.authentication.</span></span><span class="sig-name descname"><span class="pre">verify_oauth_body_hash_and_signature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_body_hash</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lti_exercise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/authentication.html#verify_oauth_body_hash_and_signature"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.authentication.verify_oauth_body_hash_and_signature" title="Link to this definition"></a></dt>
+<dd><p>Verify that the request has valid OAuth 1.0 signature and body hash.
+&#64;param request Django HttpRequest
+&#64;param req_body_hash base64-encoded SHA-1 hash of the request body (string)
+&#64;param lti_exercise the instance of the LTIExercise is used to verify that
+the LTI service set for the exercise matches the oauth_consumer_key parameter
+of the request.
+&#64;return tuple (boolean, error_message) boolean is True if verification succeeded,
+False otherwise.</p>
+</dd></dl>
+
+</section>
+<section id="module-external_services.api.oauth_nonce_cache">
+<span id="external-services-api-oauth-nonce-cache-module"></span><h2>external_services.api.oauth_nonce_cache module<a class="headerlink" href="#module-external_services.api.oauth_nonce_cache" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.oauth_nonce_cache.OAuthNonceCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.oauth_nonce_cache.</span></span><span class="sig-name descname"><span class="pre">OAuthNonceCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nonce</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">client_secret</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/oauth_nonce_cache.html#OAuthNonceCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.oauth_nonce_cache.OAuthNonceCache" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Cache for OAuth nonce values so that a received nonce may be checked
+against previously seen nonces.
+In OAuth1, the nonce value MUST be unique across all requests with the
+same timestamp, client credentials, and token combinations.
+Since LTI 1.1 does not use OAuth tokens, tokens are ignored here.
+Uses the default cache configured in Django.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.oauth_nonce_cache.OAuthNonceCache.CACHE_TIMEOUT_SECONDS">
+<span class="sig-name descname"><span class="pre">CACHE_TIMEOUT_SECONDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">600</span></em><a class="headerlink" href="#external_services.api.oauth_nonce_cache.OAuthNonceCache.CACHE_TIMEOUT_SECONDS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.oauth_nonce_cache.OAuthNonceCache.nonce_used">
+<span class="sig-name descname"><span class="pre">nonce_used</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/oauth_nonce_cache.html#OAuthNonceCache.nonce_used"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.oauth_nonce_cache.OAuthNonceCache.nonce_used" title="Link to this definition"></a></dt>
+<dd><p>Return True if the nonce has already been used.
+Return False if it has not been used, in which case it is also added to the cache.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.api.parsers">
+<span id="external-services-api-parsers-module"></span><h2>external_services.api.parsers module<a class="headerlink" href="#module-external_services.api.parsers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.parsers.LTIOutcomeXMLParser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.parsers.</span></span><span class="sig-name descname"><span class="pre">LTIOutcomeXMLParser</span></span><a class="reference internal" href="_modules/external_services/api/parsers.html#LTIOutcomeXMLParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.parsers.LTIOutcomeXMLParser" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseParser</span></code></p>
+<p>Parser for LTI 1.1 Basic Outcomes Service messages.
+The external service posts these messages to A+ in order to return the score
+of a learner’s submission.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.parsers.LTIOutcomeXMLParser.NS">
+<span class="sig-name descname"><span class="pre">NS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'{http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0}'</span></em><a class="headerlink" href="#external_services.api.parsers.LTIOutcomeXMLParser.NS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.parsers.LTIOutcomeXMLParser.TYPE_DELETE">
+<span class="sig-name descname"><span class="pre">TYPE_DELETE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'deleteResult'</span></em><a class="headerlink" href="#external_services.api.parsers.LTIOutcomeXMLParser.TYPE_DELETE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.parsers.LTIOutcomeXMLParser.TYPE_READ">
+<span class="sig-name descname"><span class="pre">TYPE_READ</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'readResult'</span></em><a class="headerlink" href="#external_services.api.parsers.LTIOutcomeXMLParser.TYPE_READ" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.parsers.LTIOutcomeXMLParser.TYPE_REPLACE">
+<span class="sig-name descname"><span class="pre">TYPE_REPLACE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'replaceResult'</span></em><a class="headerlink" href="#external_services.api.parsers.LTIOutcomeXMLParser.TYPE_REPLACE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.parsers.LTIOutcomeXMLParser.media_type">
+<span class="sig-name descname"><span class="pre">media_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'application/xml'</span></em><a class="headerlink" href="#external_services.api.parsers.LTIOutcomeXMLParser.media_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.parsers.LTIOutcomeXMLParser.parse">
+<span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stream</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/parsers.html#LTIOutcomeXMLParser.parse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.parsers.LTIOutcomeXMLParser.parse" title="Link to this definition"></a></dt>
+<dd><p>Given a stream to read from, return the parsed representation.
+Should return parsed data, or a <cite>DataAndFiles</cite> object consisting of the
+parsed data and files.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.api.parsers.parse_sourced_id">
+<span class="sig-prename descclassname"><span class="pre">external_services.api.parsers.</span></span><span class="sig-name descname"><span class="pre">parse_sourced_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sourced_id_str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/parsers.html#parse_sourced_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.parsers.parse_sourced_id" title="Link to this definition"></a></dt>
+<dd><p>Parse a sourcedId value from an LTI 1.1 Outcomes Service request.
+Return a tuple (exercise, user_profile). Either value may be None if
+the instance is not found in the database.</p>
+</dd></dl>
+
+</section>
+<section id="module-external_services.api.renderers">
+<span id="external-services-api-renderers-module"></span><h2>external_services.api.renderers module<a class="headerlink" href="#module-external_services.api.renderers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.renderers.</span></span><span class="sig-name descname"><span class="pre">LTIOutcomeResponseRenderer</span></span><a class="reference internal" href="_modules/external_services/api/renderers.html#LTIOutcomeResponseRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRenderer</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_FAILURE">
+<span class="sig-name descname"><span class="pre">CODE_MAJOR_FAILURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'failure'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_FAILURE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_SUCCESS">
+<span class="sig-name descname"><span class="pre">CODE_MAJOR_SUCCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'success'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_SUCCESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_UNSUPPORTED">
+<span class="sig-name descname"><span class="pre">CODE_MAJOR_UNSUPPORTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'unsupported'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MAJOR_UNSUPPORTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MINOR_INVALID_SOURCE_DATA">
+<span class="sig-name descname"><span class="pre">CODE_MINOR_INVALID_SOURCE_DATA</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'invalidsourcedata'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.CODE_MINOR_INVALID_SOURCE_DATA" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.charset">
+<span class="sig-name descname"><span class="pre">charset</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'utf-8'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.charset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.format">
+<span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'xml'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.format" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.media_type">
+<span class="sig-name descname"><span class="pre">media_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'application/xml'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.media_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/renderers.html#LTIOutcomeResponseRenderer.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.renderers.LTIOutcomeResponseRenderer.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'external_services/lti_outcome_response.xml'</span></em><a class="headerlink" href="#external_services.api.renderers.LTIOutcomeResponseRenderer.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.api.renderers.validation_errors_to_description">
+<span class="sig-prename descclassname"><span class="pre">external_services.api.renderers.</span></span><span class="sig-name descname"><span class="pre">validation_errors_to_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">errors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/renderers.html#validation_errors_to_description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.renderers.validation_errors_to_description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-external_services.api.serializers">
+<span id="external-services-api-serializers-module"></span><h2>external_services.api.serializers module<a class="headerlink" href="#module-external_services.api.serializers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.serializers.LTIOutcomeSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.serializers.</span></span><span class="sig-name descname"><span class="pre">LTIOutcomeSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/serializers.html#LTIOutcomeSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.serializers.LTIOutcomeSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Serializer</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.serializers.LTIOutcomeSerializer.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validated_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/serializers.html#LTIOutcomeSerializer.create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.serializers.LTIOutcomeSerializer.create" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.serializers.LTIOutcomeSerializer.to_internal_value">
+<span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/serializers.html#LTIOutcomeSerializer.to_internal_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.serializers.LTIOutcomeSerializer.to_internal_value" title="Link to this definition"></a></dt>
+<dd><p>Takes the unvalidated incoming data as input and should return the
+validated data that will be made available as serializer.validated_data.
+The return value will also be passed to the .create() or .update() methods
+if .save() is called on the serializer class.
+If any of the validation fails, then the method should raise
+a serializers.ValidationError(errors).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.serializers.LTIOutcomeSerializer.to_representation">
+<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/serializers.html#LTIOutcomeSerializer.to_representation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.serializers.LTIOutcomeSerializer.to_representation" title="Link to this definition"></a></dt>
+<dd><p>Takes the object instance that requires serialization, and should
+return a primitive representation. Typically this means returning
+a structure of built-in Python datatypes. The exact types that can be
+handled will depend on the render classes you have configured for your API.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.api.tests">
+<span id="external-services-api-tests-module"></span><h2>external_services.api.tests module<a class="headerlink" href="#module-external_services.api.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesBaseTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.tests.</span></span><span class="sig-name descname"><span class="pre">LTIOutcomesBaseTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesBaseTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesBaseTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">APITestCase</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesBaseTest.BASE_OUTCOMES_REQUEST_XML">
+<span class="sig-name descname"><span class="pre">BASE_OUTCOMES_REQUEST_XML</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;?xml</span> <span class="pre">version=&quot;1.0&quot;</span> <span class="pre">encoding=&quot;UTF-8&quot;?&gt;\n&lt;imsx_POXEnvelopeRequest</span> <span class="pre">xmlns=&quot;http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0&quot;&gt;\n</span>&#160; <span class="pre">&lt;imsx_POXHeader&gt;\n</span>&#160;&#160;&#160; <span class="pre">&lt;imsx_POXRequestHeaderInfo&gt;\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_version&gt;V1.0&lt;/imsx_version&gt;\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_messageIdentifier&gt;{msg_id}&lt;/imsx_messageIdentifier&gt;\n</span>&#160;&#160;&#160; <span class="pre">&lt;/imsx_POXRequestHeaderInfo&gt;\n</span>&#160; <span class="pre">&lt;/imsx_POXHeader&gt;\n</span>&#160; <span class="pre">&lt;imsx_POXBody&gt;\n</span>&#160;&#160;&#160; <span class="pre">&lt;{operation}Request&gt;\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;resultRecord&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;sourcedGUID&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;sourcedId&gt;{sourced_id}&lt;/sourcedId&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;/sourcedGUID&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">{result}\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;/resultRecord&gt;\n</span>&#160;&#160;&#160; <span class="pre">&lt;/{operation}Request&gt;\n</span>&#160; <span class="pre">&lt;/imsx_POXBody&gt;\n&lt;/imsx_POXEnvelopeRequest&gt;'</span></em><a class="headerlink" href="#external_services.api.tests.LTIOutcomesBaseTest.BASE_OUTCOMES_REQUEST_XML" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesBaseTest.BASE_OUTCOMES_RESPONSE_XML">
+<span class="sig-name descname"><span class="pre">BASE_OUTCOMES_RESPONSE_XML</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;?xml</span> <span class="pre">version=&quot;1.0&quot;</span> <span class="pre">encoding=&quot;UTF-8&quot;?&gt;\n&lt;imsx_POXEnvelopeResponse</span> <span class="pre">xmlns=&quot;http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0&quot;&gt;\n</span>&#160; <span class="pre">&lt;imsx_POXHeader&gt;\n</span>&#160;&#160;&#160; <span class="pre">&lt;imsx_POXResponseHeaderInfo&gt;\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_version&gt;V1.0&lt;/imsx_version&gt;\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_messageIdentifier&gt;{msg_id}&lt;/imsx_messageIdentifier&gt;\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_statusInfo&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_codeMajor&gt;{code_major}&lt;/imsx_codeMajor&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_severity&gt;{severity}&lt;/imsx_severity&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_description&gt;{description}&lt;/imsx_description&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_messageRefIdentifier&gt;{msg_ref_id}&lt;/imsx_messageRefIdentifier&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;imsx_operationRefIdentifier&gt;{operation_ref}&lt;/imsx_operationRefIdentifier&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">{extra_status}\n</span>&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;/imsx_statusInfo&gt;\n</span>&#160;&#160;&#160; <span class="pre">&lt;/imsx_POXResponseHeaderInfo&gt;\n</span>&#160; <span class="pre">&lt;/imsx_POXHeader&gt;\n</span>&#160; <span class="pre">&lt;imsx_POXBody&gt;\n</span>&#160;&#160;&#160; <span class="pre">{body}\n</span>&#160; <span class="pre">&lt;/imsx_POXBody&gt;\n&lt;/imsx_POXEnvelopeResponse&gt;'</span></em><a class="headerlink" href="#external_services.api.tests.LTIOutcomesBaseTest.BASE_OUTCOMES_RESPONSE_XML" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesBaseTest.BASE_RESULT_XML">
+<span class="sig-name descname"><span class="pre">BASE_RESULT_XML</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;result&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;resultScore&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;language&gt;en&lt;/language&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;textString&gt;{score}&lt;/textString&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;/resultScore&gt;\n</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">&lt;/result&gt;'</span></em><a class="headerlink" href="#external_services.api.tests.LTIOutcomesBaseTest.BASE_RESULT_XML" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesBaseTest.OUTCOMES_API_URL">
+<span class="sig-name descname"><span class="pre">OUTCOMES_API_URL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'/api/v2/lti-outcomes'</span></em><a class="headerlink" href="#external_services.api.tests.LTIOutcomesBaseTest.OUTCOMES_API_URL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesBaseTest.assertLTIOutcomesResponseXMLEqual">
+<span class="sig-name descname"><span class="pre">assertLTIOutcomesResponseXMLEqual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">got_xml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_xml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_elems</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesBaseTest.assertLTIOutcomesResponseXMLEqual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesBaseTest.assertLTIOutcomesResponseXMLEqual" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesBaseTest.mk_sourced_id">
+<span class="sig-name descname"><span class="pre">mk_sourced_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lti_exercise</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enrollment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesBaseTest.mk_sourced_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesBaseTest.mk_sourced_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesNoEnrollmentTests">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.tests.</span></span><span class="sig-name descname"><span class="pre">LTIOutcomesNoEnrollmentTests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesNoEnrollmentTests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest" title="external_services.api.tests.LTIOutcomesBaseTest"><code class="xref py py-class docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesNoEnrollmentTests.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesNoEnrollmentTests.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesNoEnrollmentTests.test_replaceResult_after_deadline">
+<span class="sig-name descname"><span class="pre">test_replaceResult_after_deadline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesNoEnrollmentTests.test_replaceResult_after_deadline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests.test_replaceResult_after_deadline" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesNoEnrollmentTests.test_replaceResult_without_enrollment">
+<span class="sig-name descname"><span class="pre">test_replaceResult_without_enrollment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesNoEnrollmentTests.test_replaceResult_without_enrollment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesNoEnrollmentTests.test_replaceResult_without_enrollment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesPublicServiceTests">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.tests.</span></span><span class="sig-name descname"><span class="pre">LTIOutcomesPublicServiceTests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesPublicServiceTests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesPublicServiceTests" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest" title="external_services.api.tests.LTIOutcomesBaseTest"><code class="xref py py-class docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesPublicServiceTests.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesPublicServiceTests.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesPublicServiceTests.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesPublicServiceTests.test_public_service_sourced_id">
+<span class="sig-name descname"><span class="pre">test_public_service_sourced_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesPublicServiceTests.test_public_service_sourced_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesPublicServiceTests.test_public_service_sourced_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.tests.</span></span><span class="sig-name descname"><span class="pre">LTIOutcomesTests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#external_services.api.tests.LTIOutcomesBaseTest" title="external_services.api.tests.LTIOutcomesBaseTest"><code class="xref py py-class docutils literal notranslate"><span class="pre">LTIOutcomesBaseTest</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_deleteResult">
+<span class="sig-name descname"><span class="pre">test_deleteResult</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_deleteResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_deleteResult" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_exceed_submission_limit">
+<span class="sig-name descname"><span class="pre">test_exceed_submission_limit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_exceed_submission_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_exceed_submission_limit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_oauth_and_XML">
+<span class="sig-name descname"><span class="pre">test_invalid_oauth_and_XML</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_oauth_and_XML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_oauth_and_XML" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_oauth_req">
+<span class="sig-name descname"><span class="pre">test_invalid_oauth_req</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_oauth_req"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_oauth_req" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_XML">
+<span class="sig-name descname"><span class="pre">test_invalid_req_XML</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_XML"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_XML" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_bad_score">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_bad_score</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_bad_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_bad_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_empty_msg_id">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_empty_msg_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_empty_msg_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_empty_msg_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_msg_id">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_no_msg_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_no_msg_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_msg_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_score_in_replace">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_no_score_in_replace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_no_score_in_replace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_score_in_replace" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_score_in_replace2">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_no_score_in_replace2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_no_score_in_replace2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_score_in_replace2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_sourced_id">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_no_sourced_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_no_sourced_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_no_sourced_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_unknown_operation">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_unknown_operation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_unknown_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_unknown_operation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_unknown_operation2">
+<span class="sig-name descname"><span class="pre">test_invalid_req_body_unknown_operation2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_invalid_req_body_unknown_operation2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_invalid_req_body_unknown_operation2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_no_auth_header">
+<span class="sig-name descname"><span class="pre">test_no_auth_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_no_auth_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_no_auth_header" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_nonce_reuse">
+<span class="sig-name descname"><span class="pre">test_nonce_reuse</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_nonce_reuse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_nonce_reuse" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_readResult">
+<span class="sig-name descname"><span class="pre">test_readResult</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_readResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_readResult" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_readResult_no_result">
+<span class="sig-name descname"><span class="pre">test_readResult_no_result</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_readResult_no_result"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_readResult_no_result" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_replaceResult">
+<span class="sig-name descname"><span class="pre">test_replaceResult</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_replaceResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_replaceResult" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.tests.LTIOutcomesTests.test_replaceResult2">
+<span class="sig-name descname"><span class="pre">test_replaceResult2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/tests.html#LTIOutcomesTests.test_replaceResult2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.tests.LTIOutcomesTests.test_replaceResult2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.api.views">
+<span id="external-services-api-views-module"></span><h2>external_services.api.views module<a class="headerlink" href="#module-external_services.api.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.api.views.LTIExerciseBasicOutcomesView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.api.views.</span></span><span class="sig-name descname"><span class="pre">LTIExerciseBasicOutcomesView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/views.html#LTIExerciseBasicOutcomesView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.views.LTIExerciseBasicOutcomesView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<p>View that responds to LTI 1.1 Basic Outcomes Service requests that
+are posted by the Tool Provider to A+ in order to return the scores of submissions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.views.LTIExerciseBasicOutcomesView.authentication_classes">
+<span class="sig-name descname"><span class="pre">authentication_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'external_services.api.authentication.OAuthBodyHashAuthentication'&gt;,)</span></em><a class="headerlink" href="#external_services.api.views.LTIExerciseBasicOutcomesView.authentication_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.views.LTIExerciseBasicOutcomesView.parser_classes">
+<span class="sig-name descname"><span class="pre">parser_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'external_services.api.parsers.LTIOutcomeXMLParser'&gt;,)</span></em><a class="headerlink" href="#external_services.api.views.LTIExerciseBasicOutcomesView.parser_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.views.LTIExerciseBasicOutcomesView.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'userprofile.permissions.IsLTIServiceUser'&gt;,)</span></em><a class="headerlink" href="#external_services.api.views.LTIExerciseBasicOutcomesView.permission_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="external_services.api.views.LTIExerciseBasicOutcomesView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/api/views.html#LTIExerciseBasicOutcomesView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.api.views.LTIExerciseBasicOutcomesView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.api.views.LTIExerciseBasicOutcomesView.renderer_classes">
+<span class="sig-name descname"><span class="pre">renderer_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'external_services.api.renderers.LTIOutcomeResponseRenderer'&gt;,)</span></em><a class="headerlink" href="#external_services.api.views.LTIExerciseBasicOutcomesView.renderer_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-external_services.api" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

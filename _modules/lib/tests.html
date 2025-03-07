@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleTestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.request_globals</span><span class="w"> </span><span class="kn">import</span> <span class="n">RequestGlobal</span>
+
+
+<div class="viewcode-block" id="TestGlobal">
+<a class="viewcode-back" href="../../lib.html#lib.tests.TestGlobal">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestGlobal</span><span class="p">(</span><span class="n">RequestGlobal</span><span class="p">):</span>
+    <span class="n">__test__</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Prevents this class from being picked up by pytest</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="kc">None</span>
+<div class="viewcode-block" id="TestGlobal.init">
+<a class="viewcode-back" href="../../lib.html#lib.tests.TestGlobal.init">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PassthroughMiddleware">
+<a class="viewcode-back" href="../../lib.html#lib.tests.PassthroughMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PassthroughMiddleware</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_request</span><span class="p">):</span>
+        <span class="k">return</span></div>
+
+
+
+<div class="viewcode-block" id="capture_test_global">
+<a class="viewcode-back" href="../../lib.html#lib.tests.capture_test_global">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">capture_test_global</span><span class="p">(</span><span class="n">_get_response</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inner</span><span class="p">(</span><span class="n">_request</span><span class="p">):</span>
+        <span class="n">request_global_test_obj</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">inner</span></div>
+
+
+
+<span class="n">request_global_test_obj</span> <span class="o">=</span> <span class="kc">None</span>
+<div class="viewcode-block" id="RequestGlobalTest">
+<a class="viewcode-back" href="../../lib.html#lib.tests.RequestGlobalTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestGlobalTest</span><span class="p">(</span><span class="n">SimpleTestCase</span><span class="p">):</span>
+    <span class="n">obj</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TestGlobal</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RequestGlobalTest.setUp">
+<a class="viewcode-back" href="../../lib.html#lib.tests.RequestGlobalTest.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">global</span> <span class="n">request_global_test_obj</span>
+        <span class="n">RequestGlobal</span><span class="o">.</span><span class="n">clear_globals</span><span class="p">()</span>
+        <span class="n">request_global_test_obj</span> <span class="o">=</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="RequestGlobalTest.test_clear_globals">
+<a class="viewcode-back" href="../../lib.html#lib.tests.RequestGlobalTest.test_clear_globals">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_clear_globals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+        <span class="n">RequestGlobal</span><span class="o">.</span><span class="n">clear_globals</span><span class="p">()</span>
+        <span class="n">obj2</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNot</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RequestGlobalTest.test_returns_same_object">
+<a class="viewcode-back" href="../../lib.html#lib.tests.RequestGlobalTest.test_returns_same_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_returns_same_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">TestGlobal</span><span class="p">)</span>
+        <span class="n">obj2</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIs</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj2</span><span class="p">)</span>
+        <span class="n">obj3</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIs</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj3</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RequestGlobalTest.test_is_request_specific">
+<a class="viewcode-back" href="../../lib.html#lib.tests.RequestGlobalTest.test_is_request_specific">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_is_request_specific</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_settings</span><span class="p">(</span><span class="n">MIDDLEWARE</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;append&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;lib.tests.capture_test_global&quot;</span><span class="p">]}):</span>
+            <span class="n">obj2</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">TestGlobal</span><span class="p">)</span>
+            <span class="n">obj2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">TestGlobal</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RequestGlobalTest.test_is_cleared_at_the_end">
+<a class="viewcode-back" href="../../lib.html#lib.tests.RequestGlobalTest.test_is_cleared_at_the_end">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_is_cleared_at_the_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_settings</span><span class="p">(</span><span class="n">MIDDLEWARE</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;append&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;lib.tests.capture_test_global&quot;</span><span class="p">]}):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="n">obj2</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">TestGlobal</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="n">obj2</span><span class="p">,</span> <span class="n">TestGlobal</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">,</span> <span class="n">obj2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RequestGlobalTest.test_init_called">
+<a class="viewcode-back" href="../../lib.html#lib.tests.RequestGlobalTest.test_init_called">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_init_called</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">TestGlobal</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">test</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

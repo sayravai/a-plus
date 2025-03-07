@@ -1,0 +1,1169 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.submission_models &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.submission_models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.submission_models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mimetypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">guess_type</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">IO</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">binaryornot.check</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_binary</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">DatabaseError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">post_delete</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_language</span><span class="p">,</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubmissionTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.protocol.exercise_page</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExercisePage</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTAccessible</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.object_permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_jwt_accessible_class</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultForeignKey</span><span class="p">,</span> <span class="n">JSONField</span><span class="p">,</span> <span class="n">PercentField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_random_string</span><span class="p">,</span>
+    <span class="n">query_dict_to_list_of_tuples</span><span class="p">,</span>
+    <span class="n">pairs_to_dict</span><span class="p">,</span>
+    <span class="n">safe_file_name</span><span class="p">,</span>
+    <span class="n">Enum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.localization_syntax</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_localized</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UrlMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lti_tool.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">has_lti_access_to_course</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus.celery</span><span class="w"> </span><span class="kn">import</span> <span class="n">retry_submissions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">exercise_models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectProto</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.exercise&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SubmissionQuerySet">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionQuerySet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+<div class="viewcode-block" id="SubmissionQuerySet.passes">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionQuerySet.passes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">passes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SubmissionQuerySet&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter only submissions that pass the exercise&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">grade__gte</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s2">&quot;exercise__points_to_pass&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SubmissionQuerySet.exclude_errors">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionQuerySet.exclude_errors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exclude_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status__in</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">REJECTED</span><span class="p">,</span>
+        <span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SubmissionQuerySet.exclude_unofficial">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionQuerySet.exclude_unofficial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exclude_unofficial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmissionQuerySet.annotate_submitter_points">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionQuerySet.annotate_submitter_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">annotate_submitter_points</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;total&#39;</span><span class="p">,</span>
+            <span class="n">revealed_ids</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">include_unofficial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;SubmissionQuerySet&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Annotates the total points earned by the submitter in the exercise to</span>
+<span class="sd">        the queryset. Chain after `values` and before `order_by` to ensure one</span>
+<span class="sd">        points row per submitter and exercise.</span>
+
+<span class="sd">        The result will be assigned to a field named by `field_name`.</span>
+
+<span class="sd">        Provide `revealed_ids`, if you want to hide unrevealed points from the</span>
+<span class="sd">        queryset.</span>
+
+<span class="sd">        If `include_unofficial` is `False`, only the submissions with status</span>
+<span class="sd">        `READY` are included. Otherwise, `READY` and `UNOFFICIAL` are included.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Building a case expression for calculating the total points. There</span>
+        <span class="c1"># are 4 cases:</span>
+        <span class="c1"># 1) If revealed_ids was provided, and the exercise id is not in it,</span>
+        <span class="c1">#    return 0.</span>
+        <span class="c1"># 2) If a submission has the force_exercise_points flag set to True,</span>
+        <span class="c1">#    return that submission&#39;s points.</span>
+        <span class="c1"># 3) If the grading_mode field of the exercise is set to LAST, return</span>
+        <span class="c1">#    the points of the latest submission.</span>
+        <span class="c1"># 4) In any other case, return the points of the best submission.</span>
+        <span class="c1"># If none of the submissions are in an expected status (READY or</span>
+        <span class="c1"># UNOFFICIAL, depending on the include_unofficial parameter, return 0).</span>
+        <span class="n">force_zero</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">cases</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">include_unofficial</span><span class="p">:</span>
+            <span class="n">statuses</span> <span class="o">=</span> <span class="p">(</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">statuses</span> <span class="o">=</span> <span class="p">(</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">revealed_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># revealed_ids may be an empty set.</span>
+            <span class="k">if</span> <span class="n">revealed_ids</span><span class="p">:</span>
+                <span class="c1"># This When clause crashes if the revealed_ids set is empty.</span>
+                <span class="n">cases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">When</span><span class="p">(</span>
+                        <span class="o">~</span><span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">exercise__in</span><span class="o">=</span><span class="n">revealed_ids</span><span class="p">),</span>
+                        <span class="n">then</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># No exercise is revealed, thus always return grade zero.</span>
+                <span class="n">force_zero</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">cases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">models</span><span class="o">.</span><span class="n">When</span><span class="p">(</span>
+                <span class="n">forced_points__isnull</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">then</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">F</span><span class="p">(</span><span class="s1">&#39;forced_points&#39;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">cases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">models</span><span class="o">.</span><span class="n">When</span><span class="p">(</span>
+                <span class="n">exercise__grading_mode</span><span class="o">=</span><span class="n">exercise_models</span><span class="o">.</span><span class="n">BaseExercise</span><span class="o">.</span><span class="n">GRADING_MODE</span><span class="o">.</span><span class="n">LAST</span><span class="p">,</span>
+                <span class="n">then</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Subquery</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                        <span class="n">exercise</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">OuterRef</span><span class="p">(</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">),</span>
+                        <span class="n">submitters</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">OuterRef</span><span class="p">(</span><span class="s1">&#39;submitters__id&#39;</span><span class="p">),</span>
+                        <span class="n">status__in</span><span class="o">=</span><span class="n">statuses</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-submission_time&#39;</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;grade&#39;</span><span class="p">)[:</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span>
+                <span class="n">forced_points</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Max</span><span class="p">(</span><span class="s1">&#39;grade&#39;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">force_exercise_points</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+                <span class="c1"># Coalesce ensures that 0 is returned instead of None, if none</span>
+                <span class="c1"># of the submissions are in an expected status.</span>
+                <span class="n">field_name</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">Coalesce</span><span class="p">(</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">Case</span><span class="p">(</span>
+                        <span class="o">*</span><span class="n">cases</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Max</span><span class="p">(</span>
+                            <span class="s1">&#39;grade&#39;</span><span class="p">,</span>
+                            <span class="nb">filter</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span>
+                                <span class="n">status__in</span><span class="o">=</span><span class="n">statuses</span><span class="p">,</span>
+                            <span class="p">),</span>
+                        <span class="p">),</span>
+                    <span class="p">),</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                <span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">force_zero</span> <span class="k">else</span> <span class="n">models</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="p">})</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmissionQuerySet.annotate_best_submitter_points">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionQuerySet.annotate_best_submitter_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">annotate_best_submitter_points</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;total&#39;</span><span class="p">,</span>
+            <span class="n">revealed_ids</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">include_unofficial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;SubmissionQuerySet&#39;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Annotates the total points earned by the submitter in the exercise to</span>
+<span class="sd">        the queryset. Chain after `values` and before `order_by` to ensure one</span>
+<span class="sd">        points row per submitter and exercise.</span>
+
+<span class="sd">        The result will be assigned to a field named by `field_name`.</span>
+
+<span class="sd">        Provide `revealed_ids`, if you want to hide unrevealed points from the</span>
+<span class="sd">        queryset.</span>
+
+<span class="sd">        If `include_unofficial` is `False`, only the submissions with status</span>
+<span class="sd">        `READY` are included. Otherwise, `READY` and `UNOFFICIAL` are included.</span>
+
+<span class="sd">        This method performs better than `annotate_submitter_points()`, but</span>
+<span class="sd">        this method ignores the exercise grading mode LAST. This method assumes</span>
+<span class="sd">        that exercise grading mode BEST is always used. This is a hacky and</span>
+<span class="sd">        temporary workaround for database performance issues.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Building a case expression for calculating the total points. There</span>
+        <span class="c1"># are 3 cases:</span>
+        <span class="c1"># 1) If revealed_ids was provided, and the exercise id is not in it,</span>
+        <span class="c1">#    return 0.</span>
+        <span class="c1"># 2) If a submission has the force_exercise_points flag set to True,</span>
+        <span class="c1">#    return that submission&#39;s points.</span>
+        <span class="c1"># 3) In any other case, return the points of the best submission.</span>
+        <span class="c1"># If none of the submissions are in an expected status (READY or</span>
+        <span class="c1"># UNOFFICIAL, depending on the include_unofficial parameter, return 0).</span>
+        <span class="n">force_zero</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">cases</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">include_unofficial</span><span class="p">:</span>
+            <span class="n">statuses</span> <span class="o">=</span> <span class="p">(</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">statuses</span> <span class="o">=</span> <span class="p">(</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="n">revealed_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># revealed_ids may be an empty set.</span>
+            <span class="k">if</span> <span class="n">revealed_ids</span><span class="p">:</span>
+                <span class="c1"># This When clause crashes if the revealed_ids set is empty.</span>
+                <span class="n">cases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">When</span><span class="p">(</span>
+                        <span class="o">~</span><span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">exercise__in</span><span class="o">=</span><span class="n">revealed_ids</span><span class="p">),</span>
+                        <span class="n">then</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># No exercise is revealed, thus always return grade zero.</span>
+                <span class="n">force_zero</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">cases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">models</span><span class="o">.</span><span class="n">When</span><span class="p">(</span>
+                <span class="n">forced_points__isnull</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">then</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">F</span><span class="p">(</span><span class="s1">&#39;forced_points&#39;</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span>
+                <span class="n">forced_points</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Max</span><span class="p">(</span><span class="s1">&#39;grade&#39;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">force_exercise_points</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="o">**</span><span class="p">{</span>
+                <span class="c1"># Coalesce ensures that 0 is returned instead of None, if none</span>
+                <span class="c1"># of the submissions are in an expected status.</span>
+                <span class="n">field_name</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">Coalesce</span><span class="p">(</span>
+                    <span class="n">models</span><span class="o">.</span><span class="n">Case</span><span class="p">(</span>
+                        <span class="o">*</span><span class="n">cases</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Max</span><span class="p">(</span>
+                            <span class="s1">&#39;grade&#39;</span><span class="p">,</span>
+                            <span class="nb">filter</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span>
+                                <span class="n">status__in</span><span class="o">=</span><span class="n">statuses</span><span class="p">,</span>
+                            <span class="p">),</span>
+                        <span class="p">),</span>
+                    <span class="p">),</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                <span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">force_zero</span> <span class="k">else</span> <span class="n">models</span><span class="o">.</span><span class="n">Value</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="p">})</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmissionQuerySet.defer_text_fields">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionQuerySet.defer_text_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">defer_text_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span>
+            <span class="s1">&#39;feedback&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;assistant_feedback&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;grading_data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;submission_data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;meta_data&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionManager">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionManager</span><span class="p">(</span><span class="n">JWTAccessible</span><span class="p">[</span><span class="s2">&quot;Submission&quot;</span><span class="p">],</span> <span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="n">_queryset_class</span> <span class="o">=</span> <span class="n">SubmissionQuerySet</span>
+
+    <span class="c1"># Hints the correct return type for .filter(...)</span>
+    <span class="nb">filter</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">SubmissionQuerySet</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SubmissionManager.get_queryset">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionManager.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span>\
+            <span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;submitters&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmissionManager.create_from_post">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionManager.create_from_post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_from_post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exercise</span><span class="p">,</span> <span class="n">submitters</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+
+        <span class="n">submission_data_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">query_dict_to_list_of_tuples</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;__aplus__&#39;</span>
+        <span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">meta_data_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;__aplus__&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The content of the field __aplus__ is not valid json&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">if</span> <span class="s1">&#39;lang&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">meta_data_dict</span><span class="p">:</span>
+            <span class="n">meta_data_dict</span><span class="p">[</span><span class="s1">&#39;lang&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_language</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;lti-launch-id&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span>
+                    <span class="ow">and</span> <span class="n">has_lti_access_to_course</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)):</span>
+                <span class="n">meta_data_dict</span><span class="p">[</span><span class="s1">&#39;lti-launch-id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lti-launch-id&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;lti1p3-session-id&#39;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">COOKIES</span><span class="p">:</span>
+                    <span class="n">meta_data_dict</span><span class="p">[</span><span class="s1">&#39;lti-session-id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">COOKIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lti1p3-session-id&#39;</span><span class="p">)</span>
+
+            <span class="n">new_submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="n">exercise</span><span class="p">,</span>
+                <span class="n">submission_data</span><span class="o">=</span><span class="n">submission_data_list</span><span class="p">,</span>
+                <span class="n">meta_data</span><span class="o">=</span><span class="n">meta_data_dict</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">new_submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">submitters</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed to create submission: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">exercise</span><span class="p">);</span>
+            <span class="k">raise</span> <span class="n">DatabaseError</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new_submission</span><span class="o">.</span><span class="n">add_files</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DatabaseError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed to save submitted files: </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">exercise</span><span class="p">);</span>
+            <span class="n">new_submission</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">DatabaseError</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+        <span class="k">return</span> <span class="n">new_submission</span></div>
+
+
+<div class="viewcode-block" id="SubmissionManager.exclude_errors">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionManager.exclude_errors">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exclude_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status__in</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">REJECTED</span><span class="p">,</span>
+        <span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SubmissionManager.exclude_unofficial">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionManager.exclude_unofficial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exclude_unofficial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmissionManager.get_combined_enrollment_submission_data">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionManager.get_combined_enrollment_submission_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_combined_enrollment_submission_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve the user&#39;s submissions to enrollment exercises and combine</span>
+<span class="sd">        their submission data into a single dictionary.</span>
+<span class="sd">        The most recent value (based on submission time) is used for data keys</span>
+<span class="sd">        that are present in multiple submissions.</span>
+
+<span class="sd">        The values in the returned dictionary are lists since some form inputs</span>
+<span class="sd">        accept multiple values (e.g., checkboxes). (The original submission_data</span>
+<span class="sd">        is stored as a list of key-value pairs, but multiple pairs may repeat</span>
+<span class="sd">        the same key.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">submissions</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise__status__in</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">exercise_models</span><span class="o">.</span><span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT</span><span class="p">,</span>
+                <span class="n">exercise_models</span><span class="o">.</span><span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT_EXTERNAL</span>
+            <span class="p">),</span>
+            <span class="n">submitters__user__id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;submission_time&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s1">&#39;submission_data&#39;</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+        <span class="c1"># Retrieve the ten latest submissions since older submissions likely</span>
+        <span class="c1"># do not have any useful data.</span>
+        <span class="n">enrollment_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># pylint: disable-next=unnecessary-lambda-assignment</span>
+        <span class="n">keyfunc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># the key in a key-value pair</span>
+        <span class="k">for</span> <span class="n">sbms</span> <span class="ow">in</span> <span class="n">submissions</span><span class="p">:</span>
+            <span class="c1"># submission_data should be a list of key-value pairs, but</span>
+            <span class="c1"># nothing guarantees it in the database level.</span>
+            <span class="c1"># Checkbox inputs may produce multiple values for the same key, thus</span>
+            <span class="c1"># the list of pairs may use the same key in different pairs.</span>
+            <span class="c1"># For each submission, group the submission data by the keys so that</span>
+            <span class="c1"># multiple values can be preserved for a key when all submissions</span>
+            <span class="c1"># are combined.</span>
+            <span class="n">single_sbms_grouped_data</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># dict maps keys to the list of one or more values</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">pairs</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+                        <span class="nb">sorted</span><span class="p">(</span><span class="n">sbms</span><span class="o">.</span><span class="n">submission_data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">keyfunc</span><span class="p">),</span>
+                        <span class="n">key</span><span class="o">=</span><span class="n">keyfunc</span><span class="p">):</span>
+                    <span class="n">single_sbms_grouped_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">]</span>
+
+                <span class="c1"># Update the combined enrollment submission data.</span>
+                <span class="c1"># Later submissions overwrite previous values for the same keys.</span>
+                <span class="c1"># The keys are combined from many submissions, but the value list</span>
+                <span class="c1"># for one key always originates from one submission.</span>
+                <span class="n">enrollment_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">single_sbms_grouped_data</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># submission_data was not a list of pairs</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">enrollment_data</span></div>
+</div>
+
+
+<div class="viewcode-block" id="SubmissionProto">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionProto">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionProto</span><span class="p">(</span><span class="n">UrlMixin</span><span class="p">):</span>
+    <span class="n">ABSOLUTE_URL_NAME</span> <span class="o">=</span> <span class="s2">&quot;submission&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">exercise</span><span class="p">:</span> <span class="n">LearningObjectProto</span>
+
+<div class="viewcode-block" id="SubmissionProto.get_url_kwargs">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionProto.get_url_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;submission_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">get_url_kwargs</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="SubmissionProto.get_inspect_url">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionProto.get_inspect_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_inspect_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s2">&quot;submission-inspect&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Submission">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission">[docs]</a>
+<span class="nd">@register_jwt_accessible_class</span><span class="p">(</span><span class="s2">&quot;submission&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Submission</span><span class="p">(</span><span class="n">SubmissionProto</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A submission to some course exercise from one or more submitters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">STATUS</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">([</span>
+        <span class="p">(</span><span class="s1">&#39;INITIALIZED&#39;</span><span class="p">,</span> <span class="s1">&#39;initialized&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;STATUS_INITIALIZED&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;WAITING&#39;</span><span class="p">,</span> <span class="s1">&#39;waiting&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;STATUS_WAITING&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;READY&#39;</span><span class="p">,</span> <span class="s1">&#39;ready&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;STATUS_READY&#39;</span><span class="p">)),</span> <span class="c1"># graded normally</span>
+        <span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;STATUS_ERROR&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;REJECTED&#39;</span><span class="p">,</span> <span class="s1">&#39;rejected&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;STATUS_REJECTED&#39;</span><span class="p">)),</span> <span class="c1"># missing fields etc</span>
+        <span class="p">(</span><span class="s1">&#39;UNOFFICIAL&#39;</span><span class="p">,</span> <span class="s1">&#39;unofficial&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;STATUS_UNOFFICIAL&#39;</span><span class="p">)),</span>
+        <span class="c1"># unofficial: graded after the deadline or after exceeding the submission limit</span>
+    <span class="p">])</span>
+    <span class="n">UNOFFICAL_SUBMISSION_TYPE</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">([</span>
+        <span class="p">(</span><span class="s1">&#39;DEADLINE_PASSED&#39;</span><span class="p">,</span> <span class="s1">&#39;deadline_passed&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;DEADLINE_PASSED&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;LIMIT_EXCEEDED&#39;</span><span class="p">,</span> <span class="s1">&#39;limit_exceeded&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LIMIT_EXCEEDED&#39;</span><span class="p">))</span>
+    <span class="p">])</span>
+    <span class="n">submission_time</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION_TIME&#39;</span><span class="p">),</span>
+        <span class="n">auto_now_add</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">hash</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_HASH&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">get_random_string</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Relations</span>
+    <span class="n">exercise</span><span class="p">:</span> <span class="n">exercise_models</span><span class="o">.</span><span class="n">BaseExercise</span> <span class="o">=</span> <span class="n">DefaultForeignKey</span><span class="p">(</span><span class="n">exercise_models</span><span class="o">.</span><span class="n">BaseExercise</span><span class="p">,</span> <span class="c1"># type: ignore</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EXERCISE&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;submissions&quot;</span><span class="p">)</span>
+    <span class="n">submitters</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">UserProfile</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMITTERS&#39;</span><span class="p">),</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;submissions&quot;</span><span class="p">)</span>
+    <span class="n">grader</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">UserProfile</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GRADER&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">SET_NULL</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;graded_submissions&quot;</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Grading and feedback</span>
+    <span class="n">feedback</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_FEEDBACK&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">assistant_feedback</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_STAFF_FEEDBACK&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_STATUS&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">STATUS</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">STATUS</span><span class="o">.</span><span class="n">INITIALIZED</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">unofficial_submission_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_UNOFFICIAL_SUBMISSION_TYPE&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">UNOFFICAL_SUBMISSION_TYPE</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">grade</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GRADE&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">grading_time</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GRADING_TIME&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">late_penalty_applied</span> <span class="o">=</span> <span class="n">PercentField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_LATE_PENALTY_APPLIED&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">force_exercise_points</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_FORCE_EXERCISE_POINTS&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Points received from assessment, before scaled to grade</span>
+    <span class="n">service_points</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SERVICE_POINTS&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">service_max_points</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SERVICE_MAX_POINTS&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Additional data</span>
+    <span class="n">submission_data</span> <span class="o">=</span> <span class="n">JSONField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION_DATA&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">grading_data</span> <span class="o">=</span> <span class="n">JSONField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GRADING_DATA&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">meta_data</span> <span class="o">=</span> <span class="n">JSONField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_META_DATA&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">SubmissionManager</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+        <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+        <span class="n">submitters</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">,</span> <span class="s1">&#39;Submission&#39;</span><span class="p">]</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_SUBMISSION&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_SUBMISSION_PLURAL&#39;</span><span class="p">)</span>
+        <span class="n">app_label</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-id&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Submission.ordinal_number">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.ordinal_number">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ordinal_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">submissions</span><span class="o">.</span><span class="n">exclude_errors</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span>
+            <span class="n">submission_time__lt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">submission_time</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="Submission.is_submitter">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.is_submitter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_submitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span> <span class="ow">and</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Submission.add_files">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.add_files">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the given files to this submission as SubmittedFile objects.</span>
+
+<span class="sd">        @param files: a QueryDict containing files from a POST request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">uploaded_file</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">file_object</span><span class="o">=</span><span class="n">uploaded_file</span><span class="p">,</span>
+                    <span class="n">param_name</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Submission.load">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span>
+            <span class="n">allow_submit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">feedback_revealed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExercisePage</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the submission page, i.e. the exercise form with the submitted</span>
+<span class="sd">        answers filled in. Not the same as the graded form, which is stored in</span>
+<span class="sd">        `feedback`.</span>
+
+<span class="sd">        The `allow_submit` argument determines if the submit button will be</span>
+<span class="sd">        shown on the page.</span>
+<span class="sd">        The `feedback_revealed` argument controls whether file inputs</span>
+<span class="sd">        in the exercise form are disabled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Load the exercise page and parse its contents</span>
+        <span class="n">submitters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">as_leaf_class</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="n">submitters</span><span class="p">,</span>
+            <span class="n">url_name</span><span class="o">=</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+            <span class="n">ordinal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ordinal_number</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pairs_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submission_data</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_data</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">page</span><span class="o">.</span><span class="n">populate_form</span><span class="p">(</span>
+            <span class="n">field_values</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">allow_submit</span><span class="o">=</span><span class="n">allow_submit</span><span class="p">,</span>
+            <span class="n">feedback_revealed</span><span class="o">=</span><span class="n">feedback_revealed</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">page</span></div>
+
+
+<div class="viewcode-block" id="Submission.get_post_parameters">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.get_post_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_post_parameters</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">IO</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Produces submission data for POST as (data_dict, files_dict).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_data</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">pairs_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submission_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">):</span>
+            <span class="c1"># Requests supports only one file per name in a multipart post.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">[</span><span class="n">file</span><span class="o">.</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+                <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="c1"># pylint: disable=consider-using-with</span>
+            <span class="p">)</span>
+
+        <span class="n">students</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">request</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_submitter</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">students</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">user</span> <span class="k">if</span> <span class="n">students</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">as_leaf_class</span><span class="p">()</span><span class="o">.</span><span class="n">modify_post_parameters</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">students</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Submission.clean_post_parameters">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.clean_post_parameters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_post_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="c1"># pylint: disable=consider-iterating-dictionary consider-using-dict-items</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_files</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_files</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span></div>
+
+
+<div class="viewcode-block" id="Submission.approve_penalized_submission">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.approve_penalized_submission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">approve_penalized_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove the late penalty and set the status to ready for this submission.</span>
+
+<span class="sd">        The points of this submission are reset based on the original service points.</span>
+<span class="sd">        This method is used to approve a late or unofficial submission as</span>
+<span class="sd">        a normal, graded submission.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service_points</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_max_points</span><span class="p">,</span> <span class="n">no_penalties</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_ready</span><span class="p">(</span><span class="n">approve_unofficial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Submission.set_points">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.set_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">max_points</span><span class="p">,</span> <span class="n">no_penalties</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the points and maximum points for this submissions. If the given</span>
+<span class="sd">        maximum points are different than the ones for the exercise this</span>
+<span class="sd">        submission is for, the points will be scaled.</span>
+
+<span class="sd">        The method also checks if the submission is late and if it is, by</span>
+<span class="sd">        default applies the late_submission_penalty set for the</span>
+<span class="sd">        exercise.course_module. If no_penalties is True, the penalty is not</span>
+<span class="sd">        applied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span>
+
+        <span class="c1"># Evade bad max points in remote service.</span>
+        <span class="k">if</span> <span class="n">max_points</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">max_points</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span>
+
+        <span class="c1"># The given points must be between zero and max points</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">points</span> <span class="o">&lt;=</span> <span class="n">max_points</span>
+
+        <span class="c1"># If service max points is zero, then exercise max points must be zero</span>
+        <span class="c1"># too because otherwise adjusted_grade would be ambiguous.</span>
+        <span class="c1"># Disabled: Teacher is always responsible the exercise can be passed.</span>
+        <span class="c1">#assert not (max_points == 0 and self.exercise.max_points != 0)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_points</span> <span class="o">=</span> <span class="n">points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_max_points</span> <span class="o">=</span> <span class="n">max_points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">late_penalty_applied</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Scale the given points to the maximum points for the exercise</span>
+        <span class="k">if</span> <span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">adjusted_grade</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span> <span class="o">*</span> <span class="n">points</span> <span class="o">/</span> <span class="n">max_points</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">adjusted_grade</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_penalties</span><span class="p">:</span>
+            <span class="n">timing</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">get_timing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_time</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">timing</span> <span class="ow">in</span> <span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">LATE</span><span class="p">,</span> <span class="n">exercise</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">CLOSED_AFTER</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">late_penalty_applied</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">late_submission_penalty</span> <span class="k">if</span>
+                    <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">late_submissions_allowed</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="p">)</span>
+                <span class="n">adjusted_grade</span> <span class="o">-=</span> <span class="p">(</span><span class="n">adjusted_grade</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">late_penalty_applied</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">timing</span> <span class="o">==</span> <span class="n">exercise</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unofficial_submission_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNOFFICAL_SUBMISSION_TYPE</span><span class="o">.</span><span class="n">DEADLINE_PASSED</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">no_submissions_left</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">()):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unofficial_submission_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNOFFICAL_SUBMISSION_TYPE</span><span class="o">.</span><span class="n">LIMIT_EXCEEDED</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">grade</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">adjusted_grade</span><span class="p">)</span>
+
+        <span class="c1"># Finally check that the grade is in bounds after all the math.</span>
+        <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grade</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span></div>
+
+
+<div class="viewcode-block" id="Submission.scale_grade_to">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.scale_grade_to">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale_grade_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percentage</span><span class="p">):</span>
+        <span class="n">percentage</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">percentage</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grade</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grade</span><span class="o">*</span><span class="n">percentage</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grade</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Submission.set_waiting">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.set_waiting">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_waiting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">WAITING</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mark_pending</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Submission.set_ready">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.set_ready">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">approve_unofficial</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grading_time</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_pending</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_exercise_points</span> <span class="ow">or</span> <span class="n">approve_unofficial</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span>
+
+        <span class="c1"># Fire set hooks.</span>
+        <span class="k">for</span> <span class="n">hook</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span> \
+                <span class="o">.</span><span class="n">course_hooks</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">hook_type</span><span class="o">=</span><span class="s2">&quot;post-grading&quot;</span><span class="p">):</span>
+            <span class="n">hook</span><span class="o">.</span><span class="n">trigger</span><span class="p">({</span>
+                <span class="s2">&quot;submission_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;exercise_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;course_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;site&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">BASE_URL</span><span class="p">,</span>
+            <span class="p">})</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">is_grader_stable</span><span class="p">():</span>
+            <span class="c1"># We have a successful grading task in the recovery state. It may be a sign that problems</span>
+            <span class="c1"># have been resolved, so immediately retry the next pending submission, to speed up recovery</span>
+            <span class="n">retry_submissions</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Submission.set_rejected">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.set_rejected">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_rejected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">REJECTED</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_pending</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Submission.set_error">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.set_error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ERROR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_pending</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_assessed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether the submission has been manually assessed&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_graded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lang</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lang&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="c1"># Handle cases where database includes null or non dictionary json</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_approvable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Is this submission late or unofficial so that it could be approved?&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">late_penalty_applied</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lti_launch_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lti-launch-id&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Submission.mark_pending">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.mark_pending">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mark_pending</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">grading_host</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">service_url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span>
+        <span class="k">if</span> <span class="n">grading_host</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">SUBMISSION_RETRY_SERVICES</span><span class="p">:</span>
+            <span class="n">pending</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">submission</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">created</span><span class="p">:</span>
+                <span class="n">pending</span><span class="o">.</span><span class="n">num_retries</span> <span class="o">=</span> <span class="n">F</span><span class="p">(</span><span class="s1">&#39;num_retries&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">pending</span><span class="o">.</span><span class="n">submission_time</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">pending</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Submission.clear_pending">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.Submission.clear_pending">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_pending</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pending</span> <span class="o">=</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">submission</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">pending</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+</div>
+
+
+<div class="viewcode-block" id="SubmissionTagging">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionTagging">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionTagging</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">SubmissionTag</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION_TAG&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;submission_taggings&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">submission</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Submission</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;submission_taggings&quot;</span><span class="p">,</span>
+        <span class="n">db_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">]</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SubmissionDraft">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionDraft">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionDraft</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An incomplete submission that is saved automatically before the user</span>
+<span class="sd">    submits it. A user can have exactly one draft per exercise instead of</span>
+<span class="sd">    multiple. The one draft is continuously updated as the user types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TIMESTAMP&#39;</span><span class="p">),</span>
+        <span class="n">auto_now</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">exercise</span> <span class="o">=</span> <span class="n">DefaultForeignKey</span><span class="p">(</span><span class="n">exercise_models</span><span class="o">.</span><span class="n">BaseExercise</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EXERCISE&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;submission_drafts&#39;</span>
+    <span class="p">)</span>
+    <span class="n">submitter</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">UserProfile</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMITTER&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;submission_drafts&#39;</span>
+    <span class="p">)</span>
+    <span class="n">submission_data</span> <span class="o">=</span> <span class="n">JSONField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION_DATA&#39;</span><span class="p">),</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># This flag is set to False when the student makes an actual submission.</span>
+    <span class="c1"># This way the draft doesn&#39;t have to be deleted and recreated every time</span>
+    <span class="c1"># the student makes a submission and then starts a new draft.</span>
+    <span class="n">active</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ACTIVE&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+        <span class="n">objects</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">[</span><span class="s1">&#39;SubmissionDraft&#39;</span><span class="p">]</span>
+        <span class="nb">id</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">AutoField</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_SUBMISSION_DRAFT&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_SUBMISSION_DRAFT_PLURAL&#39;</span><span class="p">)</span>
+        <span class="n">app_label</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+        <span class="n">unique_together</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="s1">&#39;submitter&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SubmissionDraft.load">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmissionDraft.load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExercisePage</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the draft page, i.e. the exercise form with the user&#39;s</span>
+<span class="sd">        incomplete answers filled in.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">enrollment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_enrollment_for</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">enrollment</span> <span class="ow">and</span> <span class="n">enrollment</span><span class="o">.</span><span class="n">selected_group</span><span class="p">:</span>
+            <span class="n">students</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">enrollment</span><span class="o">.</span><span class="n">selected_group</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">students</span> <span class="o">=</span> <span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">]</span>
+
+        <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">as_leaf_class</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="n">students</span><span class="p">,</span>
+            <span class="n">url_name</span><span class="o">=</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_data</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">pairs_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submission_data</span><span class="p">)</span>
+            <span class="c1"># Format the timestamp so that it can be used in Javascript&#39;s Date constructor</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span>
+            <span class="n">page</span><span class="o">.</span><span class="n">populate_form</span><span class="p">(</span><span class="n">field_values</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">data_values</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;draft-timestamp&#39;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">},</span> <span class="n">allow_submit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">page</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="build_upload_dir">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.build_upload_dir">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_upload_dir</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the path to a directory where a file should be saved.</span>
+<span class="sd">    This is called every time a new SubmittedFile model is created.</span>
+
+<span class="sd">    @param instance: the new SubmittedFile object</span>
+<span class="sd">    @param filename: the actual name of the submitted file</span>
+<span class="sd">    @return: a path where the file should be stored, relative to MEDIA_ROOT directory</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">submission</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">submission</span>
+    <span class="n">exercise</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">exercise</span>
+    <span class="n">submitter_ids</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="s2">&quot;course_instance_</span><span class="si">{:d}</span><span class="s2">/submissions/exercise_</span><span class="si">{:d}</span><span class="s2">/users_</span><span class="si">{}</span><span class="s2">/submission_</span><span class="si">{:d}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">submitter_ids</span><span class="p">),</span>
+        <span class="n">submission</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="n">safe_file_name</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SubmittedFile">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmittedFile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmittedFile</span><span class="p">(</span><span class="n">UrlMixin</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a file submitted by the student as a solution to an exercise.</span>
+<span class="sd">    Submitted files are always linked to a certain submission through a</span>
+<span class="sd">    foreign key relation. The files are stored on the disk while models are</span>
+<span class="sd">    stored in the database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">submission</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Submission</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;files&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">param_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_PARAM_NAME&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">file_object</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_FILE_OBJECT&#39;</span><span class="p">),</span>
+        <span class="n">upload_to</span><span class="o">=</span><span class="n">build_upload_dir</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_SUBMITTED_FILE&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_SUBMITTED_FILE_PLURAL&#39;</span><span class="p">)</span>
+        <span class="n">app_label</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the actual name of the file on the disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="SubmittedFile.get_mime">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmittedFile.get_mime">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">guess_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="SubmittedFile.is_passed">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmittedFile.is_passed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_passed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
+            <span class="c1"># PDF files are sometimes incorrectly classified as non-binary by the &#39;binaryornot&#39; library</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">is_binary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+
+
+
+    <span class="n">ABSOLUTE_URL_NAME</span> <span class="o">=</span> <span class="s2">&quot;submission-file&quot;</span>
+
+<div class="viewcode-block" id="SubmittedFile.get_url_kwargs">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.SubmittedFile.get_url_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span> <span class="c1"># pylint: disable=use-dict-literal</span>
+            <span class="n">file_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">get_url_kwargs</span><span class="p">()</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_delete_file</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deletes the actual submission files after the submission in database is</span>
+<span class="sd">    removed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<span class="n">post_delete</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">_delete_file</span><span class="p">,</span> <span class="n">SubmittedFile</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PendingSubmissionManager">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.PendingSubmissionManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PendingSubmissionManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PendingSubmissionManager.is_grader_stable">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.PendingSubmissionManager.is_grader_stable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_grader_stable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">total_retries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="nb">sum</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Sum</span><span class="p">(</span><span class="s1">&#39;num_retries&#39;</span><span class="p">))[</span><span class="s1">&#39;sum&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">total_retries</span> <span class="ow">and</span> <span class="n">total_retries</span> <span class="o">&gt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">GRADER_STABLE_THRESHOLD</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PendingSubmissionManager.get_exercise_names_if_grader_is_unstable">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.PendingSubmissionManager.get_exercise_names_if_grader_is_unstable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercise_names_if_grader_is_unstable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+        <span class="n">total_retries_per_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">(</span>
+            <span class="s1">&#39;submission__exercise__name&#39;</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">submission__exercise__course_module__course_instance</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+            <span class="n">num_retries</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Sum</span><span class="p">(</span><span class="s1">&#39;num_retries&#39;</span><span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
+            <span class="s1">&#39;-num_retries&#39;</span><span class="p">,</span>
+        <span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+        <span class="n">total_retries</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;num_retries&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">total_retries_per_exercise</span><span class="p">)</span>
+        <span class="c1"># Check if the grader can be considered unstable on this course instance</span>
+        <span class="k">if</span> <span class="n">total_retries</span> <span class="o">&gt;</span> <span class="n">settings</span><span class="o">.</span><span class="n">GRADER_STABLE_THRESHOLD</span><span class="p">:</span>
+            <span class="n">lang</span> <span class="o">=</span> <span class="n">get_language</span><span class="p">()</span>
+            <span class="n">exercises</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">pick_localized</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s1">&#39;submission__exercise__name&#39;</span><span class="p">],</span><span class="w"> </span><span class="n">lang</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">total_retries_per_exercise</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">exercises</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PendingSubmission">
+<a class="viewcode-back" href="../../exercise.html#exercise.forms.PendingSubmission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PendingSubmission</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">submission</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">(</span><span class="n">Submission</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">submission_time</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION_TIME&#39;</span><span class="p">),</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># to make usage with get_or_create easier</span>
+    <span class="p">)</span>
+    <span class="n">num_retries</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_NUMBER_OF_RETRIES&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">PendingSubmissionManager</span><span class="p">()</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_PENDING_SUBMISSION&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_PENDING_SUBMISSION_PLURAL&#39;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>authorization.permissions &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">authorization.permissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for authorization.permissions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Base permission classes.</span>
+
+<span class="sd">These classes use same interface than ones in django-rest-framework and</span>
+<span class="sd">are usable with APIViews too.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePermission</span> <span class="k">as</span> <span class="n">Permission</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">jwt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+
+
+<span class="n">SAFE_METHODS</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="s1">&#39;OPTIONS&#39;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.authorization&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FilterBackend">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.FilterBackend">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FilterBackend</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FilterBackend interface</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FilterBackend.filter_queryset">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.FilterBackend.filter_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a filtered queryset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+
+<div class="viewcode-block" id="FilterBackend.get_fields">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.FilterBackend.get_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NoPermission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.NoPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoPermission</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base Permission class that gives no access permission to anyone.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="NoPermission.has_permission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.NoPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NoPermission.has_object_permission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.NoPermission.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MessageMixin">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.MessageMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MessageMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds easy way to specify what exactly caused the PermissionDenied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MessageMixin.error_msg">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.MessageMixin.error_msg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">delim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="c1"># pylint: disable=redefined-builtin</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add extra text to self.message about the reason why permission</span>
+<span class="sd">        was denied. Uses lazy object so the message string is evaluated</span>
+<span class="sd">        only when rendered.</span>
+
+<span class="sd">        If optional argument `format` is given, then it&#39;s used with format_lazy</span>
+<span class="sd">        to format the message with the dictionary arguments from `format` arg.</span>
+
+<span class="sd">        Optional argument `delim` can be used to change the string used to join</span>
+<span class="sd">        self.message and `message`.</span>
+
+<span class="sd">        If optional argument `replace` is true, then self.message is replaced with</span>
+<span class="sd">        the `message`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">delim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">delim</span> <span class="o">=</span> <span class="s1">&#39;: &#39;</span>
+
+        <span class="k">if</span> <span class="nb">format</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">**</span><span class="nb">format</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">replace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s1">&#39;message&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="p">(</span>
+                <span class="s2">&quot;You are calling error_msg without replace=True &quot;</span>
+                <span class="s2">&quot;after calling it with it first. Fix your code by removing &quot;</span>
+                <span class="s2">&quot;the first method call and add replace=True to the second method call too.&quot;</span>
+            <span class="p">)</span>
+            <span class="n">msg_without_end_punctuation</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">punctuation</span>
+                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span>
+                <span class="s1">&#39;</span><span class="si">{}{}{}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">msg_without_end_punctuation</span><span class="p">,</span>
+                <span class="n">delim</span><span class="p">,</span>
+                <span class="n">message</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># Access mode</span>
+<span class="c1"># ===========</span>
+
+<span class="c1"># All access levels</span>
+<span class="n">ACCESS</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span>
+    <span class="p">(</span><span class="s1">&#39;ANONYMOUS&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ANYONE&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;ENROLL&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">&#39;STUDENT&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ANY_STUDENT&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;ENROLLED&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ENROLLED_STUDENT&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;ASSISTANT&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_COURSE_ASSISTANT&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;GRADING&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_GRADING&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;TEACHER&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_TEACHER&#39;</span><span class="p">)),</span>
+    <span class="p">(</span><span class="s1">&#39;SUPERUSER&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_SUPERUSER&#39;</span><span class="p">)),</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="AccessModePermission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.AccessModePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AccessModePermission</span><span class="p">(</span><span class="n">MessageMixin</span><span class="p">,</span> <span class="n">Permission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If view has access_mode that is not anonymous, then require authentication</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_PERMISSION_DENIED_MSG&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AccessModePermission.has_permission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.AccessModePermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="n">access_mode</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">get_access_mode</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">access_mode</span> <span class="o">==</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ERROR_ONLY_AUTHENTICATED&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">access_mode</span> <span class="o">&gt;=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">SUPERUSER</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span>
+
+        <span class="k">if</span> <span class="n">access_mode</span> <span class="o">&gt;=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ERROR_ONLY_TEACHERS&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">elif</span> <span class="n">access_mode</span> <span class="o">&gt;=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ERROR_ONLY_COURSE_STAFF&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">elif</span> <span class="n">access_mode</span> <span class="o">==</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">is_student</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ERROR_ONLY_ENROLLED_STUDENTS&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="c1"># Object permissions</span>
+<span class="c1"># ==================</span>
+
+
+<div class="viewcode-block" id="ObjectVisibleBasePermission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.ObjectVisibleBasePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectVisibleBasePermission</span><span class="p">(</span><span class="n">MessageMixin</span><span class="p">,</span> <span class="n">Permission</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">obj_var</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ObjectVisibleBasePermission.has_permission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.ObjectVisibleBasePermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_var</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectVisibleBasePermission.has_object_permission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.ObjectVisibleBasePermission.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="c1"># skip objects that are not the model in question</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span> <span class="ow">or</span> <span class="c1"># pylint: disable=isinstance-second-argument-not-valid-type</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_staff</span> <span class="ow">or</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span> <span class="ow">or</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_object_visible</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ObjectVisibleBasePermission.is_object_visible">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.ObjectVisibleBasePermission.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OAuth2ScopeChecker">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.OAuth2ScopeChecker">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAuth2ScopeChecker</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    To be inherited by View classes that wish to use OAuth2.</span>
+<span class="sd">    Defines check_token_scope to verify if provided bearer token has</span>
+<span class="sd">    sufficient privileges to access the view.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="OAuth2ScopeChecker.check_token_scope">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.OAuth2ScopeChecker.check_token_scope">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_token_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scopes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns true if the scope(s) required by the current view is included in the</span>
+<span class="sd">        given scopes list.</span>
+<span class="sd">        &#39;&#39;&#39;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OAuth2TokenPermission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.OAuth2TokenPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAuth2TokenPermission</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Permission controlled by OAuth2 Bearer tokens.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="OAuth2TokenPermission.has_permission">
+<a class="viewcode-back" href="../../authorization.html#authorization.permissions.OAuth2TokenPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">OAuth2ScopeChecker</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Authorization&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Missing authorization token&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Invalid authorization token&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Check if token is known and is valid for the purpose</span>
+        <span class="n">pemkey</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">APLUS_AUTH_LOCAL</span><span class="p">[</span><span class="s1">&#39;PUBLIC_KEY&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">token</span><span class="p">,</span>
+                <span class="n">pemkey</span><span class="p">,</span>
+                <span class="n">algorithms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;RS256&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">jwt</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">InvalidSignatureError</span><span class="p">,</span> <span class="n">jwt</span><span class="o">.</span><span class="n">ExpiredSignatureError</span><span class="p">,</span> <span class="n">jwt</span><span class="o">.</span><span class="n">InvalidAudienceError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;LTI 1.3: Bearer token decoding failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">check_token_scope</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;scope&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Insufficient bearer token scope: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

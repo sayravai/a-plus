@@ -1,0 +1,924 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.tests_cache &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.tests_cache</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.tests_cache</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">lib.testdata</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseTestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">LearningObjectCategory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">deviations.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MaxSubmissionsRuleDeviation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.tests</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseTestBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedContent</span><span class="p">,</span> <span class="n">InstanceContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span><span class="p">,</span> <span class="n">ModuleContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">previous_iterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CachedPoints</span><span class="p">,</span>
+    <span class="n">CachedPointsData</span><span class="p">,</span>
+    <span class="n">LearningObjectPoints</span><span class="p">,</span>
+    <span class="n">ModulePoints</span><span class="p">,</span>
+    <span class="n">ExercisePoints</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span><span class="p">,</span> <span class="n">CourseChapter</span><span class="p">,</span> <span class="n">LearningObject</span><span class="p">,</span> <span class="n">RevealRule</span><span class="p">,</span> <span class="n">StaticExercise</span><span class="p">,</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">deviations.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeadlineRuleDeviation</span>
+
+
+<div class="viewcode-block" id="CachedExerciseContentTest">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExerciseContentTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedExerciseContentTest</span><span class="p">(</span><span class="n">ExerciseTestBase</span><span class="p">):</span>
+<div class="viewcode-block" id="CachedExerciseContentTest.test_no_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExerciseContentTest.test_no_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExerciseContentTest.test_invalidation_save">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExerciseContentTest.test_invalidation_save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">lobj_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">)</span>
+        <span class="n">lobj_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lobj_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">lobj_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="c1"># learning_object children have changed</span>
+        <span class="n">lobj_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">lobj_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">lobj_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">broken_learning_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="c1"># learning_object children have changed</span>
+        <span class="n">lobj_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">lobj_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">lobj_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_object_category</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExerciseContentTest.test_invalidation_delete_exercise">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExerciseContentTest.test_invalidation_delete_exercise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_exercise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="c1"># Create an entry in the cache</span>
+        <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="n">lobj_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span>
+                <span class="s2">&quot;ExerciseEntry.get should have thrown a LearningObject.DoesNotExist&quot;</span>
+                <span class="s2">&quot; exception for a non-existent exercise&quot;</span>
+            <span class="p">)</span>
+        <span class="n">lobj_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">lobj_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">lobj_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExerciseContentTest.test_invalidation_delete_module">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExerciseContentTest.test_invalidation_delete_module">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExerciseContentTest.test_invalidation_delete_category">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExerciseContentTest.test_invalidation_delete_category">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_category</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_object_category</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CachedModuleContentTest">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModuleContentTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedModuleContentTest</span><span class="p">(</span><span class="n">ExerciseTestBase</span><span class="p">):</span>
+<div class="viewcode-block" id="CachedModuleContentTest.test_no_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModuleContentTest.test_no_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedModuleContentTest.test_invalidation_save">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModuleContentTest.test_invalidation_save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_object_category</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedModuleContentTest.test_invalidation_delete_module">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModuleContentTest.test_invalidation_delete_module">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Create an entry in the cache</span>
+        <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span>
+                <span class="s2">&quot;ModuleEntry.get should have thrown a CourseModule.DoesNotExist exception for a non-existent module&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedModuleContentTest.test_invalidation_delete_exercise">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModuleContentTest.test_invalidation_delete_exercise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_exercise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedModuleContentTest.test_invalidation_delete_category">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModuleContentTest.test_invalidation_delete_category">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_category</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_object_category</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModuleContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CachedContentTest">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedContentTest</span><span class="p">(</span><span class="n">CourseTestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="CachedContentTest.test_no_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_no_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_invalidation_delete_instance">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_invalidation_delete_instance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Create an entry in the cache</span>
+        <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fail</span><span class="p">(</span>
+                <span class="s2">&quot;CachedContentData.get should have thrown a&quot;</span>
+                <span class="s2">&quot; CourseInstance.DoesNotExist exception for a non-existent instance&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_invalidation_delete_module">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_invalidation_delete_module">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_invalidation_delete_exercise">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_invalidation_delete_exercise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_exercise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_invalidation_delete_category">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_invalidation_delete_category">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_category</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">InstanceContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_content">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_content">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_content</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module0</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNLISTED</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module0</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">total</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">min_group_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">max_group_size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">modules</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">modules</span><span class="p">()),</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">categories</span><span class="p">()),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">exercises0</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">flat_module</span><span class="p">(</span><span class="n">modules</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">level_markers</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">exercises1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">flat_module</span><span class="p">(</span><span class="n">modules</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">level_markers</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">exercises0</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">exercises1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="n">exercises0</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">module_id</span><span class="p">,</span> <span class="n">modules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">is_visible</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">is_listed</span><span class="p">())</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="n">exercises1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">module_id</span><span class="p">,</span> <span class="n">modules</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">is_visible</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">is_visible</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">is_in_maintenance</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">opening_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">opening_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">closing_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">points_to_pass</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_hierarchy">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_hierarchy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_hierarchy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">full</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">flat_full</span><span class="p">())</span>
+        <span class="n">hierarchy</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;level&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;module&#39;</span><span class="p">,</span><span class="s1">&#39;level&#39;</span><span class="p">,</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;level&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;module&#39;</span><span class="p">,</span><span class="s1">&#39;level&#39;</span><span class="p">,</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;level&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;module&#39;</span><span class="p">,</span><span class="s1">&#39;level&#39;</span><span class="p">,</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;level&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;level&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">typ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hierarchy</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">full</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">typ</span><span class="p">)</span>
+
+        <span class="n">full</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">flat_full</span><span class="p">(</span><span class="n">level_markers</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">hierarchy</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">hierarchy</span> <span class="k">if</span> <span class="n">t</span> <span class="o">!=</span> <span class="s2">&quot;level&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">typ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hierarchy</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">full</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">typ</span><span class="p">)</span>
+
+        <span class="n">begin</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">full</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_find">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_find">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_find</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">module</span><span class="p">,</span><span class="n">tree</span><span class="p">,</span><span class="n">prev</span><span class="p">,</span><span class="n">nex</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">prev</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s1">&#39;exercise&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">prev</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise0</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nex</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s1">&#39;exercise&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nex</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">eid</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">eid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">exercise</span><span class="p">,</span><span class="n">tree</span><span class="p">,</span><span class="n">prev</span><span class="p">,</span><span class="n">nex</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s1">&#39;exercise&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">tree</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">prev</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s1">&#39;exercise&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">prev</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nex</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nex</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_backwards">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_backwards">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_backwards</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">backwards</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">previous_iterator</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">modules</span><span class="p">()))</span>
+        <span class="n">hierarcy</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;module&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;module&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise&#39;</span><span class="p">,</span><span class="s1">&#39;module&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">typ</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hierarcy</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">backwards</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">typ</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_flat_modules">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_flat_modules">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_flat_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">modules_flatted</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">flatted</span><span class="p">)),</span> <span class="n">sizes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="CachedContentTest.test_deep">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedContentTest.test_deep">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_deep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subexercise</span> <span class="o">=</span> <span class="n">StaticExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
+            <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">BaseExercise</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNLISTED</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s1">&#39;s1&#39;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Deep Exercise&quot;</span><span class="p">,</span>
+            <span class="n">exercise_page_content</span><span class="o">=</span><span class="s1">&#39;$$subexercise$$content&#39;</span><span class="p">,</span>
+            <span class="n">submission_page_content</span><span class="o">=</span><span class="s1">&#39;$$subexercise$$received&#39;</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">_exercise</span><span class="p">,</span> <span class="n">_tree</span><span class="p">,</span> <span class="n">_prev</span><span class="p">,</span> <span class="n">nex</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subexercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nex</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">nex</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module2</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CachedExercisePointsTest">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedExercisePointsTest</span><span class="p">(</span><span class="n">ExerciseTestBase</span><span class="p">):</span>
+<div class="viewcode-block" id="CachedExercisePointsTest.test_no_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest.test_no_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExercisePointsTest.test_content_invalidated">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest.test_content_invalidated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_content_invalidated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">)</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExercisePointsTest.test_invalidation_save">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest.test_invalidation_save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="n">user2_base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation</span><span class="o">.</span><span class="n">exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">MaxSubmissionsRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">granter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_submissions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">reveal_rule</span> <span class="o">=</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">trigger</span><span class="o">=</span><span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">MANUAL</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">submission_feedback_reveal_rule</span> <span class="o">=</span> <span class="n">reveal_rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">reveal_rule</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExercisePointsTest.test_invalidation_delete_submission">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest.test_invalidation_delete_submission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">user2_base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission_with_two_submitters</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExercisePointsTest.test_invalidation_delete_reveal_rule">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest.test_invalidation_delete_reveal_rule">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_reveal_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">reveal_rule</span> <span class="o">=</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">trigger</span><span class="o">=</span><span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">MANUAL</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">submission_feedback_reveal_rule</span> <span class="o">=</span> <span class="n">reveal_rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">user2_base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="n">reveal_rule</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExercisePointsTest.test_invalidation_delete_max_submission_rule_deviation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest.test_invalidation_delete_max_submission_rule_deviation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_delete_max_submission_rule_deviation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">submission_rule_deviation</span> <span class="o">=</span> <span class="n">MaxSubmissionsRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">granter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_submissions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">user2_base_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="n">submission_rule_deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">user2_base_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">user2_base_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">user2_base_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedExercisePointsTest.test_invalidation_child_dependency">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedExercisePointsTest.test_invalidation_child_dependency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_child_dependency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span>
+        <span class="n">lobj_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">lobj_entry2</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">lobj_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">lobj_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">lobj_entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">lobj_entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">lobj_entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CachedModulePointsTest">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModulePointsTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedModulePointsTest</span><span class="p">(</span><span class="n">ExerciseTestBase</span><span class="p">):</span>
+<div class="viewcode-block" id="CachedModulePointsTest.test_no_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModulePointsTest.test_no_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModulePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModulePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedModulePointsTest.test_content_invalidated">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModulePointsTest.test_content_invalidated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_content_invalidated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModulePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModulePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedModulePointsTest.test_invalidation_descendant_dependency">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedModulePointsTest.test_invalidation_descendant_dependency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_descendant_dependency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModulePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">ModulePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_object</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ModulePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CachedPointsTest">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedPointsTest</span><span class="p">(</span><span class="n">CourseTestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="CachedPointsTest.test_no_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_no_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_content_invalidated">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_content_invalidated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_content_invalidated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">InstanceContent</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_invalidation_module_dependency">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_invalidation_module_dependency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_module_dependency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">ModulePoints</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_invalidation_exercise_dependency">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_invalidation_exercise_dependency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation_exercise_dependency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry2</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">CachedPointsData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">entry2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_invalidation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_invalidation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">created</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">created</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">created</span><span class="p">(),</span> <span class="n">created</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise0</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">created</span><span class="p">(),</span> <span class="n">created</span><span class="p">)</span>
+        <span class="n">created</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">created</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">CachedContent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">created</span><span class="p">(),</span> <span class="n">created</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">created</span><span class="p">(),</span> <span class="n">created</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_accumulation">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_accumulation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_accumulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">entry</span><span class="p">,</span> <span class="n">_tree</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">graded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">passed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">total</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">submission_count</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">modules</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">submission_count</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="c1"># True for now; passing individual exercises should have no bearing</span>
+        <span class="c1"># on passing a module, to mimic previous functionality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">passed</span><span class="p">)</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">categories</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">category</span><span class="o">.</span><span class="n">passed</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">set_ready</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">total</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">submission_count</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission3</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission3</span><span class="o">.</span><span class="n">set_ready</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission3</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">total</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">submission_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">110</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">110</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">modules</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">passed</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_unconfirmed">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_unconfirmed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_unconfirmed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category2</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test Category 2&quot;</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">confirm_the_level</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">category2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">total</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">unconfirmed_points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">modules</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">categories</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">category</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission3</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission3</span><span class="o">.</span><span class="n">set_ready</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission3</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">total</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">unconfirmed_points_by_difficulty</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">modules</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">category</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">categories</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">category</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_unofficial">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_unofficial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_unofficial</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">late_submissions_allowed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">accept_unofficial_submits</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise3</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">submission_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">three_days_after</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">set_ready</span><span class="p">()</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">submission_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">three_days_after</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">set_ready</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">entry</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">graded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">unofficial</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="n">entry</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">graded</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">unofficial</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedPointsTest.test_is_revealed">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.CachedPointsTest.test_is_revealed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_is_revealed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">module_chapter</span> <span class="o">=</span> <span class="n">CourseChapter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test course chapter&quot;</span><span class="p">,</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;c1&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise0</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">granter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_seconds</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">reveal_rule</span> <span class="o">=</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">trigger</span><span class="o">=</span><span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">module_chapter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module0</span><span class="o">.</span><span class="n">model_answer</span> <span class="o">=</span> <span class="n">module_chapter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module0</span><span class="o">.</span><span class="n">model_solution_reveal_rule</span> <span class="o">=</span> <span class="n">reveal_rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module0</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">entry0</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise0</span><span class="p">)</span>
+        <span class="n">entry</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span>
+        <span class="n">entry2</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise2</span><span class="p">)</span>
+        <span class="n">chapter_entry</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">module_chapter</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">entry0</span><span class="o">.</span><span class="n">is_revealed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">is_revealed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">entry2</span><span class="o">.</span><span class="n">is_revealed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">chapter_entry</span><span class="o">.</span><span class="n">is_revealed</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ExercisePointsTest">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.ExercisePointsTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExercisePointsTest</span><span class="p">(</span><span class="n">ExerciseTestBase</span><span class="p">):</span>
+<div class="viewcode-block" id="ExercisePointsTest.test_forced_points">
+<a class="viewcode-back" href="../../exercise.html#exercise.tests_cache.ExercisePointsTest.test_forced_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_forced_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">official_points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="n">forced_points_submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span>
+            <span class="n">grader</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grader</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">official_points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">official_points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">force_exercise_points</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">official_points</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span>
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">force_exercise_points</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">official_points</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+
+        <span class="n">forced_points_submission</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">official_points</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">official_points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">points</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

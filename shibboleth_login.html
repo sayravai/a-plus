@@ -1,0 +1,397 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>shibboleth_login package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">shibboleth_login package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-shibboleth_login.apps">shibboleth_login.apps module</a><ul>
+<li><a class="reference internal" href="#shibboleth_login.apps.AplusShibbolethLoginConfig"><code class="docutils literal notranslate"><span class="pre">AplusShibbolethLoginConfig</span></code></a><ul>
+<li><a class="reference internal" href="#shibboleth_login.apps.AplusShibbolethLoginConfig.name"><code class="docutils literal notranslate"><span class="pre">AplusShibbolethLoginConfig.name</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.apps.AplusShibbolethLoginConfig.verbose_name"><code class="docutils literal notranslate"><span class="pre">AplusShibbolethLoginConfig.verbose_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-shibboleth_login.auth_backend">shibboleth_login.auth_backend module</a><ul>
+<li><a class="reference internal" href="#shibboleth_login.auth_backend.ShibbolethAuthBackend"><code class="docutils literal notranslate"><span class="pre">ShibbolethAuthBackend</span></code></a><ul>
+<li><a class="reference internal" href="#shibboleth_login.auth_backend.ShibbolethAuthBackend.authenticate"><code class="docutils literal notranslate"><span class="pre">ShibbolethAuthBackend.authenticate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-shibboleth_login.parser">shibboleth_login.parser module</a><ul>
+<li><a class="reference internal" href="#shibboleth_login.parser.Parser"><code class="docutils literal notranslate"><span class="pre">Parser</span></code></a><ul>
+<li><a class="reference internal" href="#shibboleth_login.parser.Parser.DELIM"><code class="docutils literal notranslate"><span class="pre">Parser.DELIM</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.parser.Parser.get_single_value"><code class="docutils literal notranslate"><span class="pre">Parser.get_single_value()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.parser.Parser.get_urn_values"><code class="docutils literal notranslate"><span class="pre">Parser.get_urn_values()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.parser.Parser.get_values"><code class="docutils literal notranslate"><span class="pre">Parser.get_values()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#shibboleth_login.parser.colons"><code class="docutils literal notranslate"><span class="pre">colons()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.parser.shib_join"><code class="docutils literal notranslate"><span class="pre">shib_join()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-shibboleth_login.tests">shibboleth_login.tests module</a><ul>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethSettingsTest"><code class="docutils literal notranslate"><span class="pre">ShibbolethSettingsTest</span></code></a><ul>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethSettingsTest.test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated"><code class="docutils literal notranslate"><span class="pre">ShibbolethSettingsTest.test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_are_parsed_correctly"><code class="docutils literal notranslate"><span class="pre">ShibbolethSettingsTest.test_old_settings_are_parsed_correctly()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_with_http_prefix_are_parsed_correctly"><code class="docutils literal notranslate"><span class="pre">ShibbolethSettingsTest.test_old_settings_with_http_prefix_are_parsed_correctly()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest</span></code></a><ul>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.setUpTestData"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.setUpTestData()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_name_when_givename_is_missing"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_cn_is_used_for_first_name_when_givename_is_missing()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_email_is_create_when_when_email_is_missing"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_email_is_create_when_when_email_is_missing()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_last_name_is_not_updated_when_sn_is_missing"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_last_name_is_not_updated_when_sn_is_missing()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_even_with_lowercase_meta"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_new_user_is_create_even_with_lowercase_meta()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_when_there_is_valid_data"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_new_user_is_create_when_there_is_valid_data()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_with_tuni_user_info"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_new_user_is_create_with_tuni_user_info()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_no_student_id_is_set_when_it_is_missing_from_shib"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_no_student_id_is_set_when_it_is_missing_from_shib()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_old_user_found_using_email"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_old_user_found_using_email()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_does_not_contain_domain"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_permission_is_denied_when_user_id_does_not_contain_domain()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_missing"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_permission_is_denied_when_user_id_is_missing()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_way_too_long"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_permission_is_denied_when_user_id_is_way_too_long()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_is_inactive"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_permission_is_denied_when_user_is_inactive()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_second_domain_student_id_is_used_when_setting_is_changed"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_second_domain_student_id_is_used_when_setting_is_changed()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_unicode_values_are_supported_for_names"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_unicode_values_are_supported_for_names()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.tests.ShibbolethTest.test_values_are_not_updated_when_they_are_missing"><code class="docutils literal notranslate"><span class="pre">ShibbolethTest.test_values_are_not_updated_when_they_are_missing()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-shibboleth_login.urls">shibboleth_login.urls module</a></li>
+<li><a class="reference internal" href="#module-shibboleth_login.views">shibboleth_login.views module</a><ul>
+<li><a class="reference internal" href="#shibboleth_login.views.ShibbolethException"><code class="docutils literal notranslate"><span class="pre">ShibbolethException</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.views.debug"><code class="docutils literal notranslate"><span class="pre">debug()</span></code></a></li>
+<li><a class="reference internal" href="#shibboleth_login.views.login"><code class="docutils literal notranslate"><span class="pre">login()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-shibboleth_login">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">shibboleth_login package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/shibboleth_login.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="shibboleth-login-package">
+<h1>shibboleth_login package<a class="headerlink" href="#shibboleth-login-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-shibboleth_login.apps">
+<span id="shibboleth-login-apps-module"></span><h2>shibboleth_login.apps module<a class="headerlink" href="#module-shibboleth_login.apps" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="shibboleth_login.apps.AplusShibbolethLoginConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shibboleth_login.apps.</span></span><span class="sig-name descname"><span class="pre">AplusShibbolethLoginConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/apps.html#AplusShibbolethLoginConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.apps.AplusShibbolethLoginConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shibboleth_login.apps.AplusShibbolethLoginConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'shibboleth_login'</span></em><a class="headerlink" href="#shibboleth_login.apps.AplusShibbolethLoginConfig.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shibboleth_login.apps.AplusShibbolethLoginConfig.verbose_name">
+<span class="sig-name descname"><span class="pre">verbose_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'A+</span> <span class="pre">Shibboleth</span> <span class="pre">Login'</span></em><a class="headerlink" href="#shibboleth_login.apps.AplusShibbolethLoginConfig.verbose_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-shibboleth_login.auth_backend">
+<span id="shibboleth-login-auth-backend-module"></span><h2>shibboleth_login.auth_backend module<a class="headerlink" href="#module-shibboleth_login.auth_backend" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="shibboleth_login.auth_backend.ShibbolethAuthBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shibboleth_login.auth_backend.</span></span><span class="sig-name descname"><span class="pre">ShibbolethAuthBackend</span></span><a class="reference internal" href="_modules/shibboleth_login/auth_backend.html#ShibbolethAuthBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.auth_backend.ShibbolethAuthBackend" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelBackend</span></code></p>
+<p>Authenticates the trusted user from the Shibboleth middleware headers.
+Creates a new user or updates changed fields on an existing user.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.auth_backend.ShibbolethAuthBackend.authenticate">
+<span class="sig-name descname"><span class="pre">authenticate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shibd_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/auth_backend.html#ShibbolethAuthBackend.authenticate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.auth_backend.ShibbolethAuthBackend.authenticate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-shibboleth_login.parser">
+<span id="shibboleth-login-parser-module"></span><h2>shibboleth_login.parser module<a class="headerlink" href="#module-shibboleth_login.parser" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="shibboleth_login.parser.Parser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shibboleth_login.parser.</span></span><span class="sig-name descname"><span class="pre">Parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">urldecode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/parser.html#Parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.parser.Parser" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="shibboleth_login.parser.Parser.DELIM">
+<span class="sig-name descname"><span class="pre">DELIM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('(?&lt;!\\\\);')</span></em><a class="headerlink" href="#shibboleth_login.parser.Parser.DELIM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.parser.Parser.get_single_value">
+<span class="sig-name descname"><span class="pre">get_single_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KeyError()'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/parser.html#Parser.get_single_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.parser.Parser.get_single_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.parser.Parser.get_urn_values">
+<span class="sig-name descname"><span class="pre">get_urn_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/parser.html#Parser.get_urn_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.parser.Parser.get_urn_values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.parser.Parser.get_values">
+<span class="sig-name descname"><span class="pre">get_values</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KeyError()'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/parser.html#Parser.get_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.parser.Parser.get_values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shibboleth_login.parser.colons">
+<span class="sig-prename descclassname"><span class="pre">shibboleth_login.parser.</span></span><span class="sig-name descname"><span class="pre">colons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/parser.html#colons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.parser.colons" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shibboleth_login.parser.shib_join">
+<span class="sig-prename descclassname"><span class="pre">shibboleth_login.parser.</span></span><span class="sig-name descname"><span class="pre">shib_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">strings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/parser.html#shib_join"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.parser.shib_join" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-shibboleth_login.tests">
+<span id="shibboleth-login-tests-module"></span><h2>shibboleth_login.tests module<a class="headerlink" href="#module-shibboleth_login.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethSettingsTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shibboleth_login.tests.</span></span><span class="sig-name descname"><span class="pre">ShibbolethSettingsTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethSettingsTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethSettingsTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethSettingsTest.test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated">
+<span class="sig-name descname"><span class="pre">test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethSettingsTest.test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethSettingsTest.test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_are_parsed_correctly">
+<span class="sig-name descname"><span class="pre">test_old_settings_are_parsed_correctly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethSettingsTest.test_old_settings_are_parsed_correctly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_are_parsed_correctly" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_with_http_prefix_are_parsed_correctly">
+<span class="sig-name descname"><span class="pre">test_old_settings_with_http_prefix_are_parsed_correctly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethSettingsTest.test_old_settings_with_http_prefix_are_parsed_correctly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_with_http_prefix_are_parsed_correctly" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shibboleth_login.tests.</span></span><span class="sig-name descname"><span class="pre">ShibbolethTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing">
+<span class="sig-name descname"><span class="pre">test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_name_when_givename_is_missing">
+<span class="sig-name descname"><span class="pre">test_cn_is_used_for_first_name_when_givename_is_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_cn_is_used_for_first_name_when_givename_is_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_name_when_givename_is_missing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing">
+<span class="sig-name descname"><span class="pre">test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_email_is_create_when_when_email_is_missing">
+<span class="sig-name descname"><span class="pre">test_email_is_create_when_when_email_is_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_email_is_create_when_when_email_is_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_email_is_create_when_when_email_is_missing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_last_name_is_not_updated_when_sn_is_missing">
+<span class="sig-name descname"><span class="pre">test_last_name_is_not_updated_when_sn_is_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_last_name_is_not_updated_when_sn_is_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_last_name_is_not_updated_when_sn_is_missing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_even_with_lowercase_meta">
+<span class="sig-name descname"><span class="pre">test_new_user_is_create_even_with_lowercase_meta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_new_user_is_create_even_with_lowercase_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_even_with_lowercase_meta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_when_there_is_valid_data">
+<span class="sig-name descname"><span class="pre">test_new_user_is_create_when_there_is_valid_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_new_user_is_create_when_there_is_valid_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_when_there_is_valid_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_with_tuni_user_info">
+<span class="sig-name descname"><span class="pre">test_new_user_is_create_with_tuni_user_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_new_user_is_create_with_tuni_user_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_with_tuni_user_info" title="Link to this definition"></a></dt>
+<dd><p>Validate that shib login works with data obtained from Tampere universities</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_no_student_id_is_set_when_it_is_missing_from_shib">
+<span class="sig-name descname"><span class="pre">test_no_student_id_is_set_when_it_is_missing_from_shib</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_no_student_id_is_set_when_it_is_missing_from_shib"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_no_student_id_is_set_when_it_is_missing_from_shib" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_old_user_found_using_email">
+<span class="sig-name descname"><span class="pre">test_old_user_found_using_email</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_old_user_found_using_email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_old_user_found_using_email" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_does_not_contain_domain">
+<span class="sig-name descname"><span class="pre">test_permission_is_denied_when_user_id_does_not_contain_domain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_permission_is_denied_when_user_id_does_not_contain_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_does_not_contain_domain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_missing">
+<span class="sig-name descname"><span class="pre">test_permission_is_denied_when_user_id_is_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_permission_is_denied_when_user_id_is_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_missing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_way_too_long">
+<span class="sig-name descname"><span class="pre">test_permission_is_denied_when_user_id_is_way_too_long</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_permission_is_denied_when_user_id_is_way_too_long"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_way_too_long" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_is_inactive">
+<span class="sig-name descname"><span class="pre">test_permission_is_denied_when_user_is_inactive</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_permission_is_denied_when_user_is_inactive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_is_inactive" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_second_domain_student_id_is_used_when_setting_is_changed">
+<span class="sig-name descname"><span class="pre">test_second_domain_student_id_is_used_when_setting_is_changed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_second_domain_student_id_is_used_when_setting_is_changed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_second_domain_student_id_is_used_when_setting_is_changed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_unicode_values_are_supported_for_names">
+<span class="sig-name descname"><span class="pre">test_unicode_values_are_supported_for_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_unicode_values_are_supported_for_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_unicode_values_are_supported_for_names" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="shibboleth_login.tests.ShibbolethTest.test_values_are_not_updated_when_they_are_missing">
+<span class="sig-name descname"><span class="pre">test_values_are_not_updated_when_they_are_missing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/tests.html#ShibbolethTest.test_values_are_not_updated_when_they_are_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.tests.ShibbolethTest.test_values_are_not_updated_when_they_are_missing" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-shibboleth_login.urls">
+<span id="shibboleth-login-urls-module"></span><h2>shibboleth_login.urls module<a class="headerlink" href="#module-shibboleth_login.urls" title="Link to this heading"></a></h2>
+</section>
+<section id="module-shibboleth_login.views">
+<span id="shibboleth-login-views-module"></span><h2>shibboleth_login.views module<a class="headerlink" href="#module-shibboleth_login.views" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="shibboleth_login.views.ShibbolethException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">shibboleth_login.views.</span></span><span class="sig-name descname"><span class="pre">ShibbolethException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/views.html#ShibbolethException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.views.ShibbolethException" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Signals problems processing Shibboleth request.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shibboleth_login.views.debug">
+<span class="sig-prename descclassname"><span class="pre">shibboleth_login.views.</span></span><span class="sig-name descname"><span class="pre">debug</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/views.html#debug"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.views.debug" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="shibboleth_login.views.login">
+<span class="sig-prename descclassname"><span class="pre">shibboleth_login.views.</span></span><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/shibboleth_login/views.html#login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#shibboleth_login.views.login" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-shibboleth_login">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-shibboleth_login" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

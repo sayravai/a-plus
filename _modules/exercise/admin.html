@@ -1,0 +1,743 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.admin &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.admin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.admin</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.query</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuerySet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseChapter</span><span class="p">,</span>
+    <span class="n">BaseExercise</span><span class="p">,</span>
+    <span class="n">StaticExercise</span><span class="p">,</span>
+    <span class="n">ExerciseWithAttachment</span><span class="p">,</span>
+    <span class="n">LTIExercise</span><span class="p">,</span>
+    <span class="n">LTI1p3Exercise</span><span class="p">,</span>
+    <span class="n">Submission</span><span class="p">,</span>
+    <span class="n">SubmissionDraft</span><span class="p">,</span>
+    <span class="n">SubmittedFile</span><span class="p">,</span>
+    <span class="n">RevealRule</span><span class="p">,</span>
+    <span class="n">ExerciseTask</span><span class="p">,</span>
+    <span class="n">LearningObjectDisplay</span><span class="p">,</span>
+    <span class="n">PendingSubmission</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercisecollection_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseCollection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.admin_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_column_link</span><span class="p">,</span> <span class="n">RecentCourseInstanceListFilter</span>
+
+
+<div class="viewcode-block" id="real_class">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.real_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">real_class</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the leaf class name of an exercise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">model_class</span><span class="p">()</span><span class="o">.</span><span class="vm">__name__</span></div>
+
+
+
+<div class="viewcode-block" id="course_wrapper">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.course_wrapper">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">course_wrapper</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Course instance for a submission.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span></div>
+
+
+
+<div class="viewcode-block" id="submitters_wrapper">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.submitters_wrapper">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">submitters_wrapper</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Submitters as a string for a submission.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+        <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">(),</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">student_id</span> <span class="ow">or</span> <span class="n">p</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+        <span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="p">])</span></div>
+
+
+
+<span class="n">real_class</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;REAL_CLASS&#39;</span><span class="p">)</span>
+<span class="n">course_wrapper</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_INSTANCE&#39;</span><span class="p">)</span>
+<span class="n">submitters_wrapper</span><span class="o">.</span><span class="n">short_description</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;SUBMITTERS&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GradeListFilter">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.GradeListFilter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GradeListFilter</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">SimpleListFilter</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GRADE&#39;</span><span class="p">)</span>
+    <span class="n">parameter_name</span> <span class="o">=</span> <span class="s1">&#39;grade&#39;</span>
+
+<div class="viewcode-block" id="GradeListFilter.lookups">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.GradeListFilter.lookups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lookups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">model_admin</span><span class="p">:</span> <span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s1">&#39;grade__exact=0&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__exact=1&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__exact=2&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__lt=10&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 10&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__gte=10&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;= 10&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__lt=20&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 20&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__gte=20&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;= 20&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__lt=50&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 50&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__gte=50&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;= 50&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__lt=100&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 100&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__gte=100&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;= 100&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__lt=150&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 150&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__gte=150&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;= 150&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__lt=200&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt; 200&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;grade__gte=200&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;= 200&#39;</span><span class="p">),</span>
+        <span class="p">]</span></div>
+
+    <span class="c1"># pylint: disable-next=inconsistent-return-statements</span>
+<div class="viewcode-block" id="GradeListFilter.queryset">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.GradeListFilter.queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">queryset</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QuerySet</span><span class="p">]:</span>
+        <span class="n">lookup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lookup</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">lookup</span> <span class="o">=</span> <span class="n">lookup</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="p">{</span><span class="n">lookup</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">lookup</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">q</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionRecentCourseInstanceListFilter">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmissionRecentCourseInstanceListFilter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionRecentCourseInstanceListFilter</span><span class="p">(</span><span class="n">RecentCourseInstanceListFilter</span><span class="p">):</span>
+    <span class="n">course_instance_query</span> <span class="o">=</span> <span class="s1">&#39;exercise__course_module__course_instance&#39;</span></div>
+
+
+<div class="viewcode-block" id="LearningObjectRecentCourseInstanceListFilter">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.LearningObjectRecentCourseInstanceListFilter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearningObjectRecentCourseInstanceListFilter</span><span class="p">(</span><span class="n">RecentCourseInstanceListFilter</span><span class="p">):</span>
+    <span class="n">course_instance_query</span> <span class="o">=</span> <span class="s1">&#39;course_module__course_instance&#39;</span></div>
+
+
+<div class="viewcode-block" id="SubmittedFileRecentCourseInstanceListFilter">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmittedFileRecentCourseInstanceListFilter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmittedFileRecentCourseInstanceListFilter</span><span class="p">(</span><span class="n">RecentCourseInstanceListFilter</span><span class="p">):</span>
+    <span class="n">course_instance_query</span> <span class="o">=</span> <span class="s1">&#39;submission__exercise__course_module__course_instance&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="CourseChapterAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.CourseChapterAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseChapterAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__str__&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;service_url&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_module__opening_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__closing_time&#39;</span><span class="p">,</span>
+        <span class="n">LearningObjectRecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parent&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="BaseExerciseAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.BaseExerciseAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseExerciseAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__str__&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+        <span class="n">real_class</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_module__opening_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__closing_time&#39;</span><span class="p">,</span>
+        <span class="n">LearningObjectRecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parent&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_feedback_reveal_rule&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;model_solutions_reveal_rule&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SubmissionAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmissionAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+        <span class="n">course_wrapper</span><span class="p">,</span>
+        <span class="n">submitters_wrapper</span><span class="p">,</span>
+        <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;unofficial_submission_type&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;grade&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_time&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_time&#39;</span><span class="p">,</span>
+        <span class="n">SubmissionRecentCourseInstanceListFilter</span><span class="p">,</span>
+        <span class="n">GradeListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitters__student_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitters__user__username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitters__user__first_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitters__user__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitters__user__email&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_per_page</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;submitters&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;grader&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;submission_time&#39;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="SubmissionAdmin.get_queryset">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmissionAdmin.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;submitters&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionDraftAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmissionDraftAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionDraftAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitter__student_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitter__user__username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitter__user__first_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitter__user__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submitter__user__email&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+        <span class="n">course_wrapper</span><span class="p">,</span>
+        <span class="s1">&#39;submitter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;active&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;active&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span>
+        <span class="n">SubmissionRecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_per_page</span> <span class="o">=</span> <span class="mi">300</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;submitter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="SubmissionDraftAdmin.get_queryset">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmissionDraftAdmin.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">SubmissionDraft</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="s1">&#39;submission_data&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="s1">&#39;submitter&#39;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmittedFileAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmittedFileAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmittedFileAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;submission__exercise__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__student_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__first_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__email&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;get_course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;get_exercise&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;get_submitters&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;param_name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;submission&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;get_submitters&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;param_name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">SubmittedFileRecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;submission&#39;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="SubmittedFileAdmin.get_course_instance">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmittedFileAdmin.get_course_instance">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_COURSE_INSTANCE&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmittedFileAdmin.get_exercise">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmittedFileAdmin.get_exercise">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EXERCISE&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmittedFileAdmin.get_submitters">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.SubmittedFileAdmin.get_submitters">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMITTERS&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_submitters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StaticExerciseAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.StaticExerciseAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StaticExerciseAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parent&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_feedback_reveal_rule&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;model_solutions_reveal_rule&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseWithAttachmentAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.ExerciseWithAttachmentAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseWithAttachmentAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parent&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_feedback_reveal_rule&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;model_solutions_reveal_rule&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LTIExerciseAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.LTIExerciseAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTIExerciseAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__str__&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+        <span class="n">real_class</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">LearningObjectRecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;lti_service&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parent&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_feedback_reveal_rule&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;model_solutions_reveal_rule&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LTI1p3ExerciseAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.LTI1p3ExerciseAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTI1p3ExerciseAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__course__name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__str__&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">LearningObjectRecentCourseInstanceListFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;lti_service&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;parent&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_feedback_reveal_rule&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;model_solutions_reveal_rule&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseCollectionAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.ExerciseCollectionAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseCollectionAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseCollectionExerciseAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.ExerciseCollectionExerciseAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseCollectionExerciseAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__str__&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;target_category&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;course_module___course_instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;target_category&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="RevealRuleAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.RevealRuleAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RevealRuleAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;trigger&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;__str__&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;__str__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;trigger&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;delay_minutes&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;currently_revealed&#39;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseTaskAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.ExerciseTaskAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseTaskAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;task_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__course_module__course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise__course_module__course_instance__course__name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;get_course&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;task_type&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;task_id&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;task_type&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;task_id&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,)</span>
+
+<div class="viewcode-block" id="ExerciseTaskAdmin.get_course">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.ExerciseTaskAdmin.get_course">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LearningObjectDisplayAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.LearningObjectDisplayAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearningObjectDisplayAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;learning_object__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;learning_object__category__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;learning_object__course_module__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;learning_object__course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;learning_object__course_module__course_instance__course__code&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;learning_object__course_module__course_instance__course__name&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;learning_object&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;profile&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;learning_object&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;profile&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">readonly_fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;timestamp&#39;</span><span class="p">,)</span></div>
+
+
+
+<div class="viewcode-block" id="PendingSubmissionAdmin">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.PendingSubmissionAdmin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PendingSubmissionAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_display_links</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,)</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;course_instance_link&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exercise_link&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_link&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_time&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;num_retries&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_status&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;submission__status&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission_time&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">search_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__exercise__name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__exercise__course_module__course_instance__instance_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__student_id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__first_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;submission__submitters__user__email&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">raw_id_fields</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;submission&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="PendingSubmissionAdmin.submission_link">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.PendingSubmissionAdmin.submission_link">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submission_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pending_submission</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">make_column_link</span><span class="p">(</span>
+            <span class="n">pending_submission</span><span class="o">.</span><span class="n">submission</span><span class="p">,</span>
+            <span class="s1">&#39;admin:exercise_submission_change&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PendingSubmissionAdmin.course_instance_link">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.PendingSubmissionAdmin.course_instance_link">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_COURSE_INSTANCE&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">course_instance_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pending_submission</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">make_column_link</span><span class="p">(</span>
+            <span class="n">pending_submission</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="s1">&#39;admin:course_courseinstance_change&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PendingSubmissionAdmin.exercise_link">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.PendingSubmissionAdmin.exercise_link">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EXERCISE&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exercise_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pending_submission</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">make_column_link</span><span class="p">(</span>
+            <span class="n">pending_submission</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span>
+            <span class="s1">&#39;admin:exercise_baseexercise_change&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PendingSubmissionAdmin.submission_status">
+<a class="viewcode-back" href="../../exercise.html#exercise.admin.PendingSubmissionAdmin.submission_status">[docs]</a>
+    <span class="nd">@admin</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_STATUS&#39;</span><span class="p">))</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submission_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pending_submission</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="p">[</span><span class="n">pending_submission</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">status</span><span class="p">]</span></div>
+</div>
+
+
+
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">CourseChapter</span><span class="p">,</span> <span class="n">CourseChapterAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">BaseExercise</span><span class="p">,</span> <span class="n">BaseExerciseAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">StaticExercise</span><span class="p">,</span> <span class="n">StaticExerciseAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ExerciseWithAttachment</span><span class="p">,</span> <span class="n">ExerciseWithAttachmentAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LTIExercise</span><span class="p">,</span> <span class="n">LTIExerciseAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LTI1p3Exercise</span><span class="p">,</span> <span class="n">LTI1p3ExerciseAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Submission</span><span class="p">,</span> <span class="n">SubmissionAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SubmissionDraft</span><span class="p">,</span> <span class="n">SubmissionDraftAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SubmittedFile</span><span class="p">,</span> <span class="n">SubmittedFileAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ExerciseCollection</span><span class="p">,</span> <span class="n">ExerciseCollectionAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">RevealRule</span><span class="p">,</span> <span class="n">RevealRuleAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">ExerciseTask</span><span class="p">,</span> <span class="n">ExerciseTaskAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">LearningObjectDisplay</span><span class="p">,</span> <span class="n">LearningObjectDisplayAdmin</span><span class="p">)</span>
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">PendingSubmission</span><span class="p">,</span> <span class="n">PendingSubmissionAdmin</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

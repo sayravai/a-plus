@@ -1,0 +1,901 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.api.views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.api.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.api.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.payload</span><span class="w"> </span><span class="kn">import</span> <span class="n">Permission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">FileResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">wsgiref.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">mixins</span><span class="p">,</span> <span class="n">permissions</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">viewsets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotFound</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.reverse</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">action</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">api_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework_extensions.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedViewSetMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatabaseError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuerySet</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeUserMixin</span><span class="p">,</span> <span class="n">ListSerializerMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">REGEX_INT</span><span class="p">,</span> <span class="n">REGEX_INT_ME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseStatisticsView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span><span class="p">,</span> <span class="n">GraderUser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="n">JWTSubmissionCreatePermission</span><span class="p">,</span>
+    <span class="n">JWTSubmissionWritePermission</span><span class="p">,</span>
+    <span class="n">OnlyCourseStaffPermission</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.api.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseResourceMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.async_views</span><span class="w"> </span><span class="kn">import</span> <span class="n">_post_async_submission</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExercisePoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Submission</span><span class="p">,</span>
+    <span class="n">SubmittedFile</span><span class="p">,</span>
+    <span class="n">BaseExercise</span><span class="p">,</span>
+    <span class="n">LearningObject</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..permissions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SubmissionVisibleFilter</span><span class="p">,</span>
+    <span class="n">SubmittedFileVisiblePermission</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ExerciseResourceMixin</span><span class="p">,</span>
+    <span class="n">SubmissionResourceMixin</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..forms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SubmissionCreateAndReviewForm</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubmissionBriefSerializer</span><span class="p">,</span> <span class="n">SubmitterStatsBriefSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.full_serializers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ExerciseSerializer</span><span class="p">,</span>
+    <span class="n">ExerciseGraderSerializer</span><span class="p">,</span>
+    <span class="n">ExerciseStatisticsSerializer</span><span class="p">,</span>
+    <span class="n">SubmissionSerializer</span><span class="p">,</span>
+    <span class="n">SubmissionGraderSerializer</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.custom_serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubmitterStatsSerializer</span><span class="p">,</span> <span class="n">UserPointsSerializer</span>
+
+
+<div class="viewcode-block" id="ExerciseViewSet">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseViewSet</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">RetrieveModelMixin</span><span class="p">,</span>
+                      <span class="n">ExerciseResourceMixin</span><span class="p">,</span>
+                      <span class="n">viewsets</span><span class="o">.</span><span class="n">GenericViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `exercises` endpoint returns information about a single exercise. This</span>
+<span class="sd">    endpoint cannot be used for getting a list of all exercises. For that</span>
+<span class="sd">    purpose, use `/courses/&lt;course_id&gt;/exercises/`.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/`:</span>
+<span class="sd">        returns the details of a specific exercise.</span>
+
+<span class="sd">    `POST /exercises/&lt;exercise_id&gt;/grader/`:</span>
+<span class="sd">        used by automatic graders when grading a submission.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;exercise_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">ExerciseSerializer</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ExerciseViewSet.get_serializer_context">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseViewSet.get_serializer_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_serializer_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_serializer_context</span><span class="p">()</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cached_content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+
+<div class="viewcode-block" id="ExerciseViewSet.grader_detail">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseViewSet.grader_detail">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span>
+        <span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">url_path</span><span class="o">=</span><span class="s1">&#39;grader&#39;</span><span class="p">,</span>
+        <span class="n">url_name</span><span class="o">=</span><span class="s1">&#39;grader&#39;</span><span class="p">,</span>
+        <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">],</span>
+        <span class="n">get_permissions</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">JWTSubmissionCreatePermission</span><span class="p">()],</span>
+        <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">ExerciseGraderSerializer</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grader_detail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Retrieve grading info</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="n">permissions</span><span class="o">.</span><span class="n">SAFE_METHODS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1">## submit and grade new submission</span>
+
+        <span class="c1"># Onyl grader is allowed to post to this resource</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span>
+                <span class="s2">&quot;Posting to grading url is only allowed with grader &quot;</span>
+                <span class="s2">&quot;authentication token&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">info</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">submissions</span><span class="o">.</span><span class="n">get_create</span><span class="p">(</span><span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span>
+                <span class="s2">&quot;You are allowed only to create new submission to exercise &quot;</span>
+                <span class="s2">&quot;that your grader atuhentication token is for.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># resolve submiting user from grader token</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user_id</span> <span class="ow">and</span> <span class="n">user_id</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span>
+                <span class="s2">&quot;There is no user_id stored in your grader authentication token, &quot;</span>
+                <span class="s2">&quot;so it can&#39;t be used to create new submission.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">student</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span> <span class="c1"># pylint: disable=raise-missing-from</span>
+                <span class="s2">&quot;User_id in your grader authentication token doesn&#39;t really exist, &quot;</span>
+                <span class="s2">&quot;so you can&#39;t create new submission with your grader token.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># find out if student can submit new exercise and if ok create submission template</span>
+        <span class="n">status</span><span class="p">,</span> <span class="n">alerts</span><span class="p">,</span> <span class="n">students</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">check_submission_allowed</span><span class="p">(</span><span class="n">student</span><span class="p">)</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;error_messages&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;warning_messages&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">SUBMIT_STATUS</span><span class="o">.</span><span class="n">ALLOWED</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s1">&#39;success&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="n">errors</span><span class="p">})</span>
+        <span class="n">submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span>
+        <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">students</span><span class="p">)</span>
+
+        <span class="c1"># grade and update submission with data</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">_post_async_submission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span> <span class="n">submission</span><span class="p">,</span> <span class="n">errors</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExerciseSubmissionsViewSet">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmissionsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseSubmissionsViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                                 <span class="n">ExerciseResourceMixin</span><span class="p">,</span>
+                                 <span class="n">MeUserMixin</span><span class="p">,</span>
+                                 <span class="n">mixins</span><span class="o">.</span><span class="n">ListModelMixin</span><span class="p">,</span>
+                                 <span class="n">viewsets</span><span class="o">.</span><span class="n">GenericViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `submissions` endpoint returns information about the submissions of an</span>
+<span class="sd">    exercise. Can also be used for creating new submissions and submitting them</span>
+<span class="sd">    for grading.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/submissions/`:</span>
+<span class="sd">        returns a list of all submissions.</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/submissions/&lt;user_id&gt;/`:</span>
+<span class="sd">        returns a list of a specific user&#39;s submissions.</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/submissions/me/`:</span>
+<span class="sd">        returns a list of the current user&#39;s submissions.</span>
+
+<span class="sd">    `POST /exercises/&lt;exercise_id&gt;/submissions/`:</span>
+<span class="sd">        creates a new submission. Only for teachers.</span>
+
+<span class="sd">    - Body data:</span>
+<span class="sd">        - One of:</span>
+<span class="sd">            - `students`</span>
+<span class="sd">            - `students_by_user_id`</span>
+<span class="sd">            - `students_by_student_id`</span>
+<span class="sd">            - `students_by_email`</span>
+<span class="sd">        - `feedback`</span>
+<span class="sd">        - `assistant_feedback`</span>
+<span class="sd">        - `grading_data`</span>
+<span class="sd">        - `points`</span>
+<span class="sd">        - `submission_time`</span>
+
+<span class="sd">    `POST /exercises/&lt;exercise_id&gt;/submissions/submit/`:</span>
+<span class="sd">        submits a new submission for grading. Students are allowed to use this</span>
+<span class="sd">        endpoint. The body data is used as submission data and files may be</span>
+<span class="sd">        uploaded too.</span>
+
+<span class="sd">    - Body data:</span>
+<span class="sd">        - `_aplus_group`: group id when submitting as a group</span>
+<span class="sd">        - Remaining key-value pairs match questions and their answers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">filter_backends</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">SubmissionVisibleFilter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;submitters.user_id&#39;</span> <span class="c1"># submitters.user.user.id == userprofile.user.id</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="s1">&#39;exercise.id&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">SubmissionBriefSerializer</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ExerciseSubmissionsViewSet.filter_queryset">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmissionsViewSet.filter_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queryset</span><span class="p">):</span>
+        <span class="n">lookup_field</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_field</span>
+        <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup_url_kwarg</span> <span class="ow">or</span> <span class="n">lookup_field</span>
+        <span class="k">if</span> <span class="n">lookup_url_kwarg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">filter_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">lookup_field</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;__&#39;</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="n">lookup_url_kwarg</span><span class="p">]}</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">filter_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">filter_queryset</span><span class="p">(</span><span class="n">queryset</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseSubmissionsViewSet.retrieve">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmissionsViewSet.retrieve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">list</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseSubmissionsViewSet.create">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmissionsViewSet.create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">exercise_id</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+
+        <span class="c1"># TODO:</span>
+        <span class="c1"># this currently works *ONLY* using a teacher API key</span>
+
+        <span class="n">submitter</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">exercise</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">exercise_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">)</span>
+
+        <span class="n">allowed_to_submit_status</span><span class="p">,</span> <span class="n">_msg1</span><span class="p">,</span> <span class="n">_msg2</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">check_submission_allowed</span><span class="p">(</span><span class="n">submitter</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">allowed_to_submit_status</span> <span class="o">!=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">SUBMIT_STATUS</span><span class="o">.</span><span class="n">ALLOWED</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s1">&#39;Only a teacher can make submissions via this API&#39;</span><span class="p">,</span>
+                            <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="k">if</span> <span class="s2">&quot;submission_time&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;submission_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="n">form</span> <span class="o">=</span> <span class="n">SubmissionCreateAndReviewForm</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">exercise</span><span class="o">=</span><span class="n">exercise</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)</span>
+
+        <span class="c1"># check that submitters in whose name the submission is made are enrolled</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_student_profiles</span><span class="p">()</span> \
+                        <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">pk__in</span><span class="o">=</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">pk</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_students</span><span class="p">])</span> \
+                        <span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_students</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s1">&#39;Submitters must be enrolled to the course.&#39;</span><span class="p">,</span>
+                                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)</span>
+
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_students</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">feedback</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;feedback&quot;</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">assistant_feedback</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;assistant_feedback&quot;</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">grading_data</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;grading_data&quot;</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">set_points</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points&quot;</span><span class="p">),</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">,</span> <span class="n">no_penalties</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">submission_time</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;submission_time&quot;</span><span class="p">)</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">grader</span> <span class="o">=</span> <span class="n">submitter</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">grading_time</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">set_ready</span><span class="p">()</span>
+        <span class="n">sub</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseSubmissionsViewSet.submit">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmissionsViewSet.submit">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span>
+        <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">url_path</span><span class="o">=</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+        <span class="n">url_name</span><span class="o">=</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+        <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Stop submit trials for e.g. chapters.</span>
+        <span class="c1"># However, allow posts from exercises switched to maintenance status.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">is_submittable</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">http_method_not_allowed</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">status_code</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">submission_status</span><span class="p">,</span> <span class="n">alerts</span><span class="p">,</span> <span class="n">students</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">check_submission_allowed</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">submission_status</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">SUBMIT_STATUS</span><span class="o">.</span><span class="n">ALLOWED</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">new_submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_from_post</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span> <span class="n">students</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;detail&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">),</span>
+                <span class="p">}</span>
+                <span class="n">status_code</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+            <span class="k">except</span> <span class="n">DatabaseError</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;detail&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_SUBMISSION_SAVING_FAILED&#39;</span><span class="p">),</span>
+                <span class="p">}</span>
+                <span class="n">status_code</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="n">new_submission</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+
+                <span class="c1"># Enroll after succesfully submitting to the enrollment exercise.</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT</span><span class="p">,</span>
+                    <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT_EXTERNAL</span><span class="p">,</span>
+                <span class="p">)</span> <span class="ow">and</span> <span class="n">new_submission</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+                <span class="n">status_code</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;Location&#39;</span><span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;api:submission-detail&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                                        <span class="s1">&#39;submission_id&#39;</span><span class="p">:</span> <span class="n">new_submission</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                                        <span class="p">},</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">),</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="n">page</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="n">page</span><span class="o">.</span><span class="n">errors</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;error_messages&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;warning_messages&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;info_messages&#39;</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="n">errors</span><span class="p">}</span>
+            <span class="n">status_code</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status_code</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseSubmissionsViewSet.zip">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmissionsViewSet.zip">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span>
+        <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">url_path</span><span class="o">=</span><span class="s1">&#39;zip&#39;</span><span class="p">,</span>
+        <span class="n">url_name</span><span class="o">=</span><span class="s1">&#39;zip&#39;</span><span class="p">,</span>
+        <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;get&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">exercise_id</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c1"># pylint: disable=too-many-locals # noqa: MC0001</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+                <span class="s1">&#39;Only course staff can download submissions via this API&#39;</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">exercise</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">exercise_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="s1">&#39;Exercise not found&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">)</span>
+
+        <span class="n">best</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;best&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span>
+        <span class="n">submissions</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercise__id</span><span class="o">=</span><span class="n">exercise_id</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;submission_time&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_group_id</span><span class="p">(</span><span class="n">submission</span><span class="p">):</span>
+            <span class="n">group_id</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s1">&#39;group&#39;</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">meta_data</span><span class="p">:</span>
+                <span class="n">group_id</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">meta_data</span><span class="p">[</span><span class="s1">&#39;group&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">group_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">submission_data</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;_aplus_group&#39;</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+                        <span class="n">group_id</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">break</span>
+            <span class="k">return</span> <span class="n">group_id</span>
+
+        <span class="c1"># pylint: disable-next=too-many-locals</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">handle_submission</span><span class="p">(</span><span class="n">submission</span><span class="p">,</span> <span class="n">submitters</span><span class="p">,</span> <span class="n">info_csv</span><span class="p">):</span>
+            <span class="n">group_id</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">submitters</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">group_id</span> <span class="o">=</span> <span class="n">get_group_id</span><span class="p">(</span><span class="n">submission</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">group_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">group_id</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">info_csv</span>
+            <span class="n">submission_time</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">submission_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S %z&#39;</span><span class="p">)</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">service_points</span>
+            <span class="n">submission_id</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">id</span>
+            <span class="n">submitter_name</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">()])</span>
+            <span class="n">exercise_form_name</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">exercise_info</span><span class="p">[</span><span class="s2">&quot;form_i18n&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="n">submitted_files</span> <span class="o">=</span> <span class="n">SubmittedFile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">submission</span><span class="o">=</span><span class="n">submission</span><span class="p">)</span>
+            <span class="n">student_ids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">submitter</span><span class="o">.</span><span class="n">student_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="n">submitters</span><span class="p">])</span>
+            <span class="n">submitters_string</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">student_ids</span><span class="p">)</span>
+            <span class="n">submission_num</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span> <span class="c1"># Remove duplicates</span>
+                    <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercise__id</span><span class="o">=</span><span class="n">exercise_id</span><span class="p">,</span> <span class="n">submitters__in</span><span class="o">=</span><span class="n">submitters</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;submission_time&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">submission</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">submitted_file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">submitted_files</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">submitters_string</span><span class="si">}</span><span class="s2">_file</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_submission</span><span class="si">{</span><span class="n">submission_num</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">original_name</span> <span class="o">=</span> <span class="n">submitted_file</span><span class="o">.</span><span class="n">filename</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">submitted_file</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                        <span class="n">zip_file</span><span class="o">.</span><span class="n">writestr</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                    <span class="k">if</span> <span class="n">group_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">info_csv</span> <span class="o">+=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">,group</span><span class="si">{</span><span class="n">group_id</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">submission_time</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">original_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">points</span><span class="si">}</span><span class="s2">,&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">submission_id</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">submitter_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">exercise_form_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">submission_num</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">info_csv</span> <span class="o">+=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">submitters_string</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">submission_time</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">original_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">points</span><span class="si">}</span><span class="s2">,&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">submission_id</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">submitter_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">exercise_form_name</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">submission_num</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">info_csv</span>
+
+        <span class="c1"># Create a zip file in memory</span>
+        <span class="n">zip_buffer</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_buffer</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_file</span><span class="p">:</span>
+            <span class="n">info_csv</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;filename,label,created_at,original_name,points,submission_id,&quot;</span>
+                <span class="s2">&quot;submitter_name,exercise_form_name,submission_index</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">best</span><span class="p">:</span>
+                <span class="n">unique_submitters</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">submission</span> <span class="ow">in</span> <span class="n">submissions</span><span class="p">:</span>
+                    <span class="n">submitters</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="p">)</span> <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="n">submitters</span><span class="p">):</span>
+                        <span class="c1"># Skip staff submissions</span>
+                        <span class="k">continue</span>
+                    <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="n">submitters</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">submitter</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_submitters</span><span class="p">:</span>
+                            <span class="n">unique_submitters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">submitter</span><span class="p">)</span>
+                <span class="n">unique_submissions</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="n">unique_submitters</span><span class="p">:</span>
+                    <span class="n">submission_entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">exercise</span><span class="p">,</span> <span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">best_submission</span>
+                    <span class="k">if</span> <span class="n">submission_entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">submission</span> <span class="o">=</span> <span class="n">submissions</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">submission_entry</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+                    <span class="c1"># Prevent duplicate best submissions due to group submissions</span>
+                    <span class="k">if</span> <span class="n">submission</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">unique_submissions</span><span class="p">:</span>
+                        <span class="n">unique_submissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">submission</span><span class="p">)</span>
+                        <span class="n">info_csv</span> <span class="o">=</span> <span class="n">handle_submission</span><span class="p">(</span><span class="n">submission</span><span class="p">,</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">info_csv</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">submission</span> <span class="ow">in</span> <span class="n">submissions</span><span class="p">:</span>
+                    <span class="n">submitters</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="p">)</span> <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="n">submitters</span><span class="p">):</span>
+                        <span class="c1"># Skip staff submissions</span>
+                        <span class="k">continue</span>
+                    <span class="n">info_csv</span> <span class="o">=</span> <span class="n">handle_submission</span><span class="p">(</span><span class="n">submission</span><span class="p">,</span> <span class="n">submitters</span><span class="p">,</span> <span class="n">info_csv</span><span class="p">)</span>
+            <span class="n">zip_file</span><span class="o">.</span><span class="n">writestr</span><span class="p">(</span><span class="s1">&#39;info.csv&#39;</span><span class="p">,</span> <span class="n">info_csv</span><span class="p">)</span>
+        <span class="n">zip_buffer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">FileResponse</span><span class="p">(</span><span class="n">zip_buffer</span><span class="p">,</span> <span class="n">as_attachment</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;submissions.zip&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="ExerciseSubmissionsViewSet.get_access_mode">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmissionsViewSet.get_access_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_access_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># The API is not supposed to use the access mode permission in views,</span>
+        <span class="c1"># but this is currently required so that enrollment exercises work in</span>
+        <span class="c1"># the CourseVisiblePermission.</span>
+        <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span>
+
+        <span class="c1"># Loosen the access mode if this is an enrollment exercise.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT</span><span class="p">,</span>
+                <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT_EXTERNAL</span><span class="p">,</span>
+              <span class="p">):</span>
+            <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLL</span>
+
+        <span class="k">return</span> <span class="n">access_mode</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExerciseSubmitterStatsViewSet">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmitterStatsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseSubmitterStatsViewSet</span><span class="p">(</span><span class="n">ListSerializerMixin</span><span class="p">,</span>
+                                    <span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                                    <span class="n">MeUserMixin</span><span class="p">,</span>
+                                    <span class="n">ExerciseResourceMixin</span><span class="p">,</span>
+                                    <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `submitter_stats` endpoint returns statistical information about the</span>
+<span class="sd">    students&#39; submissions in this exercise, including current grade and</span>
+<span class="sd">    submission count.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/submitter_stats/`:</span>
+<span class="sd">        returns a list of all users.</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/submitter_stats/&lt;user_id&gt;/`:</span>
+<span class="sd">        returns a specific user&#39;s submission statistics.</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/submitter_stats/me/`:</span>
+<span class="sd">        returns the current user&#39;s submission statistics.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">filter_backends</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span> <span class="c1"># UserProfile.user.id</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="c1"># Following produces duplicate profiles for each submission</span>
+    <span class="c1">#parent_lookup_map = {&#39;exercise_id&#39;: &#39;submissions.exercise.id&#39;}</span>
+    <span class="n">listserializer_class</span> <span class="o">=</span> <span class="n">SubmitterStatsBriefSerializer</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">SubmitterStatsSerializer</span>
+
+<div class="viewcode-block" id="ExerciseSubmitterStatsViewSet.get_queryset">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseSubmitterStatsViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_staff_and_students</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionViewSet">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.SubmissionViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionViewSet</span><span class="p">(</span><span class="n">mixins</span><span class="o">.</span><span class="n">RetrieveModelMixin</span><span class="p">,</span>
+                        <span class="n">SubmissionResourceMixin</span><span class="p">,</span>
+                        <span class="n">viewsets</span><span class="o">.</span><span class="n">GenericViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `submissions` endpoint returns information about a single submissions</span>
+<span class="sd">    in an exercise. This endpoint cannot be used for listing all submissions.</span>
+<span class="sd">    To view a list of all submissions in an exercise, use</span>
+<span class="sd">    `/exercises/&lt;exercise_id&gt;/submissions/`.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /submissions/&lt;submission_id&gt;/`:</span>
+<span class="sd">        returns the details of a specific submission.</span>
+
+<span class="sd">    `GET /submissions/&lt;submission_id&gt;/grader/`:</span>
+<span class="sd">        used by automatic graders when grading a submission.</span>
+
+<span class="sd">    `GET /submissions/&lt;submission_id&gt;/re-submit/`:</span>
+<span class="sd">        resubmits a submission for grading.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;submission_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">SubmissionSerializer</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SubmissionViewSet.grader_detail">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.SubmissionViewSet.grader_detail">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span>
+        <span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">url_path</span><span class="o">=</span><span class="s1">&#39;grader&#39;</span><span class="p">,</span>
+        <span class="n">url_name</span><span class="o">=</span><span class="s1">&#39;grader&#39;</span><span class="p">,</span>
+        <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">],</span>
+        <span class="n">get_permissions</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">JWTSubmissionWritePermission</span><span class="p">()],</span>
+        <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">SubmissionGraderSerializer</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grader_detail</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Retrieve grading info</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="n">permissions</span><span class="o">.</span><span class="n">SAFE_METHODS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1">## submit grade info</span>
+
+        <span class="c1"># get user and related exercise and submission</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span>
+                <span class="s2">&quot;Posting to grading url is only allowed with grader &quot;</span>
+                <span class="s2">&quot;authentication token&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">submissions</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">WRITE</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span>
+                <span class="s2">&quot;You are not allowed to grade other submissions than what &quot;</span>
+                <span class="s2">&quot;your grader authentication token is for&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">_post_async_submission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="SubmissionViewSet.resubmit">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.SubmissionViewSet.resubmit">[docs]</a>
+    <span class="nd">@action</span><span class="p">(</span>
+        <span class="n">detail</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">url_path</span><span class="o">=</span><span class="s1">&#39;re-submit&#39;</span><span class="p">,</span>
+        <span class="n">url_name</span><span class="o">=</span><span class="s1">&#39;re-submit&#39;</span><span class="p">,</span>
+        <span class="n">get_permissions</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">OnlyCourseStaffPermission</span><span class="p">()],</span>
+        <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;post&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resubmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">is_submittable</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">http_method_not_allowed</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">grade</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># Enroll after succesfully resubmitting to the enrollment exercise.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT</span><span class="p">,</span>
+                    <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT_EXTERNAL</span><span class="p">,</span>
+                <span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span>
+                <span class="ow">and</span> <span class="n">page</span><span class="o">.</span><span class="n">is_loaded</span> <span class="ow">and</span> <span class="n">page</span><span class="o">.</span><span class="n">is_accepted</span>
+                <span class="p">):</span>
+            <span class="n">submitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">first</span><span class="p">()</span><span class="o">.</span><span class="n">user</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="n">submitter</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="n">submitter</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_banned</span><span class="p">(</span><span class="n">submitter</span><span class="p">)</span>
+                    <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="n">submitter</span><span class="p">)</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Location&#39;</span><span class="p">:</span> <span class="n">reverse</span><span class="p">(</span>
+                <span class="s1">&#39;api:submission-detail&#39;</span><span class="p">,</span>
+                <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;submission_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">id</span><span class="p">},</span>
+                <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">page</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;errors&#39;</span><span class="p">:</span> <span class="n">page</span><span class="o">.</span><span class="n">errors</span><span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionFileViewSet">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.SubmissionFileViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionFileViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                            <span class="n">SubmissionResourceMixin</span><span class="p">,</span>
+                            <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `files` endpoint is used for downloading files sent as attachments of a</span>
+<span class="sd">    submission.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /submissions/&lt;submission_id&gt;/files/&lt;submittedfile_id&gt;`:</span>
+<span class="sd">        returns the details of a specific file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">SubmittedFileVisiblePermission</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;submittedfile_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;submission_id&#39;</span><span class="p">:</span> <span class="s1">&#39;submission.id&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">SubmittedFile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SubmissionFileViewSet.list">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.SubmissionFileViewSet.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">submission_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-differ unused-argument</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">([])</span></div>
+
+    <span class="c1"># pylint: disable-next=arguments-differ unused-argument</span>
+<div class="viewcode-block" id="SubmissionFileViewSet.retrieve">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.SubmissionFileViewSet.retrieve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">submission_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">submittedfile_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">sfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">sfile</span><span class="o">.</span><span class="n">file_object</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">FileWrapper</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/octet-stream&#39;</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;</span><span class="si">{}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sfile</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CoursePointsViewSet">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.CoursePointsViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CoursePointsViewSet</span><span class="p">(</span><span class="n">ListSerializerMixin</span><span class="p">,</span>
+                          <span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                          <span class="n">MeUserMixin</span><span class="p">,</span>
+                          <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                          <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `points` endpoint returns information about the points earned in the</span>
+<span class="sd">    course by the user.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/points/`:</span>
+<span class="sd">        returns a list of all users.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/points/&lt;user_id&gt;/`:</span>
+<span class="sd">        returns a list of a specific user&#39;s points.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/points/me/`:</span>
+<span class="sd">        returns a list of the current user&#39;s points.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">filter_backends</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">listserializer_class</span> <span class="o">=</span> <span class="n">UserPointsSerializer</span>
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">UserPointsSerializer</span>
+
+<div class="viewcode-block" id="CoursePointsViewSet.get_course_instance_object">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.CoursePointsViewSet.get_course_instance_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_instance_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_course_instance_object</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">Http404</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NotFound</span><span class="p">(</span><span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Course not found.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span></div>
+
+
+<div class="viewcode-block" id="CoursePointsViewSet.get_queryset">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.CoursePointsViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_staff_and_students</span></div>
+
+
+<div class="viewcode-block" id="CoursePointsViewSet.retrieve">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.CoursePointsViewSet.retrieve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s1">&#39;detail&#39;</span><span class="p">:</span> <span class="s1">&#39;You are not enrolled in the course.&#39;</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">retrieve</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExerciseStatisticsView">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseStatisticsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseStatisticsView</span><span class="p">(</span><span class="n">BaseStatisticsView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns submission statistics for an exercise, over a given time window.</span>
+
+<span class="sd">    Returns the following attributes:</span>
+
+<span class="sd">    - `submission_count`: total number of submissions.</span>
+<span class="sd">    - `submitters`: number of users submitting.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /exercises/&lt;exercise_id&gt;/statistics/`:</span>
+<span class="sd">        returns the statistics for the given exercise.</span>
+
+<span class="sd">    - URL parameters:</span>
+<span class="sd">        - `endtime`: date and time in ISO 8601 format indicating the end point</span>
+<span class="sd">          of time window we are interested in. Default: now.</span>
+<span class="sd">        - `starttime`: date and time in ISO 8601 format indicating the start point</span>
+<span class="sd">          of time window we are interested in. Default: one day before endtime</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">serializer_class</span> <span class="o">=</span> <span class="n">ExerciseStatisticsSerializer</span>
+
+<div class="viewcode-block" id="ExerciseStatisticsView.get_queryset">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseStatisticsView.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuerySet</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span>
+        <span class="n">exercise_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="n">exercise_id</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseStatisticsView.get_object">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.views.ExerciseStatisticsView.get_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">update</span><span class="p">({</span> <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">]</span> <span class="p">})</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

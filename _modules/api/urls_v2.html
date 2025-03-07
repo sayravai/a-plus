@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>api.urls_v2 &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">api.urls_v2</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for api.urls_v2</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">include</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">re_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework_extensions.routers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExtendedDefaultRouter</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">userprofile.api.views</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">course.api.views</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">course.api.lti_views</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">exercise.api.views</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">exercise.api.csv.views</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">external_services.api.views</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">authorization.api.views</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">lib.api.statistics</span>
+
+
+<div class="viewcode-block" id="AplusRouter">
+<a class="viewcode-back" href="../../api.html#api.urls_v2.AplusRouter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AplusRouter</span><span class="p">(</span><span class="n">ExtendedDefaultRouter</span><span class="p">):</span>
+    <span class="n">routes</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ExtendedDefaultRouter</span><span class="o">.</span><span class="n">routes</span><span class="p">)</span>
+    <span class="c1"># Add DELETE to list routes. Enabled if there is method `destroy_many` in the viewset.</span>
+    <span class="c1"># This could break if the super class definition in the framework is modified.</span>
+    <span class="c1"># We have to assume that the first route in routes is the list route.</span>
+    <span class="c1"># The framework does not map the DELETE method for it at all, so we do it here.</span>
+    <span class="n">routes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mapping</span><span class="p">[</span><span class="s1">&#39;delete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;destroy_many&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># The following causes URLs to be routed either with or without the trailing slash.</span>
+        <span class="c1"># It is needed, because LTI 1.3 specifies some URLs that do not have trailing slash,</span>
+        <span class="c1"># but Django (and A+) default behavior automatically assumes the trailing slash,</span>
+        <span class="c1"># and some of the existing links to A+ material might assume this as well.</span>
+        <span class="c1"># The side effect of this change is, that the reverse URLs for APIs now appear</span>
+        <span class="c1"># without trailing slash, while before it was included in URL. Therefore the</span>
+        <span class="c1"># comparisons in some of the API unit tests needed to be fixed, but calling the</span>
+        <span class="c1"># API URLs in existing implementations should work without modifications, because</span>
+        <span class="c1"># both URL variants are routed.</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trailing_slash</span> <span class="o">=</span> <span class="s1">&#39;/?&#39;</span></div>
+
+
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">AplusRouter</span><span class="p">()</span>
+
+<span class="n">api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;users&#39;</span><span class="p">,</span>
+             <span class="n">userprofile</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">UserViewSet</span><span class="p">,</span>
+             <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;courses&#39;</span><span class="p">,</span>
+                  <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseViewSet</span><span class="p">,</span>
+                  <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">courses</span><span class="p">:</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;exercises&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseExercisesViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-exercises&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;tree&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseExerciseTreeViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-tree&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;students&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseStudentsViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-students&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;usertags&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseUsertagsViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-usertags&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;taggings&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseUsertaggingsViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-taggings&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;points&#39;</span><span class="p">,</span>
+                     <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CoursePointsViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-points&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;submissiondata&#39;</span><span class="p">,</span>
+                     <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">csv</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseSubmissionDataViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-submissiondata&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;aggregatedata&#39;</span><span class="p">,</span>
+                     <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">csv</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseAggregateDataViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-aggregatedata&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;resultsdata&#39;</span><span class="p">,</span>
+                     <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">csv</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseResultsDataViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-resultsdata&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;bestresultsdata&#39;</span><span class="p">,</span>
+                     <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">csv</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseBestResultsDataViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-resultsdata-best&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;mygroups&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseOwnStudentGroupsViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-mygroups&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;groups&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseStudentGroupsViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-groups&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;news&#39;</span><span class="p">,</span>
+                     <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseNewsViewSet</span><span class="p">,</span>
+                     <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-news&#39;</span><span class="p">)</span>
+    <span class="n">courses</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;lineitems&#39;</span><span class="p">,</span>
+                    <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">lti_views</span><span class="o">.</span><span class="n">CourseLineItemsViewSet</span><span class="p">,</span>
+                    <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;course-lineitems&#39;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;exercises&#39;</span><span class="p">,</span>
+                  <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">ExerciseViewSet</span><span class="p">,</span>
+                  <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;exercise&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">exercises</span><span class="p">:</span>
+    <span class="n">exercises</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;submissions&#39;</span><span class="p">,</span>
+                       <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">ExerciseSubmissionsViewSet</span><span class="p">,</span>
+                       <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;exercise-submissions&#39;</span><span class="p">)</span>
+    <span class="n">exercises</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;submitter_stats&#39;</span><span class="p">,</span>
+                       <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">ExerciseSubmitterStatsViewSet</span><span class="p">,</span>
+                       <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;exercise-submitter_stats&#39;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">api</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;submissions&#39;</span><span class="p">,</span>
+                  <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">SubmissionViewSet</span><span class="p">,</span>
+                  <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;submission&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">submissions</span><span class="p">:</span>
+    <span class="n">submissions</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;files&#39;</span><span class="p">,</span>
+                         <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">SubmissionFileViewSet</span><span class="p">,</span>
+                         <span class="n">basename</span><span class="o">=</span><span class="s1">&#39;submission-files&#39;</span><span class="p">)</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">re_path</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="n">include</span><span class="p">((</span><span class="n">api</span><span class="o">.</span><span class="n">urls</span><span class="p">,</span> <span class="s1">&#39;api&#39;</span><span class="p">),</span> <span class="n">namespace</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">)),</span>
+
+    <span class="n">re_path</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^get-token&quot;</span><span class="p">,</span> <span class="n">authorization</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">RemoteAuthenticationView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;get-token&quot;</span><span class="p">),</span>
+    <span class="n">re_path</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^me&#39;</span><span class="p">,</span> <span class="n">userprofile</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">MeDetail</span><span class="o">.</span><span class="n">as_view</span><span class="p">()),</span>
+    <span class="n">re_path</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^lti-outcomes&#39;</span><span class="p">,</span> <span class="n">external_services</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">LTIExerciseBasicOutcomesView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;lti-outcomes&#39;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s1">&#39;statistics/&#39;</span><span class="p">,</span> <span class="n">lib</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">statistics</span><span class="o">.</span><span class="n">BaseStatisticsView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;statistics&#39;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s1">&#39;courses/&lt;int:course_id&gt;/statistics/&#39;</span><span class="p">,</span>
+        <span class="n">course</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">CourseStatisticsView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;course-statistics&#39;</span>
+    <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s1">&#39;exercises/&lt;int:exercise_id&gt;/statistics/&#39;</span><span class="p">,</span>
+        <span class="n">exercise</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">views</span><span class="o">.</span><span class="n">ExerciseStatisticsView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span>
+        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;exercise-statistics&#39;</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+
+
+<span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;API_DEBUG&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># Print list of api urls</span>
+    <span class="n">_urls</span> <span class="o">=</span> <span class="p">[(</span><span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">urls</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="p">]</span>
+    <span class="n">_urls</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urlpatterns</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="p">]</span>
+    <span class="n">_lens</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_urls</span><span class="p">),</span> <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">urls</span><span class="p">)}</span>
+    <span class="n">_urls</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;  - {:&lt;</span><span class="si">{v:d}</span><span class="s2">s} {:&lt;</span><span class="si">{n:d}</span><span class="s2">s} </span><span class="si">{!s:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">_lens</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">_urls</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; API URLS:&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">_urls</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Print list of api view permissions</span>
+    <span class="n">_vseen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">_views</span> <span class="o">=</span> <span class="p">[</span><span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">cls</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">api</span><span class="o">.</span><span class="n">urls</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="p">]</span>
+    <span class="n">_views</span> <span class="o">+=</span> <span class="p">[</span><span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="o">.</span><span class="n">cls</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urlpatterns</span> <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">callback</span><span class="p">]</span>
+    <span class="n">_methods</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;retrieve&#39;</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="s1">&#39;partial_update&#39;</span><span class="p">,</span> <span class="s1">&#39;destroy&#39;</span><span class="p">)</span>
+    <span class="c1"># pylint: disable=unnecessary-lambda-assignment</span>
+    <span class="n">_get_methods</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(((</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">_methods</span><span class="p">))</span>
+    <span class="n">_get_perms</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">v</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">())</span>
+    <span class="n">_views</span> <span class="o">=</span> <span class="p">[(</span><span class="n">v</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">_get_methods</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">_get_perms</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_views</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">v</span> <span class="ow">in</span> <span class="n">_vseen</span> <span class="ow">or</span> <span class="n">_vseen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">v</span><span class="p">))]</span>
+    <span class="n">_lens</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_views</span><span class="p">)</span>
+    <span class="n">_perms</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;  - {:&lt;</span><span class="si">{v:d}</span><span class="s2">s} {:&lt;</span><span class="si">{m:d}</span><span class="s2">s} </span><span class="si">{:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">_lens</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">_views</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; API PERMS:&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">_perms</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; API methods:&quot;</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">_methods</span><span class="p">))</span>
+
+    <span class="c1"># clean vars out of memory</span>
+    <span class="k">del</span> <span class="n">_urls</span><span class="p">,</span> <span class="n">_lens</span><span class="p">,</span> <span class="n">_vseen</span><span class="p">,</span> <span class="n">_views</span><span class="p">,</span> <span class="n">_methods</span><span class="p">,</span> <span class="n">_get_methods</span><span class="p">,</span> <span class="n">_get_perms</span><span class="p">,</span> <span class="n">_perms</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

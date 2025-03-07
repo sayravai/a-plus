@@ -1,0 +1,560 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.api.full_serializers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.api.full_serializers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.api.full_serializers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span><span class="p">,</span> <span class="n">exceptions</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedHyperlinkedIdentityField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AplusModelSerializer</span><span class="p">,</span>
+    <span class="n">NestedHyperlinkedIdentityFieldWithQuery</span><span class="p">,</span>
+    <span class="n">StatisticsSerializer</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.api.full_serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TreeExerciseSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.api.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseBriefSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.api.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserBriefSerializer</span><span class="p">,</span> <span class="n">UserListField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseInstance</span><span class="p">,</span>
+    <span class="n">Course</span><span class="p">,</span>
+    <span class="n">CourseModule</span><span class="p">,</span>
+    <span class="n">UserTag</span><span class="p">,</span>
+    <span class="n">UserTagging</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseBriefSerializer</span><span class="p">,</span>
+    <span class="n">CourseNewsBriefSerializer</span><span class="p">,</span>
+    <span class="n">CourseStudentGroupBriefSerializer</span><span class="p">,</span>
+    <span class="n">CourseUsertagBriefSerializer</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;CourseModuleSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseWriteSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseStudentGroupSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseUsertagSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseUsertaggingsSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;TreeCourseModuleSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseNewsSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseStatisticsSerializer&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="CourseModuleSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseModuleSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseModuleSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-exercises-detail&#39;</span><span class="p">)</span>
+    <span class="n">exercises</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+    <span class="n">display_name</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;__str__&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CourseModuleSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseModuleSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseModule</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;html_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;display_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;is_open&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercises&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseModuleSerializer.get_exercises">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseModuleSerializer.get_exercises">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercises</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">CourseModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedDict</span><span class="p">:</span>
+        <span class="c1"># List only exercises derived from BaseExercise, thus no Chapter texts (/exercise/&lt;id&gt; returns 404 for those)</span>
+        <span class="c1"># Check if the exercises were prefetched in the view</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;exercises&#39;</span><span class="p">):</span>
+            <span class="n">exercises</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">exercises</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exercises</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">ExerciseBriefSerializer</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">exercises</span><span class="p">,</span> <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">serializer</span><span class="o">.</span><span class="n">data</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseSerializer</span><span class="p">(</span><span class="n">CourseBriefSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exercises</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-exercises-list&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-tree-list&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-points-list&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+    <span class="n">students</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-students-list&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+    <span class="n">taggings</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-taggings-list&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+    <span class="n">usertags</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-usertags-list&#39;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;html&#39;</span><span class="p">)</span>
+    <span class="n">my_points</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span>
+        <span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-points-detail&#39;</span><span class="p">,</span>
+        <span class="n">lookup_map</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">o</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">my_data</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span>
+        <span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-submissiondata-detail&#39;</span><span class="p">,</span>
+        <span class="n">lookup_map</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">o</span><span class="o">=</span><span class="kc">None</span><span class="p">:</span> <span class="s1">&#39;me&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-submissiondata-list&#39;</span><span class="p">)</span>
+    <span class="n">aggregate_data</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-aggregatedata-list&#39;</span><span class="p">)</span>
+    <span class="n">results_data</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-resultsdata-list&#39;</span><span class="p">)</span>
+    <span class="n">best_results_data</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-resultsdata-best-list&#39;</span><span class="p">)</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-groups-list&#39;</span><span class="p">)</span>
+    <span class="n">my_groups</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-mygroups-list&#39;</span><span class="p">)</span>
+    <span class="n">news</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-news-list&#39;</span><span class="p">)</span>
+    <span class="n">statistics</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span><span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;course-statistics&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CourseSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">CourseBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;starting_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ending_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;group_work_allowed&#39;</span><span class="p">,</span>
+            <span class="c1"># links</span>
+            <span class="s1">&#39;exercises&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;tree&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;points&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;students&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;taggings&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;usertags&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;my_points&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;my_data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;aggregate_data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;results_data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;best_results_data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;groups&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;my_groups&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;news&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;statistics&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseWriteSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseWriteSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseWriteSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Serializer for creating and modifying course models using POST and PUT.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">course_url</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ListSerializer</span><span class="p">(</span><span class="n">child</span><span class="o">=</span><span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">())</span>
+
+<div class="viewcode-block" id="CourseWriteSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseWriteSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;code&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;course_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;instance_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;starting_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ending_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;group_work_allowed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;configure_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;teachers&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseWriteSerializer.set_teachers">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseWriteSerializer.set_teachers">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_teachers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">teachers</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">teachers</span><span class="p">:</span>
+            <span class="n">userprofile</span><span class="p">:</span> <span class="n">UserProfile</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="c1"># If user does not exist, create a new user.</span>
+                <span class="c1"># If external authentication (e.g. Shibboleth) is used, other</span>
+                <span class="c1"># attributes will be updated when user logs in for the first time.</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="n">userprofile</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+            <span class="n">users</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">userprofile</span><span class="p">)</span>
+
+        <span class="n">course</span><span class="o">.</span><span class="n">set_teachers</span><span class="p">(</span><span class="n">users</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseWriteSerializer.validate">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseWriteSerializer.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedDict</span><span class="p">:</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+        <span class="c1"># Take out fields that cannot be handled by standard serializer logic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;code&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_url</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;course_url&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teachers</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;teachers&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="CourseWriteSerializer.create">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseWriteSerializer.create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validated_data</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CourseInstance</span><span class="p">:</span>
+        <span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">course</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course_url</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Course creation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">validated_data</span><span class="p">,</span> <span class="n">course</span><span class="o">=</span><span class="n">course</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_teachers</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">teachers</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">instance</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Course instance creation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseWriteSerializer.update">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseWriteSerializer.update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">validated_data</span><span class="p">:</span> <span class="n">OrderedDict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CourseInstance</span><span class="p">:</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">instance_name</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instance_name&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">instance_name</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">starting_time</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;starting_time&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">starting_time</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">ending_time</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ending_time&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">ending_time</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">group_work_allowed</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;group_work_allowed&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">group_work_allowed</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">configure_url</span> <span class="o">=</span> <span class="n">validated_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;configure_url&#39;</span><span class="p">,</span> <span class="n">instance</span><span class="o">.</span><span class="n">configure_url</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_teachers</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">teachers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="CourseWriteSerializer.to_representation">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseWriteSerializer.to_representation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_representation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrderedDict</span><span class="p">:</span>
+        <span class="c1"># Used for producing response to POST or PUT request.</span>
+        <span class="c1"># Need to temporarily remove fields not present in CourseInstance,</span>
+        <span class="c1"># otherwise the superclass to_representation call starts nagging</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;course_url&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_representation</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">code</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">resp</span><span class="p">[</span><span class="s1">&#39;course_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">return</span> <span class="n">resp</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CourseUsertagSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertagSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseUsertagSerializer</span><span class="p">(</span><span class="n">CourseUsertagBriefSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Full Serializer for UserTag model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">taggings</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityFieldWithQuery</span><span class="p">(</span>
+        <span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-taggings-list&#39;</span><span class="p">,</span>
+        <span class="n">lookup_map</span><span class="o">=</span><span class="p">{</span> <span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;course_instance_id&#39;</span> <span class="p">},</span>
+        <span class="n">query_params</span><span class="o">=</span><span class="p">{</span> <span class="s1">&#39;tag_id&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span> <span class="p">},</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="CourseUsertagSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertagSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">CourseUsertagBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">UserTag</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;slug&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;font_color&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;font_white&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;taggings&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseUsertagSerializer.validate">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertagSerializer.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+        <span class="c1"># Name is enough, slug will be automatically generated</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="s2">&quot;At minimum, field &#39;name&#39; is required&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="CourseUsertagSerializer.create">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertagSerializer.create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validated_data</span><span class="p">):</span>
+        <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;course_instance_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;course_id&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">validated_data</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseUsertaggingsSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertaggingsSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseUsertaggingsSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">UserBriefSerializer</span><span class="p">()</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">CourseUsertagBriefSerializer</span><span class="p">()</span>
+    <span class="n">_required</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;student_id&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span> <span class="p">]</span>
+
+<div class="viewcode-block" id="CourseUsertaggingsSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertaggingsSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">UserTagging</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;tag&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;api:course-taggings-detail&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="CourseUsertaggingsSerializer.validate">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertaggingsSerializer.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that data.user has at least one of the fields in required.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;user&#39;</span> <span class="ow">in</span> <span class="n">user</span><span class="p">:</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">])</span>
+            <span class="k">del</span> <span class="n">user</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">user</span><span class="p">[</span><span class="n">field</span><span class="p">]:</span> <span class="k">del</span> <span class="n">user</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>
+
+        <span class="n">fields_in_user</span> <span class="o">=</span> <span class="p">{</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">user</span> <span class="p">}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fields_in_user</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span>
+                <span class="s2">&quot;At least one of </span><span class="si">{}</span><span class="s2"> is required&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_required</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="CourseUsertaggingsSerializer.create">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseUsertaggingsSerializer.create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validated_data</span><span class="p">):</span>
+        <span class="n">user_dict</span> <span class="o">=</span> <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span>
+        <span class="n">tag_dict</span> <span class="o">=</span> <span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span>
+
+        <span class="n">first_in_required</span> <span class="o">=</span> <span class="p">[</span> <span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_required</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">user_dict</span> <span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user__id</span><span class="o">=</span><span class="n">user_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]),</span>
+                <span class="s1">&#39;student_id&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">get_by_student_id</span><span class="p">(</span><span class="n">user_dict</span><span class="p">[</span><span class="s1">&#39;student_id&#39;</span><span class="p">]),</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user__username</span><span class="o">=</span><span class="n">user_dict</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]),</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">get_by_email</span><span class="p">(</span><span class="n">user_dict</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]),</span>
+            <span class="p">}[</span><span class="n">first_in_required</span><span class="p">]()</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">UserTag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+               <span class="n">slug</span><span class="o">=</span><span class="n">tag_dict</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">],</span>
+               <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;course_id&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">UserTag</span><span class="o">.</span><span class="n">DoesNotExist</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># 404 with description</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">NotFound</span><span class="p">(</span>
+                 <span class="s2">&quot;Tag with slug </span><span class="si">{slug}</span><span class="s2"> was not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">slug</span><span class="o">=</span><span class="n">tag_dict</span><span class="p">[</span><span class="s1">&#39;slug&#39;</span><span class="p">]</span>
+                 <span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">except</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">DoesNotExist</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">NotFound</span><span class="p">(</span>
+                 <span class="s2">&quot;User identified with </span><span class="si">{key}</span><span class="s2">:</span><span class="si">{value}</span><span class="s2"> was not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                     <span class="n">key</span><span class="o">=</span><span class="n">first_in_required</span><span class="p">,</span>
+                     <span class="n">value</span><span class="o">=</span><span class="n">user_dict</span><span class="p">[</span><span class="n">first_in_required</span><span class="p">]</span>
+                 <span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="n">obj</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">UserTagging</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">created</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">serializers</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span>
+                <span class="s2">&quot;User </span><span class="si">{user}</span><span class="s2"> already has tag </span><span class="si">{slug}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                    <span class="n">slug</span><span class="o">=</span><span class="n">tag</span><span class="o">.</span><span class="n">slug</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseStudentGroupSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseStudentGroupSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseStudentGroupSerializer</span><span class="p">(</span><span class="n">CourseStudentGroupBriefSerializer</span><span class="p">):</span>
+    <span class="n">members</span> <span class="o">=</span> <span class="n">UserListField</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CourseStudentGroupSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseStudentGroupSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">CourseStudentGroupBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;api:course-groups-detail&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TreeCourseModuleSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.TreeCourseModuleSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TreeCourseModuleSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Serializes items in the `modules` list of `CachedContent.data`. Does not</span>
+<span class="sd">    derive from `AplusModelSerializer` because the items are `dict`s instead of</span>
+<span class="sd">    model objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">children</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TreeCourseModuleSerializer.get_children">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.TreeCourseModuleSerializer.get_children">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">TreeExerciseSerializer</span><span class="p">(</span>
+            <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">children</span><span class="p">,</span>
+            <span class="n">many</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">serializer</span><span class="o">.</span><span class="n">data</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CourseNewsSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseNewsSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseNewsSerializer</span><span class="p">(</span><span class="n">CourseNewsBriefSerializer</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CourseNewsSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseNewsSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">CourseNewsBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;api:course-news-detail&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseStatisticsSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.full_serializers.CourseStatisticsSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseStatisticsSerializer</span><span class="p">(</span><span class="n">StatisticsSerializer</span><span class="p">):</span>
+    <span class="n">course_id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

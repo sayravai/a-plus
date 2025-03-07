@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edit_course.managers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edit_course.managers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edit_course.managers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LearningObject</span><span class="p">,</span>
+    <span class="n">CourseChapter</span><span class="p">,</span>
+    <span class="n">BaseExercise</span><span class="p">,</span>
+    <span class="n">LTIExercise</span><span class="p">,</span>
+    <span class="n">StaticExercise</span><span class="p">,</span>
+    <span class="n">ExerciseWithAttachment</span><span class="p">,</span>
+    <span class="n">LTI1p3Exercise</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectCategory</span><span class="p">,</span> <span class="n">CourseModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.exercise_forms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseChapterForm</span><span class="p">,</span>
+    <span class="n">BaseExerciseForm</span><span class="p">,</span>
+    <span class="n">LTIExerciseForm</span><span class="p">,</span>
+    <span class="n">ExerciseWithAttachmentForm</span><span class="p">,</span>
+    <span class="n">StaticExerciseForm</span><span class="p">,</span>
+    <span class="n">ExerciseCollectionExerciseForm</span><span class="p">,</span>
+    <span class="n">LTI1p3ExerciseForm</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.course_forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectCategoryForm</span><span class="p">,</span> <span class="n">CourseModuleForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercisecollection_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseCollection</span>
+
+<div class="viewcode-block" id="ModelManager">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ModelManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelManager</span><span class="p">:</span>
+    <span class="n">object_class</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">instance_field</span> <span class="o">=</span> <span class="s2">&quot;course_instance&quot;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ModelManager.get_object">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ModelManager.get_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">object_id</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance_field</span><span class="p">:</span> <span class="n">instance</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">object_class</span><span class="p">,</span> <span class="o">**</span><span class="n">fields</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelManager.new_object">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ModelManager.new_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">new_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument redefined-builtin</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_class</span><span class="p">(</span><span class="n">course_instance</span><span class="o">=</span><span class="n">instance</span><span class="p">)</span> <span class="c1"># pylint: disable=not-callable</span></div>
+
+
+<div class="viewcode-block" id="ModelManager.get_form_class">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ModelManager.get_form_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">form_class</span></div>
+
+
+<div class="viewcode-block" id="ModelManager.can_delete">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ModelManager.can_delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExerciseContainerMixin">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ExerciseContainerMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseContainerMixin</span><span class="p">:</span>
+
+<div class="viewcode-block" id="ExerciseContainerMixin.can_delete">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ExerciseContainerMixin.can_delete">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="n">learning_objects</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CategoryManager">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.CategoryManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CategoryManager</span><span class="p">(</span><span class="n">ExerciseContainerMixin</span><span class="p">,</span> <span class="n">ModelManager</span><span class="p">):</span>
+    <span class="n">object_class</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">LearningObjectCategoryForm</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;CATEGORY_lowercase&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ModuleManager">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ModuleManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModuleManager</span><span class="p">(</span><span class="n">ExerciseContainerMixin</span><span class="p">,</span> <span class="n">ModelManager</span><span class="p">):</span>
+    <span class="n">object_class</span> <span class="o">=</span> <span class="n">CourseModule</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">CourseModuleForm</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODULE&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ModuleManager.new_object">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ModuleManager.new_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">new_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span> <span class="c1"># pylint: disable=redefined-builtin</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">object_class</span><span class="p">(</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span>
+            <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">course_modules</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExerciseManager">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ExerciseManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseManager</span><span class="p">(</span><span class="n">ModelManager</span><span class="p">):</span>
+    <span class="n">object_class</span> <span class="o">=</span> <span class="n">LearningObject</span>
+    <span class="n">instance_field</span> <span class="o">=</span> <span class="s2">&quot;course_module__course_instance&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LEARNING_OBJECT&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ExerciseManager.new_object">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ExerciseManager.new_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">new_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span> <span class="c1"># pylint: disable=redefined-builtin</span>
+        <span class="n">CLASSES</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="kc">None</span><span class="p">:</span> <span class="n">BaseExercise</span><span class="p">,</span>
+            <span class="s2">&quot;lti&quot;</span><span class="p">:</span> <span class="n">LTIExercise</span><span class="p">,</span>
+            <span class="s2">&quot;chapter&quot;</span><span class="p">:</span> <span class="n">CourseChapter</span><span class="p">,</span>
+            <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="n">StaticExercise</span><span class="p">,</span>
+            <span class="s2">&quot;attachment&quot;</span><span class="p">:</span> <span class="n">ExerciseWithAttachment</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CLASSES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span>
+        <span class="n">object_class</span> <span class="o">=</span> <span class="n">CLASSES</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span>
+
+        <span class="n">module</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="n">CourseModule</span><span class="p">,</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">parent_id</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="n">instance</span>
+        <span class="p">)</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;course_module&quot;</span><span class="p">:</span> <span class="n">module</span><span class="p">,</span>
+            <span class="s2">&quot;order&quot;</span><span class="p">:</span> <span class="n">module</span><span class="o">.</span><span class="n">learning_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">first_category</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">first_category</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">first_category</span>
+        <span class="k">return</span> <span class="n">object_class</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseManager.get_form_class">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.managers.ExerciseManager.get_form_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">FORMS</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">CourseChapter</span><span class="p">:</span> <span class="n">CourseChapterForm</span><span class="p">,</span>
+            <span class="n">BaseExercise</span><span class="p">:</span> <span class="n">BaseExerciseForm</span><span class="p">,</span>
+            <span class="n">LTIExercise</span><span class="p">:</span> <span class="n">LTIExerciseForm</span><span class="p">,</span>
+            <span class="n">LTI1p3Exercise</span><span class="p">:</span> <span class="n">LTI1p3ExerciseForm</span><span class="p">,</span>
+            <span class="n">StaticExercise</span><span class="p">:</span> <span class="n">StaticExerciseForm</span><span class="p">,</span>
+            <span class="n">ExerciseWithAttachment</span><span class="p">:</span> <span class="n">ExerciseWithAttachmentForm</span><span class="p">,</span>
+            <span class="n">ExerciseCollection</span><span class="p">:</span> <span class="n">ExerciseCollectionExerciseForm</span><span class="p">,</span>
+
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FORMS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;No form known for the object type: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="c1"># pylint: disable=raising-format-tuple</span>
+                <span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FORMS</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="vm">__class__</span><span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

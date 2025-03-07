@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.api.serializers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.api.serializers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.api.serializers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlencode</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Manager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">HyperlinkedModelSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.utils.field_mapping</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_nested_relation_kwargs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_attribute</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">,</span> <span class="n">NestedHyperlinkedRelatedField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_aplus_url</span>
+
+
+<div class="viewcode-block" id="NestedHyperlinkedModelSerializer">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.NestedHyperlinkedModelSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NestedHyperlinkedModelSerializer</span><span class="p">(</span><span class="n">HyperlinkedModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extension of `HyperlinkedModelSerializer` that adds support for</span>
+<span class="sd">    nested resources.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">serializer_related_field</span> <span class="o">=</span> <span class="n">NestedHyperlinkedRelatedField</span>
+    <span class="n">serializer_url_field</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span>
+
+<div class="viewcode-block" id="NestedHyperlinkedModelSerializer.get_default_field_names">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.NestedHyperlinkedModelSerializer.get_default_field_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_default_field_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">declared_fields</span><span class="p">,</span> <span class="n">model_info</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the default list of field names that will be used if the</span>
+<span class="sd">        `Meta.fields` option is not specified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">url_field_name</span><span class="p">]</span> <span class="o">+</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">declared_fields</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">+</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">model_info</span><span class="o">.</span><span class="n">forward_relations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NestedHyperlinkedModelSerializer.build_nested_field">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.NestedHyperlinkedModelSerializer.build_nested_field">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_nested_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">relation_info</span><span class="p">,</span> <span class="n">nested_depth</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create nested fields for forward and reverse relationships.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">NestedSerializer</span><span class="p">(</span><span class="n">NestedHyperlinkedModelSerializer</span><span class="p">):</span>
+            <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+                <span class="n">model</span> <span class="o">=</span> <span class="n">relation_info</span><span class="o">.</span><span class="n">related_model</span>
+                <span class="n">depth</span> <span class="o">=</span> <span class="n">nested_depth</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="n">field_class</span> <span class="o">=</span> <span class="n">NestedSerializer</span>
+        <span class="n">field_kwargs</span> <span class="o">=</span> <span class="n">get_nested_relation_kwargs</span><span class="p">(</span><span class="n">relation_info</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">field_class</span><span class="p">,</span> <span class="n">field_kwargs</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AlwaysListSerializer">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AlwaysListSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AlwaysListSerializer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;_many&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;many&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">AlwaysListSerializer</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">_many</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">_many</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="HtmlViewField">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.HtmlViewField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HtmlViewField</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ReadOnlyField</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HtmlViewField.to_representation">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.HtmlViewField.to_representation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_representation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">build_aplus_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NestedHyperlinkedIdentityFieldWithQuery">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NestedHyperlinkedIdentityFieldWithQuery</span><span class="p">(</span><span class="n">NestedHyperlinkedIdentityField</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">query_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__query_params</span> <span class="o">=</span> <span class="n">query_params</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NestedHyperlinkedIdentityFieldWithQuery.get_url">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery.get_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">view_name</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="p">):</span> <span class="c1"># pylint: disable=redefined-builtin</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">view_name</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__query_params</span><span class="p">:</span>
+            <span class="c1"># pylint: disable-next=unnecessary-lambda-assignment</span>
+            <span class="n">get</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">else</span> <span class="n">get_attribute</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__query_params</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">url</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AttributeProxy">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AttributeProxy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AttributeProxy</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="zip_instance_extra_with_iterable">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.zip_instance_extra_with_iterable">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">zip_instance_extra_with_iterable</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="n">extra</span><span class="p">):</span>
+    <span class="n">extra_attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">get_attribute</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">attrs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">attrs</span> <span class="ow">in</span> <span class="n">extra</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">AttributeProxy</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_attrs</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">iterable</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CompositeListSerializer">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.CompositeListSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompositeListSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">ListSerializer</span><span class="p">):</span>
+<div class="viewcode-block" id="CompositeListSerializer.with_extra">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.CompositeListSerializer.with_extra">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_extra</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">extra</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">partial</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="n">extra</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">serializers</span><span class="o">.</span><span class="n">empty</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__extra</span> <span class="o">=</span> <span class="n">extra</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">instance</span> <span class="ow">and</span> <span class="n">source</span><span class="p">:</span>
+            <span class="n">iterable</span> <span class="o">=</span> <span class="n">instance</span><span class="p">[</span><span class="n">source</span><span class="p">]</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">zip_instance_extra_with_iterable</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="n">extra</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CompositeListSerializer.get_attribute">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.CompositeListSerializer.get_attribute">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">Manager</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span>
+        <span class="k">return</span> <span class="n">zip_instance_extra_with_iterable</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">iterable</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extra</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AplusSerializerMetaMetaclass">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AplusSerializerMetaMetaclass">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AplusSerializerMetaMetaclass</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dict_</span><span class="p">):</span>
+        <span class="n">new_cls</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dict_</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">parent</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">new_cls</span><span class="p">,</span> <span class="n">new_cls</span><span class="p">),</span> <span class="n">k</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">new_cls</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="o">**</span><span class="n">v</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+                    <span class="n">parent</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">new_cls</span><span class="p">,</span> <span class="n">new_cls</span><span class="p">),</span> <span class="n">k</span><span class="p">,</span> <span class="p">())</span>
+                    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+                    <span class="n">seen_add</span> <span class="o">=</span> <span class="n">seen</span><span class="o">.</span><span class="n">add</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">parent</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">seen</span> <span class="ow">or</span> <span class="n">seen_add</span><span class="p">(</span><span class="n">x</span><span class="p">))]</span>
+                    <span class="n">res</span> <span class="o">+=</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span> <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span> <span class="ow">in</span> <span class="n">seen</span> <span class="ow">or</span> <span class="n">seen_add</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">new_cls</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)(</span><span class="n">res</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">new_cls</span></div>
+
+
+
+<div class="viewcode-block" id="AplusSerializerMeta">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AplusSerializerMeta">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AplusSerializerMeta</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">AplusSerializerMetaMetaclass</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="AplusModelSerializerBase">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AplusModelSerializerBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AplusModelSerializerBase</span><span class="p">(</span><span class="n">NestedHyperlinkedModelSerializer</span><span class="p">):</span>
+    <span class="n">url_field_name</span> <span class="o">=</span> <span class="s1">&#39;url&#39;</span>
+    <span class="n">html_url_field_name</span> <span class="o">=</span> <span class="s1">&#39;html_url&#39;</span>
+
+<div class="viewcode-block" id="AplusModelSerializerBase.get_field_names">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AplusModelSerializerBase.get_field_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_field_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">declared_fields</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_field_names</span><span class="p">(</span><span class="n">declared_fields</span><span class="p">,</span> <span class="n">info</span><span class="p">))</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Meta</span><span class="p">,</span> <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_field_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_field_name</span> <span class="ow">in</span> <span class="n">extra_kwargs</span><span class="p">:</span>
+            <span class="n">fields</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_field_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fields</span></div>
+
+
+<div class="viewcode-block" id="AplusModelSerializerBase.build_unknown_field">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AplusModelSerializerBase.build_unknown_field">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_unknown_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">model_class</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">field_name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">html_url_field_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">HtmlViewField</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">field_name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_field_name</span><span class="p">:</span>
+            <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Meta</span><span class="p">,</span> <span class="s1">&#39;extra_kwargs&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;context&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">}</span>
+            <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">url_field_name</span><span class="p">])</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">NestedHyperlinkedIdentityField</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">build_unknown_field</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">model_class</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AplusModelSerializer">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AplusModelSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AplusModelSerializer</span><span class="p">(</span><span class="n">AplusModelSerializerBase</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;pk&#39;</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AplusModelSerializer.Meta">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.AplusModelSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusSerializerMeta</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StatisticsSerializer">
+<a class="viewcode-back" href="../../../lib.api.html#lib.api.serializers.StatisticsSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StatisticsSerializer</span><span class="p">(</span><span class="n">serializers</span><span class="o">.</span><span class="n">Serializer</span><span class="p">):</span>
+    <span class="n">starttime</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">endtime</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">submission_count</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">submitters</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,503 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.remote_page &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.remote_page</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.remote_page</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">posixpath</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span><span class="p">,</span> <span class="n">urljoin</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">requests.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.payload</span><span class="w"> </span><span class="kn">import</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">Permissions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_http_date_safe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">post</span> <span class="k">as</span> <span class="n">aplus_post</span><span class="p">,</span> <span class="n">get</span> <span class="k">as</span> <span class="n">aplus_get</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.remote_page&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RemotePageException">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePageException">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemotePageException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span></div>
+
+
+
+<div class="viewcode-block" id="RemotePageNotFound">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePageNotFound">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemotePageNotFound</span><span class="p">(</span><span class="n">RemotePageException</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="mi">404</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="RemotePageNotModified">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePageNotModified">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemotePageNotModified</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expires</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expires</span> <span class="o">=</span> <span class="n">expires</span></div>
+
+
+
+<div class="viewcode-block" id="parse_expires">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.parse_expires">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_expires</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">parse_http_date_safe</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;Expires&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="ow">or</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="request_for_response">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.request_for_response">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">request_for_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="n">post</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">instance_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+    <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permissions</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">instance_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">post</span><span class="p">:</span>
+            <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">WRITE</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">READ</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">instance_id</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">last_retry</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">EXERCISE_HTTP_RETRIES</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">last_retry</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">request_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">post</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;POST </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">aplus_post</span><span class="p">(</span>
+                        <span class="n">url</span><span class="p">,</span>
+                        <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                        <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">EXERCISE_HTTP_TIMEOUT</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;GET </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+                    <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">if</span> <span class="n">stamp</span><span class="p">:</span>
+                        <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;If-Modified-Since&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stamp</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">aplus_get</span><span class="p">(</span>
+                        <span class="n">url</span><span class="p">,</span>
+                        <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">,</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">EXERCISE_HTTP_TIMEOUT</span><span class="p">,</span>
+                        <span class="n">headers</span><span class="o">=</span><span class="n">headers</span>
+                    <span class="p">)</span>
+                <span class="n">request_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">request_time</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Response </span><span class="si">%d</span><span class="s2"> (</span><span class="si">%d</span><span class="s2"> sec) </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">request_time</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">response</span>
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">304</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RemotePageNotModified</span><span class="p">(</span><span class="n">parse_expires</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">500</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="n">last_retry</span><span class="p">:</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;ConnectionError </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">);</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="n">last_retry</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sleep </span><span class="si">%d</span><span class="s2"> sec before retry&quot;</span><span class="p">,</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">EXERCISE_HTTP_RETRIES</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">EXERCISE_HTTP_RETRIES</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;HTTP request loop ended in unexpected state&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;HTTP request loop ended in unexpected state&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">404</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RemotePageNotFound</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;REQUESTED_RESOURCE_NOT_FOUND_FROM_COURSE_SERVICE&#39;</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">raise</span> <span class="n">RemotePageException</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s1">&#39;CONNECTING_TO_COURSE_SERVICE_FAILED -- </span><span class="si">{code}</span><span class="s1">&#39;</span><span class="p">),</span>
+            <span class="n">code</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;-1&#39;</span><span class="p">,</span>
+        <span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+
+<div class="viewcode-block" id="RemotePage">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemotePage</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a page that can be loaded over HTTP for further processing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="c1"># pylint: disable=too-many-arguments</span>
+            <span class="n">url</span><span class="p">,</span>
+            <span class="n">post</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">instance_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">request_for_response</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">post</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">stamp</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="s1">&#39;html5lib&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RemotePage.base_address">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.base_address">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">query</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">fragment</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">REMOTE_PAGE_HOSTS_MAP</span><span class="p">:</span>
+            <span class="n">auth</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">domain</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">netloc</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">)</span>
+            <span class="n">domain</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">REMOTE_PAGE_HOSTS_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">domain</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">netloc</span><span class="o">=</span><span class="n">auth</span><span class="o">+</span><span class="n">sep</span><span class="o">+</span><span class="n">domain</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">url</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.meta">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.meta">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">meta</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="p">:</span>
+            <span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">element</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.header">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.header">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.last_modified">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.last_modified">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">last_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s1">&#39;Last-Modified&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.expires">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.expires">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expires</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">parse_expires</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">response</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.title">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.title">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">contents</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.head">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.head">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_attribute</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">head</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">search_attribute</span><span class="p">))</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.select_element_or_body">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.select_element_or_body">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_element_or_body</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">search_attributes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tag</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">search_attributes</span><span class="p">:</span>
+                <span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="o">**</span><span class="n">attr</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">element</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">element</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">body</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.element_or_body">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.element_or_body">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">element_or_body</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">search_attributes</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span>
+            <span class="n">id_attrs_to_remove</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">clean_result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">element</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_element_or_body</span><span class="p">(</span><span class="n">search_attributes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">element</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_remove_id_attr</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">id_attrs_to_remove</span><span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+            <span class="n">clean_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_element</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">clean_result</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_clean_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">once</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;data-aplus-once&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">}):</span>
+            <span class="n">once</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_id_attr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">element</span><span class="p">:</span> <span class="n">Tag</span><span class="p">,</span>
+            <span class="n">id_values_to_remove</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove the id attribute from the element</span>
+<span class="sd">        if the id value is one of the values given in id_values_to_remove.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">id_values_to_remove</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">id_values_to_remove</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">element</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RemotePage.body">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.body">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tag</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">body</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="RemotePage.fix_relative_urls">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.fix_relative_urls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fix_relative_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_multilingual_course</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_address</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">tag</span><span class="p">,</span><span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;img&quot;</span><span class="p">,</span><span class="s2">&quot;src&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;script&quot;</span><span class="p">,</span><span class="s2">&quot;src&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;iframe&quot;</span><span class="p">,</span><span class="s2">&quot;src&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;link&quot;</span><span class="p">,</span><span class="s2">&quot;href&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="s2">&quot;href&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;video&quot;</span><span class="p">,</span><span class="s2">&quot;poster&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span><span class="s2">&quot;src&quot;</span><span class="p">),</span>
+        <span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fix_relative_urls</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">is_multilingual_course</span><span class="p">)</span></div>
+
+
+    <span class="c1"># pylint: disable-next=too-many-locals too-many-branches</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fix_relative_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">tag_name</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">is_multilingual_course</span><span class="p">):</span>
+        <span class="c1"># Starts with &quot;#&quot;, &quot;//&quot; or &quot;https:&quot;.</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;^(#|\/\/|\w+:)&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="c1"># noqa: W605</span>
+        <span class="c1"># Ends with filename extension &quot;.html&quot; and possibly &quot;#anchor&quot;.</span>
+        <span class="n">chapter</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;.*\.html(#.+)?$&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="c1"># noqa: W605</span>
+        <span class="c1"># Starts with at least one &quot;../&quot;.</span>
+        <span class="n">start_dotdot_path</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^(../)+&quot;</span><span class="p">)</span>
+        <span class="c1"># May end with the language suffix _en or _en/#anchor or _en#anchor.</span>
+        <span class="n">lang_suffix</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?P&lt;lang&gt;_[a-z]</span><span class="si">{2}</span><span class="s1">)?(?P&lt;slash&gt;/)?(?P&lt;anchor&gt;#.+)?$&#39;</span><span class="p">)</span>
+        <span class="c1"># Detect certain A+ exercise info URLs so that they are not broken by</span>
+        <span class="c1"># the transformations: &quot;../../module1/chapter/module1_chapter_exercise/info/model/&quot;.</span>
+        <span class="c1"># URLs /plain, /info, /info/model, /info/template.</span>
+        <span class="n">exercise_info</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/((plain)|(info(/model|/template)?))/?(#.+)?$&#39;</span><span class="p">)</span>
+
+        <span class="c1"># If Gitmanager is in use, fix relative static URLs to that host</span>
+        <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">GITMANAGER_URL</span><span class="p">:</span>
+            <span class="n">gmurl</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">GITMANAGER_URL</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">REMOTE_PAGE_HOSTS_MAP</span><span class="p">:</span>
+                <span class="n">domain</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">REMOTE_PAGE_HOSTS_MAP</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">gmurl</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">gmurl</span><span class="o">.</span><span class="n">netloc</span><span class="p">)</span>
+                <span class="n">gmurl</span> <span class="o">=</span> <span class="n">gmurl</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">netloc</span><span class="o">=</span><span class="n">domain</span><span class="p">)</span>
+            <span class="n">staticurl</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="n">gmurl</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">netloc</span><span class="o">=</span><span class="n">gmurl</span><span class="o">.</span><span class="n">netloc</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">staticurl</span> <span class="o">=</span> <span class="n">url</span>
+
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="p">{</span><span class="n">attr_name</span><span class="p">:</span><span class="kc">True</span><span class="p">}):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Custom transform for RST chapter to chapter links.</span>
+            <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">has_attr</span><span class="p">(</span><span class="s1">&#39;data-aplus-chapter&#39;</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">chapter</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">without_html_suffix</span> <span class="o">=</span> <span class="n">value</span><span class="p">[:</span><span class="n">i</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span> <span class="o">+</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span> <span class="c1"># Keep #anchor in the end.</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">without_html_suffix</span> <span class="o">=</span> <span class="n">value</span><span class="p">[:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+                    <span class="n">without_html_suffix</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="c1"># Remove all ../ from the start and prepend exactly &quot;../../&quot;.</span>
+                <span class="c1"># a-plus-rst-tools modifies chapter links so that the URL path</span>
+                <span class="c1"># begins from the html build root directory (_build/html).</span>
+                <span class="c1"># The path starts with &quot;../&quot; to match the directory depth and</span>
+                <span class="c1"># there are as many &quot;../&quot; as needed to reach the root.</span>
+                <span class="c1"># Chapter html files are located under module directories in</span>
+                <span class="c1"># the _build/html directory and some courses use subdirectories</span>
+                <span class="c1"># under the module directories too.</span>
+                <span class="c1"># In A+, the URL path must start with &quot;../../&quot; so that it</span>
+                <span class="c1"># removes the current chapter and module from the A+ chapter</span>
+                <span class="c1"># page URL: /course/course_instance/module/chapter/</span>
+                <span class="c1"># (A+ URLs do not have the same &quot;subdirectories&quot; as</span>
+                <span class="c1"># the real subdirectories in the course git repo.)</span>
+                <span class="n">new_val</span> <span class="o">=</span> <span class="s1">&#39;../../&#39;</span> <span class="o">+</span> <span class="n">start_dotdot_path</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">without_html_suffix</span><span class="p">)</span>
+
+                <span class="n">split_path</span> <span class="o">=</span> <span class="n">new_val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">exercise_info</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">new_val</span><span class="p">):</span>
+                    <span class="c1"># If the module directory has subdirectories in the course</span>
+                    <span class="c1"># git repo, the subdirectory must be modified in the A+ URL.</span>
+                    <span class="c1"># The subdirectory slash / is converted to underscore _.</span>
+                    <span class="c1"># Convert &quot;../../module1/subdir/chapter2_en&quot; into &quot;../../module1/subdir_chapter2_en&quot;.</span>
+                    <span class="c1"># Do not convert if the URL points to an A+ page such as</span>
+                    <span class="c1"># &quot;../../module1/chapter2/info/model/&quot;.</span>
+                    <span class="n">chapter_key</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split_path</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
+                    <span class="n">new_val</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">split_path</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">chapter_key</span>
+
+                <span class="c1"># Remove lang suffix in chapter2_en#anchor without modifying the #anchor.</span>
+                <span class="c1"># Add slash / to the end before the #anchor.</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">lang_suffix</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">new_val</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span> <span class="ow">and</span> <span class="n">is_multilingual_course</span><span class="p">:</span>
+                    <span class="n">anchor</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;anchor&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">anchor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">anchor</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="n">new_val</span> <span class="o">=</span> <span class="n">new_val</span><span class="p">[:</span><span class="n">m</span><span class="o">.</span><span class="n">start</span><span class="p">()]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">anchor</span>
+
+                <span class="n">element</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_val</span>
+
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">test</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+
+                <span class="c1"># Custom transform for RST generated exercises.</span>
+                <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">has_attr</span><span class="p">(</span><span class="s1">&#39;data-aplus-path&#39;</span><span class="p">):</span>
+                    <span class="c1"># If the exercise description HTML has links to static files such as images,</span>
+                    <span class="c1"># their links can be fixed with the data-aplus-path=&quot;/static/{course}&quot; attribute.</span>
+                    <span class="c1"># A+ converts &quot;{course}&quot; into the course key used by the backend based on</span>
+                    <span class="c1"># the exercise service URL. For example, in the MOOC-Grader, exercise service URLs</span>
+                    <span class="c1"># follow this scheme: &quot;http://grader.local/coursekey/exercisekey&quot;.</span>
+                    <span class="c1"># In the exercise HTML, image &lt;img data-aplus-path=&quot;/static/{course}&quot; src=&quot;../_images/image.png&quot;&gt;</span>
+                    <span class="c1"># gets the correct URL &quot;http://grader.local/static/coursekey/_images/image.png&quot;.</span>
+                    <span class="n">fix_path</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="s1">&#39;data-aplus-path&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                        <span class="s1">&#39;</span><span class="si">{course}</span><span class="s1">&#39;</span><span class="p">,</span>
+                        <span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="n">fix_value</span> <span class="o">=</span> <span class="n">start_dotdot_path</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">fix_path</span> <span class="o">+</span> <span class="n">fix_value</span>
+
+                <span class="c1"># url points to the exercise service, e.g., MOOC-Grader.</span>
+                <span class="c1"># This fixes links to static files (such as images) in RST chapters.</span>
+                <span class="c1"># The image URL must be absolute and refer to the server with static content</span>
+                <span class="c1"># instead of the A+ server. Traditionally this has been the grader server, but</span>
+                <span class="c1"># recently gitmanager is used. If GITMANAGER_URL is specified, we assume gitmanager.</span>
+                <span class="c1"># A relative URL with only path &quot;/static/course/image.png&quot; would target the A+ server</span>
+                <span class="c1"># when it is included in the A+ page. The value should be a relative</span>
+                <span class="c1"># path in the course build directory so that it becomes the full</span>
+                <span class="c1"># correct URL to the target file.</span>
+                <span class="c1"># E.g., urljoin(&#39;http://localhost:8080/static/default/module1/chapter.html&#39;, &quot;../_images/image.png&quot;)</span>
+                <span class="c1"># -&gt; &#39;http://localhost:8080/static/default/_images/image.png&#39;</span>
+                <span class="n">element</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">staticurl</span><span class="o">.</span><span class="n">geturl</span><span class="p">(),</span> <span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RemotePage.find_and_replace">
+<a class="viewcode-back" href="../../lib.html#lib.remote_page.RemotePage.find_and_replace">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_and_replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">list_of_attributes</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_attributes</span><span class="p">)</span> <span class="c1"># noqa: E741</span>
+        <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># noqa: E741</span>
+            <span class="k">return</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="p">{</span><span class="n">attr_name</span><span class="p">:</span><span class="kc">True</span><span class="p">}):</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">list_of_attributes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+                        <span class="n">element</span><span class="p">[</span><span class="n">name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">element</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">l</span><span class="p">:</span>
+                <span class="k">return</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

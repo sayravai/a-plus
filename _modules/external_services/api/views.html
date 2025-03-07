@@ -1,0 +1,147 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.api.views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.api.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.api.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIView</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.authentication</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAuthBodyHashAuthentication</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIOutcomeXMLParser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIOutcomeResponseRenderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIOutcomeSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IsLTIServiceUser</span>
+
+
+<div class="viewcode-block" id="LTIExerciseBasicOutcomesView">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.views.LTIExerciseBasicOutcomesView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTIExerciseBasicOutcomesView</span><span class="p">(</span><span class="n">APIView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;View that responds to LTI 1.1 Basic Outcomes Service requests that</span>
+<span class="sd">    are posted by the Tool Provider to A+ in order to return the scores of submissions.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">parser_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">LTIOutcomeXMLParser</span><span class="p">,)</span>
+    <span class="n">authentication_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">OAuthBodyHashAuthentication</span><span class="p">,)</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">IsLTIServiceUser</span><span class="p">,)</span>
+    <span class="n">renderer_classes</span> <span class="o">=</span> <span class="p">(</span><span class="n">LTIOutcomeResponseRenderer</span><span class="p">,)</span>
+    <span class="c1"># pylint: disable-next=unused-argument</span>
+<div class="viewcode-block" id="LTIExerciseBasicOutcomesView.post">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.views.LTIExerciseBasicOutcomesView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># version is the API version parameter from the URL</span>
+        <span class="c1"># request.data is the parsed Outcome XML in the request body</span>
+        <span class="n">serializer</span> <span class="o">=</span> <span class="n">LTIOutcomeSerializer</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">serializer</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">serializer</span><span class="o">.</span><span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;req_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_REPLACE</span><span class="p">:</span>
+                <span class="n">exercise</span> <span class="o">=</span> <span class="n">serializer</span><span class="o">.</span><span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;exercise&#39;</span><span class="p">]</span>
+                <span class="n">student</span> <span class="o">=</span> <span class="n">serializer</span><span class="o">.</span><span class="n">validated_data</span><span class="p">[</span><span class="s1">&#39;submitter&#39;</span><span class="p">]</span>
+                <span class="n">sbms_status</span><span class="p">,</span> <span class="n">alerts</span><span class="p">,</span> <span class="n">_students</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">check_submission_allowed</span><span class="p">(</span><span class="n">student</span><span class="p">)</span>
+                <span class="n">errors</span> <span class="o">=</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;error_messages&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;warning_messages&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;info_messages&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">sbms_status</span> <span class="o">!=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">SUBMIT_STATUS</span><span class="o">.</span><span class="n">ALLOWED</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s1">&#39;detail&#39;</span><span class="p">:</span> <span class="n">errors</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+                    <span class="c1"># the key &quot;detail&quot; is also used by raised exceptions in authentication and parsing</span>
+                <span class="n">serializer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span> <span class="c1"># creates a new submission</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">(</span><span class="n">serializer</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_200_OK</span><span class="p">)</span>
+
+        <span class="c1"># Invalid data</span>
+        <span class="c1"># Validation errors are given in a dict that has field names as keys and</span>
+        <span class="c1"># the error strings as values.</span>
+        <span class="c1"># That is confusing since it looks similar to a dict of validated data.</span>
+        <span class="c1"># We use the key &quot;detail&quot; here to signal an error state to the renderer since</span>
+        <span class="c1"># the same key is used by authentication and parsing errors.</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">({</span><span class="s1">&#39;detail&#39;</span><span class="p">:</span> <span class="n">serializer</span><span class="o">.</span><span class="n">errors</span><span class="p">},</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

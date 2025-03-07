@@ -1,0 +1,219 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.api.serializers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.api.serializers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.api.serializers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.reverse</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedHyperlinkedIdentityField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AplusModelSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.api.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserBriefSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span><span class="p">,</span> <span class="n">SubmittedFile</span><span class="p">,</span> <span class="n">BaseExercise</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;ExerciseBriefSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;SubmissionBriefSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;SubmittedFileBriefSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;SubmitterStatsBriefSerializer&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="ExerciseBriefSerializer">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.ExerciseBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseBriefSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span>
+        <span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:exercise-detail&#39;</span><span class="p">,</span>
+        <span class="n">lookup_map</span><span class="o">=</span><span class="s1">&#39;exercise.api.views.ExerciseViewSet&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">display_name</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;__str__&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExerciseBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.ExerciseBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">BaseExercise</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;html_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;display_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;max_submissions&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;hierarchical_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;difficulty&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionBriefSerializer">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmissionBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionBriefSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+    <span class="c1">#display_name = serializers.CharField(source=&#39;__str__&#39;)</span>
+    <span class="n">grade</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SubmissionBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmissionBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Submission</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;submission_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;grade&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;api:submission-detail&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lookup_map&#39;</span><span class="p">:</span> <span class="s1">&#39;exercise.api.views.SubmissionViewSet&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="SubmissionBriefSerializer.get_grade">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmissionBriefSerializer.get_grade">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">grade</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">feedback_revealed</span> <span class="k">else</span> <span class="mi">0</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmittedFileBriefSerializer">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmittedFileBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmittedFileBriefSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+    <span class="c1">#url = HtmlViewField()</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span>
+        <span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:submission-files-detail&#39;</span><span class="p">,</span>
+        <span class="n">lookup_map</span><span class="o">=</span><span class="s1">&#39;exercise.api.views.SubmissionFileViewSet&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="SubmittedFileBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmittedFileBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">SubmittedFile</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;filename&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;param_name&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmitterStatsBriefSerializer">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmitterStatsBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmitterStatsBriefSerializer</span><span class="p">(</span><span class="n">UserBriefSerializer</span><span class="p">):</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SubmitterStatsBriefSerializer.get_stats">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmitterStatsBriefSerializer.get_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span>
+            <span class="s1">&#39;api:exercise-submitter_stats-detail&#39;</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">request</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmitterStatsBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../exercise.api.html#exercise.api.serializers.SubmitterStatsBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">UserBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">UserBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="o">.</span><span class="n">fields</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="s1">&#39;stats&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,498 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>deviations.viewbase &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">deviations.viewbase</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for deviations.viewbase</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">groupby</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span><span class="p">,</span> <span class="n">ngettext</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">UserTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">CourseInstanceBaseView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">deviations.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubmissionRuleDeviation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_ajax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseFormView</span><span class="p">,</span> <span class="n">BaseRedirectView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.pseudonymize</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_user</span>
+
+
+<div class="viewcode-block" id="ListDeviationsView">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.ListDeviationsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ListDeviationsView</span><span class="p">(</span><span class="n">CourseInstanceBaseView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+    <span class="n">deviation_model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SubmissionRuleDeviation</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ListDeviationsView.get_common_objects">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.ListDeviationsView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="n">all_deviations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise__course_module__course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviation_groups</span> <span class="o">=</span> <span class="n">get_deviation_groups</span><span class="p">(</span><span class="n">all_deviations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;deviation_groups&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AddDeviationsView">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.AddDeviationsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AddDeviationsView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+    <span class="n">deviation_model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SubmissionRuleDeviation</span><span class="p">]</span>
+    <span class="n">session_key</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="AddDeviationsView.get_context_data">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.AddDeviationsView.get_context_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;previous&#39;</span><span class="p">):</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cancel_action&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;previous&#39;</span><span class="p">)})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cancel_action&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;deviations-list-dl&#39;</span><span class="p">)})</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+
+
+<div class="viewcode-block" id="AddDeviationsView.get_form_kwargs">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.AddDeviationsView.get_form_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_form_kwargs</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;instance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="AddDeviationsView.get_initial_get_param_spec">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.AddDeviationsView.get_initial_get_param_spec">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_initial_get_param_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]:</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">list_arg</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+
+        <span class="n">spec</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_initial_get_param_spec</span><span class="p">()</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="s2">&quot;module&quot;</span><span class="p">:</span> <span class="n">list_arg</span><span class="p">,</span>
+            <span class="s2">&quot;exercise&quot;</span><span class="p">:</span> <span class="n">list_arg</span><span class="p">,</span>
+            <span class="s2">&quot;submitter&quot;</span><span class="p">:</span> <span class="n">list_arg</span><span class="p">,</span>
+            <span class="s2">&quot;submitter_tag&quot;</span><span class="p">:</span> <span class="n">list_arg</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="k">return</span> <span class="n">spec</span></div>
+
+
+<div class="viewcode-block" id="AddDeviationsView.form_valid">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.AddDeviationsView.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">BaseForm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">exercises</span> <span class="o">=</span> <span class="n">get_exercises</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">)</span>
+        <span class="n">submitters</span> <span class="o">=</span> <span class="n">get_submitters</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">)</span>
+        <span class="n">existing_deviations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise__in</span><span class="o">=</span><span class="n">exercises</span><span class="p">,</span>
+            <span class="n">submitter__in</span><span class="o">=</span><span class="n">submitters</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">existing_deviations</span><span class="p">:</span>
+            <span class="c1"># Some deviations already existed. Use OverrideDeviationsView to</span>
+            <span class="c1"># confirm which ones the user wants to override. Store the form</span>
+            <span class="c1"># values in the current session, so they can be used afterwards.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">success_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="o">.</span><span class="n">get_override_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">session_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_session_data</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">success_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_success_no_override_url</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="n">submitters</span><span class="p">:</span>
+                    <span class="n">new_deviation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="p">(</span>
+                        <span class="n">exercise</span><span class="o">=</span><span class="n">exercise</span><span class="p">,</span>
+                        <span class="n">submitter</span><span class="o">=</span><span class="n">submitter</span><span class="p">,</span>
+                        <span class="n">granter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">new_deviation</span><span class="o">.</span><span class="n">update_by_form</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">)</span>
+                    <span class="n">new_deviation</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;SUCCESS_ADDING_DEVIATIONS&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AddDeviationsView.serialize_session_data">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.AddDeviationsView.serialize_session_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_session_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert input form data into serializable values that can be stored in</span>
+<span class="sd">        the session cache.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">,</span> <span class="s1">&#39;submitter&#39;</span><span class="p">,</span> <span class="s1">&#39;submitter_tag&#39;</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">form_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">[])]</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OverrideDeviationsView">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.OverrideDeviationsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OverrideDeviationsView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+    <span class="c1"># form_class is not really used, but it is required by the FormView.</span>
+    <span class="c1"># The form contains only checkboxes and the user input is validated in</span>
+    <span class="c1"># the form_valid method. The form HTML is manually written in the template.</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">Form</span>
+    <span class="n">deviation_model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SubmissionRuleDeviation</span><span class="p">]</span>
+    <span class="n">session_key</span><span class="p">:</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="OverrideDeviationsView.get_common_objects">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.OverrideDeviationsView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deserialize_session_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">session_key</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span> <span class="o">=</span> <span class="n">get_exercises</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submitters</span> <span class="o">=</span> <span class="n">get_submitters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">existing_deviations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">,</span>
+            <span class="n">submitter__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deviation_groups</span> <span class="o">=</span> <span class="n">get_deviation_groups</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">existing_deviations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;session_data&quot;</span><span class="p">,</span> <span class="s2">&quot;exercises&quot;</span><span class="p">,</span> <span class="s2">&quot;submitters&quot;</span><span class="p">,</span> <span class="s2">&quot;existing_deviations&quot;</span><span class="p">,</span> <span class="s2">&quot;deviation_groups&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OverrideDeviationsView.form_valid">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.OverrideDeviationsView.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">BaseForm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">override_deviations</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">deviation_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;override&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">id_pair</span> <span class="ow">in</span> <span class="n">deviation_list</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">submitter_id</span><span class="p">,</span> <span class="n">exercise_id</span> <span class="o">=</span> <span class="n">id_pair</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="n">submitter_id</span><span class="p">,</span> <span class="n">exercise_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">submitter_id</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">exercise_id</span><span class="p">)</span>
+                <span class="n">override_deviations</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">submitter_id</span><span class="p">,</span> <span class="n">exercise_id</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+                    <span class="n">format_lazy</span><span class="p">(</span>
+                        <span class="n">_</span><span class="p">(</span><span class="s2">&quot;INVALID_EXERCISE_OR_SUBMITTER_ID -- </span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">),</span>
+                        <span class="nb">id</span><span class="o">=</span><span class="n">id_pair</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+
+        <span class="n">existing_deviations</span> <span class="o">=</span> <span class="p">{(</span><span class="n">d</span><span class="o">.</span><span class="n">submitter_id</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">exercise_id</span><span class="p">):</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">existing_deviations</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">submitter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">submitters</span><span class="p">:</span>
+                <span class="n">existing_deviation</span> <span class="o">=</span> <span class="n">existing_deviations</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">submitter</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">existing_deviation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">submitter</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="ow">in</span> <span class="n">override_deviations</span><span class="p">:</span>
+                        <span class="n">existing_deviation</span><span class="o">.</span><span class="n">granter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+                        <span class="n">existing_deviation</span><span class="o">.</span><span class="n">update_by_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_data</span><span class="p">)</span>
+                        <span class="n">existing_deviation</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_deviation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="p">(</span>
+                        <span class="n">exercise</span><span class="o">=</span><span class="n">exercise</span><span class="p">,</span>
+                        <span class="n">submitter</span><span class="o">=</span><span class="n">submitter</span><span class="p">,</span>
+                        <span class="n">granter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">new_deviation</span><span class="o">.</span><span class="n">update_by_form</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_data</span><span class="p">)</span>
+                    <span class="n">new_deviation</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">session_key</span><span class="p">]</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;SUCCESS_OVERRIDING_DEVIATIONS&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OverrideDeviationsView.deserialize_session_data">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.OverrideDeviationsView.deserialize_session_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">deserialize_session_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert serialized session data back into its original representation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">session_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="p">[])),</span>
+            <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">session_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;module&#39;</span><span class="p">,</span> <span class="p">[])),</span>
+            <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">session_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;submitter&#39;</span><span class="p">,</span> <span class="p">[])),</span>
+            <span class="s1">&#39;submitter_tag&#39;</span><span class="p">:</span> <span class="n">UserTag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">session_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;submitter_tag&#39;</span><span class="p">,</span> <span class="p">[])),</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RemoveDeviationsByIDView">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.RemoveDeviationsByIDView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemoveDeviationsByIDView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseRedirectView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+    <span class="n">deviation_model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SubmissionRuleDeviation</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RemoveDeviationsByIDView.post">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.RemoveDeviationsByIDView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">deviations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">id__in</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span>
+            <span class="n">exercise__course_module__course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">deviations</span><span class="p">:</span>
+            <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">is_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">204</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="o">.</span><span class="n">get_list_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RemoveDeviationsView">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.RemoveDeviationsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RemoveDeviationsView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+    <span class="n">deviation_model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SubmissionRuleDeviation</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RemoveDeviationsView.get_form_kwargs">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.RemoveDeviationsView.get_form_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_form_kwargs</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;instance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="RemoveDeviationsView.get_success_url">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.RemoveDeviationsView.get_success_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;deviations-remove-dl&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RemoveDeviationsView.form_valid">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.RemoveDeviationsView.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">BaseForm</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+        <span class="n">number_of_removed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">deviations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deviation_model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise__in</span><span class="o">=</span><span class="n">get_exercises</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">),</span>
+            <span class="n">submitter__in</span><span class="o">=</span><span class="n">get_submitters</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">deviations</span><span class="p">:</span>
+            <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="n">number_of_removed</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">number_of_removed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NOTHING_REMOVED&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">ngettext</span><span class="p">(</span>
+                <span class="s1">&#39;REMOVED_DEVIATION -- </span><span class="si">{count}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;REMOVED_DEVIATIONS -- </span><span class="si">{count}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">number_of_removed</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="n">number_of_removed</span><span class="p">)</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># pylint: disable-next=too-many-locals</span>
+<div class="viewcode-block" id="get_deviation_groups">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.get_deviation_groups">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_deviation_groups</span><span class="p">(</span>
+        <span class="n">all_deviations</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">[</span><span class="n">SubmissionRuleDeviation</span><span class="p">],</span>
+        <span class="n">pseudonymize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">SubmissionRuleDeviation</span><span class="p">],</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Group the deviations by user and module.</span>
+
+<span class="sd">    Grouping condition: deviations can be grouped if the user has been</span>
+<span class="sd">    granted the same deviation (based on the `is_equal` method) for all</span>
+<span class="sd">    exercises in the module.</span>
+
+<span class="sd">    The returned tuples contain the following values:</span>
+<span class="sd">    1. List of deviations with the same user and module.</span>
+<span class="sd">    2. Boolean representing whether the deviations in the list can be</span>
+<span class="sd">    displayed as a group (i.e. the grouping condition is satisfied).</span>
+<span class="sd">    3. An id that uniquely identifies the group of deviations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find the number of exercises in each module.</span>
+    <span class="n">course_instances</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">all_deviations</span>
+        <span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;exercise__course_module__course_instance&#39;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="n">exercise_counts</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">course_module__course_instance__in</span><span class="o">=</span><span class="n">course_instances</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;course_module_id&#39;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="n">exercise_count_by_module</span> <span class="o">=</span> <span class="p">{</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;course_module_id&#39;</span><span class="p">]:</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">exercise_counts</span><span class="p">}</span>
+
+    <span class="n">ordered_deviations</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">all_deviations</span>
+        <span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+            <span class="s1">&#39;submitter&#39;</span><span class="p">,</span> <span class="s1">&#39;submitter__user&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;granter&#39;</span><span class="p">,</span> <span class="s1">&#39;granter__user&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="s1">&#39;exercise__course_module&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise__course_module__course_instance&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">defer</span><span class="p">(</span>
+            <span class="s1">&#39;exercise__exercise_info&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise__description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise__course_module__course_instance__description&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># parent is prefetched because there may be multiple ancestors, and</span>
+        <span class="c1"># they are needed for building the deviation&#39;s URL.</span>
+        <span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;exercise__parent&#39;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;submitter&#39;</span><span class="p">,</span> <span class="s1">&#39;exercise__course_module&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">deviation_groups</span> <span class="o">=</span> <span class="n">groupby</span><span class="p">(</span>
+        <span class="n">ordered_deviations</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">submitter</span><span class="p">,</span> <span class="n">obj</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">submitter</span><span class="p">,</span> <span class="n">module</span><span class="p">),</span> <span class="n">deviations_iter</span> <span class="ow">in</span> <span class="n">deviation_groups</span><span class="p">:</span>
+        <span class="n">format_user</span><span class="p">(</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">pseudonymize</span><span class="p">,</span> <span class="n">submitter</span><span class="p">)</span>
+        <span class="n">deviations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">deviations_iter</span><span class="p">)</span>
+        <span class="n">can_group</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">show_granter</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">deviations</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># Group must have at least 2 deviations.</span>
+            <span class="n">can_group</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">group_exercises</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="c1"># Check that the same deviation has been granted for all exercises.</span>
+            <span class="n">first_granter</span> <span class="o">=</span> <span class="n">deviations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">granter</span><span class="o">.</span><span class="n">id</span>
+            <span class="k">for</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">deviations</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">deviation</span><span class="o">.</span><span class="n">is_groupable</span><span class="p">(</span><span class="n">deviations</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">can_group</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">show_granter</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">deviation</span><span class="o">.</span><span class="n">granter</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">first_granter</span><span class="p">:</span>
+                    <span class="n">show_granter</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">can_group</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="n">group_exercises</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_exercises</span><span class="p">)</span> <span class="o">!=</span> <span class="n">exercise_count_by_module</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">]:</span>
+                    <span class="c1"># The number of exercises that have deviations doesn&#39;t</span>
+                    <span class="c1"># match the number of exercises in the module, so there</span>
+                    <span class="c1"># are some exercises that don&#39;t have a deviation.</span>
+                    <span class="n">can_group</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">group_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">deviations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">submitter</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">can_group</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">yield</span> <span class="p">(</span><span class="n">deviations</span><span class="p">,</span> <span class="n">can_group</span><span class="p">,</span> <span class="n">group_id</span><span class="p">,</span> <span class="n">show_granter</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_exercises">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.get_exercises">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_exercises</span><span class="p">(</span><span class="n">form_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">[</span><span class="n">BaseExercise</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the exercises that match the input form&#39;s `exercise` and `module`</span>
+<span class="sd">    fields.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">form_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="o">|</span> <span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">course_module__in</span><span class="o">=</span><span class="n">form_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;module&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_submitters">
+<a class="viewcode-back" href="../../deviations.html#deviations.viewbase.get_submitters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_submitters</span><span class="p">(</span><span class="n">form_data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the submitters that match the input form&#39;s `submitter` and</span>
+<span class="sd">    `submitter_tag` fields.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">form_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;submitter&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="o">|</span> <span class="n">models</span><span class="o">.</span><span class="n">Q</span><span class="p">(</span><span class="n">taggings__tag__in</span><span class="o">=</span><span class="n">form_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;submitter_tag&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,675 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.api package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">lib.api package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-lib.api.constants">lib.api.constants module</a></li>
+<li><a class="reference internal" href="#module-lib.api.core">lib.api.core module</a><ul>
+<li><a class="reference internal" href="#lib.api.core.APlusContentNegotiation"><code class="docutils literal notranslate"><span class="pre">APlusContentNegotiation</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.core.APlusContentNegotiation.get_accept_list"><code class="docutils literal notranslate"><span class="pre">APlusContentNegotiation.get_accept_list()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.core.APlusJSONRenderer"><code class="docutils literal notranslate"><span class="pre">APlusJSONRenderer</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.core.APlusJSONRenderer.media_type"><code class="docutils literal notranslate"><span class="pre">APlusJSONRenderer.media_type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.core.APlusVersioning"><code class="docutils literal notranslate"><span class="pre">APlusVersioning</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.core.APlusVersioning.determine_version"><code class="docutils literal notranslate"><span class="pre">APlusVersioning.determine_version()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.core.APlusVersioning.invalid_accept_version_message"><code class="docutils literal notranslate"><span class="pre">APlusVersioning.invalid_accept_version_message</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.api.fields">lib.api.fields module</a><ul>
+<li><a class="reference internal" href="#lib.api.fields.NestedHyperlinkedIdentityField"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedIdentityField</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.fields.NestedHyperlinkedRelatedField"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedRelatedField</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.fields.NestedHyperlinkedRelatedField.get_url"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedRelatedField.get_url()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.api.filters">lib.api.filters module</a><ul>
+<li><a class="reference internal" href="#lib.api.filters.FieldValuesFilter"><code class="docutils literal notranslate"><span class="pre">FieldValuesFilter</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.filters.FieldValuesFilter.filter_queryset"><code class="docutils literal notranslate"><span class="pre">FieldValuesFilter.filter_queryset()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.api.mixins">lib.api.mixins module</a><ul>
+<li><a class="reference internal" href="#lib.api.mixins.ListSerializerMixin"><code class="docutils literal notranslate"><span class="pre">ListSerializerMixin</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.mixins.ListSerializerMixin.get_serializer_class"><code class="docutils literal notranslate"><span class="pre">ListSerializerMixin.get_serializer_class()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.mixins.MeUserMixin"><code class="docutils literal notranslate"><span class="pre">MeUserMixin</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.mixins.MeUserMixin.initial"><code class="docutils literal notranslate"><span class="pre">MeUserMixin.initial()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.mixins.MeUserMixin.me_user_url_kw"><code class="docutils literal notranslate"><span class="pre">MeUserMixin.me_user_url_kw</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.mixins.MeUserMixin.me_user_value"><code class="docutils literal notranslate"><span class="pre">MeUserMixin.me_user_value</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.api.renderers">lib.api.renderers module</a><ul>
+<li><a class="reference internal" href="#lib.api.renderers.CSVExcelRenderer"><code class="docutils literal notranslate"><span class="pre">CSVExcelRenderer</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.renderers.CSVExcelRenderer.flatten_item"><code class="docutils literal notranslate"><span class="pre">CSVExcelRenderer.flatten_item()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.renderers.CSVExcelRenderer.format"><code class="docutils literal notranslate"><span class="pre">CSVExcelRenderer.format</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.renderers.CSVExcelRenderer.render"><code class="docutils literal notranslate"><span class="pre">CSVExcelRenderer.render()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.renderers.CSVExcelRenderer.writer_opts"><code class="docutils literal notranslate"><span class="pre">CSVExcelRenderer.writer_opts</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.renderers.remove_newlines"><code class="docutils literal notranslate"><span class="pre">remove_newlines()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.api.serializers">lib.api.serializers module</a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.AlwaysListSerializer"><code class="docutils literal notranslate"><span class="pre">AlwaysListSerializer</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializer"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializer</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializer.Meta</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializer.Meta.fields"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializer.Meta.fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializerBase"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializerBase</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializerBase.build_unknown_field"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializerBase.build_unknown_field()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializerBase.get_field_names"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializerBase.get_field_names()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializerBase.html_url_field_name"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializerBase.html_url_field_name</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.AplusModelSerializerBase.url_field_name"><code class="docutils literal notranslate"><span class="pre">AplusModelSerializerBase.url_field_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.serializers.AplusSerializerMeta"><code class="docutils literal notranslate"><span class="pre">AplusSerializerMeta</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.AplusSerializerMetaMetaclass"><code class="docutils literal notranslate"><span class="pre">AplusSerializerMetaMetaclass</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.AttributeProxy"><code class="docutils literal notranslate"><span class="pre">AttributeProxy</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.CompositeListSerializer"><code class="docutils literal notranslate"><span class="pre">CompositeListSerializer</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.CompositeListSerializer.get_attribute"><code class="docutils literal notranslate"><span class="pre">CompositeListSerializer.get_attribute()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.CompositeListSerializer.with_extra"><code class="docutils literal notranslate"><span class="pre">CompositeListSerializer.with_extra()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.serializers.HtmlViewField"><code class="docutils literal notranslate"><span class="pre">HtmlViewField</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.HtmlViewField.to_representation"><code class="docutils literal notranslate"><span class="pre">HtmlViewField.to_representation()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedIdentityFieldWithQuery</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery.get_url"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedIdentityFieldWithQuery.get_url()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedModelSerializer"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedModelSerializer</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.build_nested_field"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedModelSerializer.build_nested_field()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.get_default_field_names"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedModelSerializer.get_default_field_names()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.serializer_related_field"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedModelSerializer.serializer_related_field</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.serializer_url_field"><code class="docutils literal notranslate"><span class="pre">NestedHyperlinkedModelSerializer.serializer_url_field</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.api.serializers.StatisticsSerializer"><code class="docutils literal notranslate"><span class="pre">StatisticsSerializer</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.serializers.zip_instance_extra_with_iterable"><code class="docutils literal notranslate"><span class="pre">zip_instance_extra_with_iterable()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.api.statistics">lib.api.statistics module</a><ul>
+<li><a class="reference internal" href="#lib.api.statistics.BaseStatisticsView"><code class="docutils literal notranslate"><span class="pre">BaseStatisticsView</span></code></a><ul>
+<li><a class="reference internal" href="#lib.api.statistics.BaseStatisticsView.get_object"><code class="docutils literal notranslate"><span class="pre">BaseStatisticsView.get_object()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.statistics.BaseStatisticsView.get_queryset"><code class="docutils literal notranslate"><span class="pre">BaseStatisticsView.get_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#lib.api.statistics.BaseStatisticsView.serializer_class"><code class="docutils literal notranslate"><span class="pre">BaseStatisticsView.serializer_class</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">lib.api package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lib.api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lib-api-package">
+<h1>lib.api package<a class="headerlink" href="#lib-api-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lib.api.authentication.html">lib.api.authentication package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="lib.api.authentication.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lib.api.authentication.html#module-lib.api.authentication.grader">lib.api.authentication.grader module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication.add_token_permissions"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication.add_token_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication.allow_any_issuer"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication.allow_any_issuer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication.authenticate"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication.authenticate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication.authenticate_exercise_token"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication.authenticate_exercise_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication.authenticate_submission_token"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication.authenticate_submission_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication.get_token"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication.get_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.grader.GraderAuthentication.get_user"><code class="docutils literal notranslate"><span class="pre">GraderAuthentication.get_user()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="lib.api.authentication.html#module-lib.api.authentication">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.get_graderauth_exercise_params"><code class="docutils literal notranslate"><span class="pre">get_graderauth_exercise_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="lib.api.authentication.html#lib.api.authentication.get_graderauth_submission_params"><code class="docutils literal notranslate"><span class="pre">get_graderauth_submission_params()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lib.api.constants">
+<span id="lib-api-constants-module"></span><h2>lib.api.constants module<a class="headerlink" href="#module-lib.api.constants" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lib.api.core">
+<span id="lib-api-core-module"></span><h2>lib.api.core module<a class="headerlink" href="#module-lib.api.core" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.core.APlusContentNegotiation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.core.</span></span><span class="sig-name descname"><span class="pre">APlusContentNegotiation</span></span><a class="reference internal" href="_modules/lib/api/core.html#APlusContentNegotiation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.core.APlusContentNegotiation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DefaultContentNegotiation</span></code></p>
+<p>We add to default content negotiation feature will update all application/json
+with our own type. This is not the optimal way to handle the problem.
+Real solution would do it in media_type_matches function in django rest framework</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.core.APlusContentNegotiation.get_accept_list">
+<span class="sig-name descname"><span class="pre">get_accept_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/core.html#APlusContentNegotiation.get_accept_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.core.APlusContentNegotiation.get_accept_list" title="Link to this definition"></a></dt>
+<dd><p>Given the incoming request, return a tokenized list of media
+type strings.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.core.APlusJSONRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.core.</span></span><span class="sig-name descname"><span class="pre">APlusJSONRenderer</span></span><a class="reference internal" href="_modules/lib/api/core.html#APlusJSONRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.core.APlusJSONRenderer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">JSONRenderer</span></code></p>
+<p>Just mark that our own responses are aplus json and not normal one</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.core.APlusJSONRenderer.media_type">
+<span class="sig-name descname"><span class="pre">media_type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'application/vnd.aplus+json'</span></em><a class="headerlink" href="#lib.api.core.APlusJSONRenderer.media_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.core.APlusVersioning">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.core.</span></span><span class="sig-name descname"><span class="pre">APlusVersioning</span></span><a class="reference internal" href="_modules/lib/api/core.html#APlusVersioning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.core.APlusVersioning" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">URLPathVersioning</span></code></p>
+<p>Our versioning class takes major version from URL real api version is
+then read from settings based on major version.</p>
+<p>If client provides version in accept header (only with correct media type)
+it will be tested that it is less or equal to what we support.</p>
+<p>If version in URL or in Accept header is not supported, corect html error
+is returned. (URL case should not be possible if urls.py is correct).</p>
+<p>Task of telling the client our api version in content type is also done here.
+This is due to design of django rest framework.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.core.APlusVersioning.determine_version">
+<span class="sig-name descname"><span class="pre">determine_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/core.html#APlusVersioning.determine_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.core.APlusVersioning.determine_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.core.APlusVersioning.invalid_accept_version_message">
+<span class="sig-name descname"><span class="pre">invalid_accept_version_message</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Invalid</span> <span class="pre">version</span> <span class="pre">in</span> <span class="pre">&quot;Accept&quot;</span> <span class="pre">header.'</span></em><a class="headerlink" href="#lib.api.core.APlusVersioning.invalid_accept_version_message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.api.fields">
+<span id="lib-api-fields-module"></span><h2>lib.api.fields module<a class="headerlink" href="#module-lib.api.fields" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.fields.NestedHyperlinkedIdentityField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.fields.</span></span><span class="sig-name descname"><span class="pre">NestedHyperlinkedIdentityField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/fields.html#NestedHyperlinkedIdentityField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.fields.NestedHyperlinkedIdentityField" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lib.api.fields.NestedHyperlinkedRelatedField" title="lib.api.fields.NestedHyperlinkedRelatedField"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedHyperlinkedRelatedField</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">HyperlinkedIdentityField</span></code></p>
+<p>Represents a nested hyperlinked resource itself.
+Will get lookup_map from view class in serializer context</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.fields.NestedHyperlinkedRelatedField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.fields.</span></span><span class="sig-name descname"><span class="pre">NestedHyperlinkedRelatedField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/fields.html#NestedHyperlinkedRelatedField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.fields.NestedHyperlinkedRelatedField" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">HyperlinkedRelatedField</span></code></p>
+<p>Handles HyperlinkedRelatedField with views that are nested.</p>
+<dl>
+<dt>Args:</dt><dd><p>view_name: Name of url rule used for reverse resolving
+lookup_map: Item specifig mapping how to resolve url kwargs for named url conf.</p>
+<blockquote>
+<div><p>If value is dict, it’s used as is.
+If value is string, it’s resolved to class using django import_string.
+If value is class (e.g. resolved from string above) lookup_map is constructed
+member variables <cite>lookup_field</cite>, <cite>lookup_url_kwarg</cite> and <cite>parent_lookup_map</cite>.
+If value is ommited, we try look for view from context and do above.
+If no value is resolvable by above means, error is raised.</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.fields.NestedHyperlinkedRelatedField.get_url">
+<span class="sig-name descname"><span class="pre">get_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/fields.html#NestedHyperlinkedRelatedField.get_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.fields.NestedHyperlinkedRelatedField.get_url" title="Link to this definition"></a></dt>
+<dd><p>Given an object, return the URL that hyperlinks to the object.</p>
+<p>May raise a <cite>NoReverseMatch</cite> if the <cite>view_name</cite> and <cite>lookup_field</cite>
+attributes are not configured to correctly match the URL conf.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.api.filters">
+<span id="lib-api-filters-module"></span><h2>lib.api.filters module<a class="headerlink" href="#module-lib.api.filters" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.filters.FieldValuesFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.filters.</span></span><span class="sig-name descname"><span class="pre">FieldValuesFilter</span></span><a class="reference internal" href="_modules/lib/api/filters.html#FieldValuesFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.filters.FieldValuesFilter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFilterBackend</span></code></p>
+<p>A filter backend that returns instances whose field (query parameter
+<cite>field</cite>) matches one of the provided values (query parameter <cite>values</cite>,
+comma separated). Add to the view a <cite>field_values_map</cite> attribute that maps
+API fields to model fields.</p>
+<p>Differences to <cite>SearchFilter</cite>:
+- Queries target only one field at a time instead of any of the</p>
+<blockquote>
+<div><p>view’s <cite>search_fields</cite>.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Queries use exact matching.</p></li>
+<li><p>When multiple values are provided, the <cite>OR</cite> operator is used instead of
+<cite>AND</cite>.</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.filters.FieldValuesFilter.filter_queryset">
+<span class="sig-name descname"><span class="pre">filter_queryset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queryset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QuerySet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">APIView</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QuerySet</span></span></span><a class="reference internal" href="_modules/lib/api/filters.html#FieldValuesFilter.filter_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.filters.FieldValuesFilter.filter_queryset" title="Link to this definition"></a></dt>
+<dd><p>Return a filtered queryset.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.api.mixins">
+<span id="lib-api-mixins-module"></span><h2>lib.api.mixins module<a class="headerlink" href="#module-lib.api.mixins" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.mixins.ListSerializerMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.mixins.</span></span><span class="sig-name descname"><span class="pre">ListSerializerMixin</span></span><a class="reference internal" href="_modules/lib/api/mixins.html#ListSerializerMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.mixins.ListSerializerMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.mixins.ListSerializerMixin.get_serializer_class">
+<span class="sig-name descname"><span class="pre">get_serializer_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/mixins.html#ListSerializerMixin.get_serializer_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.mixins.ListSerializerMixin.get_serializer_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.mixins.MeUserMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.mixins.</span></span><span class="sig-name descname"><span class="pre">MeUserMixin</span></span><a class="reference internal" href="_modules/lib/api/mixins.html#MeUserMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.mixins.MeUserMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.mixins.MeUserMixin.initial">
+<span class="sig-name descname"><span class="pre">initial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/mixins.html#MeUserMixin.initial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.mixins.MeUserMixin.initial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.mixins.MeUserMixin.me_user_url_kw">
+<span class="sig-name descname"><span class="pre">me_user_url_kw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#lib.api.mixins.MeUserMixin.me_user_url_kw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.mixins.MeUserMixin.me_user_value">
+<span class="sig-name descname"><span class="pre">me_user_value</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'me'</span></em><a class="headerlink" href="#lib.api.mixins.MeUserMixin.me_user_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.api.renderers">
+<span id="lib-api-renderers-module"></span><h2>lib.api.renderers module<a class="headerlink" href="#module-lib.api.renderers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.renderers.CSVExcelRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.renderers.</span></span><span class="sig-name descname"><span class="pre">CSVExcelRenderer</span></span><a class="reference internal" href="_modules/lib/api/renderers.html#CSVExcelRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.renderers.CSVExcelRenderer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CSVRenderer</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.renderers.CSVExcelRenderer.flatten_item">
+<span class="sig-name descname"><span class="pre">flatten_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/renderers.html#CSVExcelRenderer.flatten_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.renderers.CSVExcelRenderer.flatten_item" title="Link to this definition"></a></dt>
+<dd><p>Remove newlines from the item in addition to flattening</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.renderers.CSVExcelRenderer.format">
+<span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'excel.csv'</span></em><a class="headerlink" href="#lib.api.renderers.CSVExcelRenderer.format" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.renderers.CSVExcelRenderer.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">media_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer_opts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/renderers.html#CSVExcelRenderer.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.renderers.CSVExcelRenderer.render" title="Link to this definition"></a></dt>
+<dd><p>Extract sep from GET parameters if specified</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.renderers.CSVExcelRenderer.writer_opts">
+<span class="sig-name descname"><span class="pre">writer_opts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'delimiter':</span> <span class="pre">';'}</span></em><a class="headerlink" href="#lib.api.renderers.CSVExcelRenderer.writer_opts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.api.renderers.remove_newlines">
+<span class="sig-prename descclassname"><span class="pre">lib.api.renderers.</span></span><span class="sig-name descname"><span class="pre">remove_newlines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/renderers.html#remove_newlines"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.renderers.remove_newlines" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-lib.api.serializers">
+<span id="lib-api-serializers-module"></span><h2>lib.api.serializers module<a class="headerlink" href="#module-lib.api.serializers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.AlwaysListSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">AlwaysListSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#AlwaysListSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AlwaysListSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">AplusModelSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#AplusModelSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AplusModelSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lib.api.serializers.AplusModelSerializerBase" title="lib.api.serializers.AplusModelSerializerBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AplusModelSerializerBase</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializer.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/lib/api/serializers.html#AplusModelSerializer.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AplusModelSerializer.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lib.api.serializers.AplusSerializerMeta" title="lib.api.serializers.AplusSerializerMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">AplusSerializerMeta</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializer.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'url')</span></em><a class="headerlink" href="#lib.api.serializers.AplusModelSerializer.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializerBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">AplusModelSerializerBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#AplusModelSerializerBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AplusModelSerializerBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lib.api.serializers.NestedHyperlinkedModelSerializer" title="lib.api.serializers.NestedHyperlinkedModelSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedHyperlinkedModelSerializer</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializerBase.build_unknown_field">
+<span class="sig-name descname"><span class="pre">build_unknown_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#AplusModelSerializerBase.build_unknown_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AplusModelSerializerBase.build_unknown_field" title="Link to this definition"></a></dt>
+<dd><p>Raise an error on any unknown fields.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializerBase.get_field_names">
+<span class="sig-name descname"><span class="pre">get_field_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#AplusModelSerializerBase.get_field_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AplusModelSerializerBase.get_field_names" title="Link to this definition"></a></dt>
+<dd><p>Returns the list of all field names that should be created when
+instantiating this serializer class. This is based on the default
+set of fields, but also takes into account the <cite>Meta.fields</cite> or
+<cite>Meta.exclude</cite> options if they have been specified.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializerBase.html_url_field_name">
+<span class="sig-name descname"><span class="pre">html_url_field_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'html_url'</span></em><a class="headerlink" href="#lib.api.serializers.AplusModelSerializerBase.html_url_field_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusModelSerializerBase.url_field_name">
+<span class="sig-name descname"><span class="pre">url_field_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'url'</span></em><a class="headerlink" href="#lib.api.serializers.AplusModelSerializerBase.url_field_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusSerializerMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">AplusSerializerMeta</span></span><a class="reference internal" href="_modules/lib/api/serializers.html#AplusSerializerMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AplusSerializerMeta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.AplusSerializerMetaMetaclass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">AplusSerializerMetaMetaclass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#AplusSerializerMetaMetaclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AplusSerializerMetaMetaclass" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.AttributeProxy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">AttributeProxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#AttributeProxy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.AttributeProxy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.CompositeListSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">CompositeListSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#CompositeListSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.CompositeListSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ListSerializer</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.CompositeListSerializer.get_attribute">
+<span class="sig-name descname"><span class="pre">get_attribute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#CompositeListSerializer.get_attribute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.CompositeListSerializer.get_attribute" title="Link to this definition"></a></dt>
+<dd><p>Given the <em>outgoing</em> object instance, return the primitive value
+that should be used for this field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.CompositeListSerializer.with_extra">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">with_extra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">extra</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#CompositeListSerializer.with_extra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.CompositeListSerializer.with_extra" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.HtmlViewField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">HtmlViewField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#HtmlViewField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.HtmlViewField" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadOnlyField</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.HtmlViewField.to_representation">
+<span class="sig-name descname"><span class="pre">to_representation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#HtmlViewField.to_representation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.HtmlViewField.to_representation" title="Link to this definition"></a></dt>
+<dd><p>Transform the <em>outgoing</em> native value into primitive data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">NestedHyperlinkedIdentityFieldWithQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#NestedHyperlinkedIdentityFieldWithQuery"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lib.api.fields.NestedHyperlinkedIdentityField" title="lib.api.fields.NestedHyperlinkedIdentityField"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedHyperlinkedIdentityField</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery.get_url">
+<span class="sig-name descname"><span class="pre">get_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#NestedHyperlinkedIdentityFieldWithQuery.get_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.NestedHyperlinkedIdentityFieldWithQuery.get_url" title="Link to this definition"></a></dt>
+<dd><p>Given an object, return the URL that hyperlinks to the object.</p>
+<p>May raise a <cite>NoReverseMatch</cite> if the <cite>view_name</cite> and <cite>lookup_field</cite>
+attributes are not configured to correctly match the URL conf.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.NestedHyperlinkedModelSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">NestedHyperlinkedModelSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#NestedHyperlinkedModelSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.NestedHyperlinkedModelSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">HyperlinkedModelSerializer</span></code></p>
+<p>Extension of <cite>HyperlinkedModelSerializer</cite> that adds support for
+nested resources.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.NestedHyperlinkedModelSerializer.build_nested_field">
+<span class="sig-name descname"><span class="pre">build_nested_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested_depth</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#NestedHyperlinkedModelSerializer.build_nested_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.build_nested_field" title="Link to this definition"></a></dt>
+<dd><p>Create nested fields for forward and reverse relationships.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.serializers.NestedHyperlinkedModelSerializer.get_default_field_names">
+<span class="sig-name descname"><span class="pre">get_default_field_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_info</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#NestedHyperlinkedModelSerializer.get_default_field_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.get_default_field_names" title="Link to this definition"></a></dt>
+<dd><p>Return the default list of field names that will be used if the
+<cite>Meta.fields</cite> option is not specified.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.serializers.NestedHyperlinkedModelSerializer.serializer_related_field">
+<span class="sig-name descname"><span class="pre">serializer_related_field</span></span><a class="headerlink" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.serializer_related_field" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#lib.api.fields.NestedHyperlinkedRelatedField" title="lib.api.fields.NestedHyperlinkedRelatedField"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedHyperlinkedRelatedField</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.serializers.NestedHyperlinkedModelSerializer.serializer_url_field">
+<span class="sig-name descname"><span class="pre">serializer_url_field</span></span><a class="headerlink" href="#lib.api.serializers.NestedHyperlinkedModelSerializer.serializer_url_field" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#lib.api.fields.NestedHyperlinkedIdentityField" title="lib.api.fields.NestedHyperlinkedIdentityField"><code class="xref py py-class docutils literal notranslate"><span class="pre">NestedHyperlinkedIdentityField</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.serializers.StatisticsSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">StatisticsSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#StatisticsSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.StatisticsSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Serializer</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.api.serializers.zip_instance_extra_with_iterable">
+<span class="sig-prename descclassname"><span class="pre">lib.api.serializers.</span></span><span class="sig-name descname"><span class="pre">zip_instance_extra_with_iterable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/serializers.html#zip_instance_extra_with_iterable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.serializers.zip_instance_extra_with_iterable" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-lib.api.statistics">
+<span id="lib-api-statistics-module"></span><h2>lib.api.statistics module<a class="headerlink" href="#module-lib.api.statistics" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.api.statistics.BaseStatisticsView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.api.statistics.</span></span><span class="sig-name descname"><span class="pre">BaseStatisticsView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/statistics.html#BaseStatisticsView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.statistics.BaseStatisticsView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RetrieveAPIView</span></code></p>
+<p>Returns submission statistics for the entire system, over a given time window.</p>
+<p>Returns the following attributes:</p>
+<ul class="simple">
+<li><p><cite>submission_count</cite>: total number of submissions.</p></li>
+<li><p><cite>submitters</cite>: number of users submitting.</p></li>
+</ul>
+<section id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><cite>GET /statistics/</cite>:</dt><dd><p>returns the statistics for the system.</p>
+</dd>
+</dl>
+<ul class="simple">
+<li><dl class="simple">
+<dt>URL parameters:</dt><dd><ul>
+<li><p><cite>endtime</cite>: date and time in ISO 8601 format indicating the end point
+of time window we are interested in. Default: now.</p></li>
+<li><p><cite>starttime</cite>: date and time in ISO 8601 format indicating the start point
+of time window we are interested in. Default: one day before endtime</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.statistics.BaseStatisticsView.get_object">
+<span class="sig-name descname"><span class="pre">get_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/api/statistics.html#BaseStatisticsView.get_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.statistics.BaseStatisticsView.get_object" title="Link to this definition"></a></dt>
+<dd><p>Returns the object the view is displaying.</p>
+<p>You may want to override this if you need to provide non-standard
+queryset lookups.  Eg if objects are referenced using multiple
+keyword arguments in the url conf.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.api.statistics.BaseStatisticsView.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QuerySet</span></span></span><a class="reference internal" href="_modules/lib/api/statistics.html#BaseStatisticsView.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.api.statistics.BaseStatisticsView.get_queryset" title="Link to this definition"></a></dt>
+<dd><p>Get the list of items for this view.
+This must be an iterable, and may be a queryset.
+Defaults to using <cite>self.queryset</cite>.</p>
+<p>This method should always be used rather than accessing <cite>self.queryset</cite>
+directly, as <cite>self.queryset</cite> gets evaluated only once, and those results
+are cached for all subsequent requests.</p>
+<p>You may want to override this if you need to provide different
+querysets depending on the incoming request.</p>
+<p>(Eg. return a list of items that is specific to the user)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.api.statistics.BaseStatisticsView.serializer_class">
+<span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#lib.api.statistics.BaseStatisticsView.serializer_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#lib.api.serializers.StatisticsSerializer" title="lib.api.serializers.StatisticsSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">StatisticsSerializer</span></code></a></p>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-lib.api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-lib.api" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

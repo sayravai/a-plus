@@ -1,0 +1,477 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edit_course.exercise_forms &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edit_course.exercise_forms</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edit_course.exercise_forms</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">LearningObjectCategory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObject</span><span class="p">,</span> <span class="n">CourseChapter</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">,</span> \
+    <span class="n">LTIExercise</span><span class="p">,</span> <span class="n">StaticExercise</span><span class="p">,</span> <span class="n">ExerciseWithAttachment</span><span class="p">,</span> <span class="n">RevealRule</span><span class="p">,</span> \
+    <span class="n">LTI1p3Exercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DateTimeLocalInput</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.course_forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">FieldsetModelForm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercisecollection_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseCollection</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;aplus.exercise&quot;</span><span class="p">)</span>
+
+<span class="n">COMMON_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;audience&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;category&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;course_module&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;parent&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;order&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">SERVICE_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;service_url&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">EXERCISE_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;max_submissions&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;max_points&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;difficulty&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;points_to_pass&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;allow_assistant_viewing&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;allow_assistant_grading&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;min_group_size&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;max_group_size&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;model_answers&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;templates&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;grading_mode&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="LearningObjectMixin">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LearningObjectMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearningObjectMixin</span><span class="p">:</span>
+
+<div class="viewcode-block" id="LearningObjectMixin.init_fields">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LearningObjectMixin.init_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">init_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lobject</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lobject</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;course_module&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lobject</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;parent&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span>\
+            <span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lobject</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>\
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lobject</span><span class="o">.</span><span class="n">course_module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;parent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_service_head</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="LearningObjectMixin.get_hierarchy_fieldset">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LearningObjectMixin.get_hierarchy_fieldset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_hierarchy_fieldset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;HIERARCHY&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;audience&#39;</span><span class="p">,</span> <span class="s1">&#39;category&#39;</span><span class="p">,</span><span class="s1">&#39;course_module&#39;</span><span class="p">,</span><span class="s1">&#39;parent&#39;</span><span class="p">,</span><span class="s1">&#39;order&#39;</span><span class="p">,</span><span class="s1">&#39;url&#39;</span><span class="p">)</span> <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="LearningObjectMixin.get_content_fieldset">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LearningObjectMixin.get_content_fieldset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_content_fieldset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">add</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;CONTENT&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">add</span><span class="p">)</span> <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseChapterForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.CourseChapterForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseChapterForm</span><span class="p">(</span><span class="n">LearningObjectMixin</span><span class="p">,</span> <span class="n">FieldsetModelForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CourseChapterForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.CourseChapterForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseChapter</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">COMMON_FIELDS</span> <span class="o">+</span> <span class="n">SERVICE_FIELDS</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="s1">&#39;use_wide_column&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;generate_table_of_contents&#39;</span>
+        <span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_fields</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CourseChapterForm.get_fieldsets">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.CourseChapterForm.get_fieldsets">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fieldsets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_hierarchy_fieldset</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_content_fieldset</span><span class="p">(</span>
+                <span class="s1">&#39;use_wide_column&#39;</span><span class="p">,</span> <span class="s1">&#39;generate_table_of_contents&#39;</span><span class="p">),</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RevealRuleForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.RevealRuleForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RevealRuleForm</span><span class="p">(</span><span class="n">FieldsetModelForm</span><span class="p">):</span>
+    <span class="c1"># This form is only used internally by BaseExerciseForm.</span>
+
+<div class="viewcode-block" id="RevealRuleForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.RevealRuleForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">RevealRule</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;trigger&#39;</span><span class="p">,</span> <span class="s1">&#39;delay_minutes&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;currently_revealed&#39;</span><span class="p">,</span> <span class="s1">&#39;show_zero_points_immediately&#39;</span><span class="p">]</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">is_submission_feedback</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;trigger&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data-trigger&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">zero_feedback_triggers</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_ALL</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_OR_FULL_POINTS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">TIME</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">MANUAL</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">COMPLETION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">]</span> <span class="k">if</span> <span class="n">is_submission_feedback</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;show_zero_points_immediately&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data-visible-triggers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zero_feedback_triggers</span>
+
+        <span class="c1"># Visibility rules for the form fields. Each of the following fields is</span>
+        <span class="c1"># only visible when one of their specified values is selected from the</span>
+        <span class="c1"># trigger dropdown. See edit_model.html.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;currently_revealed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data-visible-triggers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">MANUAL</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data-visible-triggers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">TIME</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;delay_minutes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data-visible-triggers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_ALL</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_OR_FULL_POINTS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="RevealRuleForm.clean">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.RevealRuleForm.clean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">trigger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;trigger&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">trigger</span> <span class="o">==</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">TIME</span><span class="p">:</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span>
+                    <span class="s1">&#39;ERROR_REQUIRED_WITH_SELECTED_TRIGGER&#39;</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">forms</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BaseExerciseForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.BaseExerciseForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseExerciseForm</span><span class="p">(</span><span class="n">LearningObjectMixin</span><span class="p">,</span> <span class="n">FieldsetModelForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BaseExerciseForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.BaseExerciseForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">BaseExercise</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">COMMON_FIELDS</span> <span class="o">+</span> <span class="n">SERVICE_FIELDS</span> <span class="o">+</span> <span class="n">EXERCISE_FIELDS</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_fields</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># This form contains two embedded RevealRuleForms.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission_feedback_form</span> <span class="o">=</span> <span class="n">RevealRuleForm</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+            <span class="n">instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">active_submission_feedback_reveal_rule</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;submission_feedback&#39;</span><span class="p">,</span>
+            <span class="n">is_submission_feedback</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_solutions_form</span> <span class="o">=</span> <span class="n">RevealRuleForm</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+            <span class="n">instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">active_model_solutions_reveal_rule</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;model_solutions&#39;</span><span class="p">,</span>
+            <span class="n">is_submission_feedback</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="BaseExerciseForm.get_fieldsets">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.BaseExerciseForm.get_fieldsets">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fieldsets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_hierarchy_fieldset</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_content_fieldset</span><span class="p">(</span><span class="s1">&#39;model_answers&#39;</span><span class="p">,</span> <span class="s1">&#39;templates&#39;</span><span class="p">),</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;GRADING&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="s1">&#39;max_submissions&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;max_points&#39;</span><span class="p">,</span><span class="s1">&#39;points_to_pass&#39;</span><span class="p">,</span> <span class="s1">&#39;difficulty&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;allow_assistant_viewing&#39;</span><span class="p">,</span><span class="s1">&#39;allow_assistant_grading&#39;</span><span class="p">,</span><span class="s1">&#39;grading_mode&#39;</span><span class="p">)</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;GROUPS&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="s1">&#39;min_group_size&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;max_group_size&#39;</span><span class="p">)</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;REVEAL_SUBMISSION_FEEDBACK&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">submission_feedback_form</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;REVEAL_MODEL_SOLUTIONS&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">model_solutions_form</span> <span class="p">},</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="BaseExerciseForm.is_valid">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.BaseExerciseForm.is_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_feedback_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_solutions_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseExerciseForm.save">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.BaseExerciseForm.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="c1"># Save the reveal rules only if they have been changed.</span>
+        <span class="c1"># If they were not changed, we can keep using the default rule and</span>
+        <span class="c1"># there&#39;s no need to save a new RevealRule.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_feedback_form</span><span class="o">.</span><span class="n">has_changed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">submission_feedback_reveal_rule</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">submission_feedback_form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_solutions_form</span><span class="o">.</span><span class="n">has_changed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">model_solutions_reveal_rule</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_solutions_form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LTIExerciseForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LTIExerciseForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTIExerciseForm</span><span class="p">(</span><span class="n">BaseExerciseForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LTIExerciseForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LTIExerciseForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">LTIExercise</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">COMMON_FIELDS</span> <span class="o">+</span> <span class="n">SERVICE_FIELDS</span> <span class="o">+</span> <span class="n">EXERCISE_FIELDS</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="s1">&#39;lti_service&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;context_id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;resource_link_id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;resource_link_title&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;aplus_get_and_post&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;open_in_iframe&#39;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_service_head</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="LTIExerciseForm.get_content_fieldset">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LTIExerciseForm.get_content_fieldset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_content_fieldset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">add</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_content_fieldset</span><span class="p">(</span><span class="s1">&#39;lti_service&#39;</span><span class="p">,</span><span class="s1">&#39;context_id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;resource_link_id&#39;</span><span class="p">,</span><span class="s1">&#39;resource_link_title&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;aplus_get_and_post&#39;</span><span class="p">,</span><span class="s1">&#39;open_in_iframe&#39;</span><span class="p">,</span><span class="s1">&#39;service_url&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LTI1p3ExerciseForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LTI1p3ExerciseForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTI1p3ExerciseForm</span><span class="p">(</span><span class="n">BaseExerciseForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LTI1p3ExerciseForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LTI1p3ExerciseForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">LTI1p3Exercise</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">COMMON_FIELDS</span> <span class="o">+</span> <span class="n">SERVICE_FIELDS</span> <span class="o">+</span> <span class="n">EXERCISE_FIELDS</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="s1">&#39;lti_service&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;custom&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;open_in_iframe&#39;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_service_head</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="LTI1p3ExerciseForm.get_content_fieldset">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.LTI1p3ExerciseForm.get_content_fieldset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_content_fieldset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">add</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_content_fieldset</span><span class="p">(</span><span class="s1">&#39;lti_service&#39;</span><span class="p">,</span> <span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="s1">&#39;open_in_iframe&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExerciseWithAttachmentForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.ExerciseWithAttachmentForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseWithAttachmentForm</span><span class="p">(</span><span class="n">BaseExerciseForm</span><span class="p">):</span>
+    <span class="n">multipart</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="ExerciseWithAttachmentForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.ExerciseWithAttachmentForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ExerciseWithAttachment</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">COMMON_FIELDS</span> <span class="o">+</span> <span class="n">SERVICE_FIELDS</span> <span class="o">+</span> <span class="n">EXERCISE_FIELDS</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;files_to_submit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attachment&#39;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ExerciseWithAttachmentForm.get_content_fieldset">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.ExerciseWithAttachmentForm.get_content_fieldset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_content_fieldset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">add</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_content_fieldset</span><span class="p">(</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="s1">&#39;files_to_submit&#39;</span><span class="p">,</span> <span class="s1">&#39;attachment&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StaticExerciseForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.StaticExerciseForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StaticExerciseForm</span><span class="p">(</span><span class="n">BaseExerciseForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="StaticExerciseForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.StaticExerciseForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">StaticExercise</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">COMMON_FIELDS</span> <span class="o">+</span> <span class="n">EXERCISE_FIELDS</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;exercise_page_content&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;submission_page_content&#39;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remote_service_head</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="StaticExerciseForm.get_content_fieldset">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.StaticExerciseForm.get_content_fieldset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_content_fieldset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">add</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_content_fieldset</span><span class="p">(</span>
+            <span class="s1">&#39;exercise_page_content&#39;</span><span class="p">,</span> <span class="s1">&#39;submission_page_content&#39;</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ExerciseCollectionExerciseForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.ExerciseCollectionExerciseForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseCollectionExerciseForm</span><span class="p">(</span><span class="n">BaseExerciseForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExerciseCollectionExerciseForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.ExerciseCollectionExerciseForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">ExerciseCollection</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">COMMON_FIELDS</span> <span class="o">+</span> <span class="n">EXERCISE_FIELDS</span> <span class="o">+</span> <span class="n">SERVICE_FIELDS</span> <span class="o">+</span> \
+                 <span class="p">[</span><span class="s1">&#39;target_category&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ExerciseCollectionExerciseForm.get_content_fieldset">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.exercise_forms.ExerciseCollectionExerciseForm.get_content_fieldset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_content_fieldset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">add</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_content_fieldset</span><span class="p">(</span><span class="s1">&#39;target_category&#39;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

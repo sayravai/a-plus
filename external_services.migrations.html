@@ -1,0 +1,681 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.migrations package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">external_services.migrations package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-external_services.migrations.0001_initial">external_services.migrations.0001_initial module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0002_auto_20150427_1717">external_services.migrations.0002_auto_20150427_1717 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0002_auto_20150427_1717.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0002_auto_20150427_1717.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0002_auto_20150427_1717.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0003_menuitem_access">external_services.migrations.0003_menuitem_access module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0003_menuitem_access.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0003_menuitem_access.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0003_menuitem_access.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0004_auto_20150828_1210">external_services.migrations.0004_auto_20150828_1210 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0004_auto_20150828_1210.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0004_auto_20150828_1210.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0004_auto_20150828_1210.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0005_auto_20160829_1344">external_services.migrations.0005_auto_20160829_1344 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0005_auto_20160829_1344.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0005_auto_20160829_1344.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0005_auto_20160829_1344.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0006_ltiservice_enable_api_access">external_services.migrations.0006_ltiservice_enable_api_access module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0006_ltiservice_enable_api_access.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0006_ltiservice_enable_api_access.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0006_ltiservice_enable_api_access.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0007_ltiservice_access_settings">external_services.migrations.0007_ltiservice_access_settings module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0007_ltiservice_access_settings.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0007_ltiservice_access_settings.Migration.atomic"><code class="docutils literal notranslate"><span class="pre">Migration.atomic</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0007_ltiservice_access_settings.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0007_ltiservice_access_settings.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.migrations.0007_ltiservice_access_settings.backwards_autoselect"><code class="docutils literal notranslate"><span class="pre">backwards_autoselect()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0007_ltiservice_access_settings.forwards_autoselect"><code class="docutils literal notranslate"><span class="pre">forwards_autoselect()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0008_auto_20180724_1445">external_services.migrations.0008_auto_20180724_1445 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0008_auto_20180724_1445.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0008_auto_20180724_1445.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0008_auto_20180724_1445.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0009_auto_20180822_1629">external_services.migrations.0009_auto_20180822_1629 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0009_auto_20180822_1629.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0009_auto_20180822_1629.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0009_auto_20180822_1629.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0010_auto_20180918_1916">external_services.migrations.0010_auto_20180918_1916 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0010_auto_20180918_1916.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0010_auto_20180918_1916.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0010_auto_20180918_1916.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.migrations.0010_auto_20180918_1916.validate_no_domain"><code class="docutils literal notranslate"><span class="pre">validate_no_domain()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0011_menuitem_menu_url">external_services.migrations.0011_menuitem_menu_url module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0011_menuitem_menu_url.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0011_menuitem_menu_url.Migration.atomic"><code class="docutils literal notranslate"><span class="pre">Migration.atomic</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0011_menuitem_menu_url.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0011_menuitem_menu_url.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.migrations.0011_menuitem_menu_url.backwards"><code class="docutils literal notranslate"><span class="pre">backwards()</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0011_menuitem_menu_url.forwards"><code class="docutils literal notranslate"><span class="pre">forwards()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0012_auto_20201202_1856">external_services.migrations.0012_auto_20201202_1856 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0012_auto_20201202_1856.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0012_auto_20201202_1856.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0012_auto_20201202_1856.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0013_auto_20210414_1146">external_services.migrations.0013_auto_20210414_1146 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0013_auto_20210414_1146.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0013_auto_20210414_1146.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0013_auto_20210414_1146.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0014_auto_20210701_1730">external_services.migrations.0014_auto_20210701_1730 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0014_auto_20210701_1730.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0014_auto_20210701_1730.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0014_auto_20210701_1730.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.migrations.0014_auto_20210701_1730.validate_no_domain"><code class="docutils literal notranslate"><span class="pre">validate_no_domain()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0015_auto_20210812_1536">external_services.migrations.0015_auto_20210812_1536 module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0015_auto_20210812_1536.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0015_auto_20210812_1536.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0015_auto_20210812_1536.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#external_services.migrations.0015_auto_20210812_1536.validate_no_domain"><code class="docutils literal notranslate"><span class="pre">validate_no_domain()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0016_alter_menuitem_service">external_services.migrations.0016_alter_menuitem_service module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0016_alter_menuitem_service.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0016_alter_menuitem_service.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0016_alter_menuitem_service.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0017_lti1p3service">external_services.migrations.0017_lti1p3service module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0017_lti1p3service.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0017_lti1p3service.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0017_lti1p3service.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0018_alter_menuitem_menu_url">external_services.migrations.0018_alter_menuitem_menu_url module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0018_alter_menuitem_menu_url.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0018_alter_menuitem_menu_url.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0018_alter_menuitem_menu_url.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations.0019_alter_linkservice_destination_region">external_services.migrations.0019_alter_linkservice_destination_region module</a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0019_alter_linkservice_destination_region.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#external_services.migrations.0019_alter_linkservice_destination_region.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#external_services.migrations.0019_alter_linkservice_destination_region.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-external_services.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">external_services.migrations package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/external_services.migrations.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="external-services-migrations-package">
+<h1>external_services.migrations package<a class="headerlink" href="#external-services-migrations-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-external_services.migrations.0001_initial">
+<span id="external-services-migrations-0001-initial-module"></span><h2>external_services.migrations.0001_initial module<a class="headerlink" href="#module-external_services.migrations.0001_initial" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0001_initial.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0001_initial.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0001_initial.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0001_initial.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0001_initial.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('inheritance',</span> <span class="pre">'0001_initial'),</span> <span class="pre">('course',</span> <span class="pre">'0001_initial')]</span></em><a class="headerlink" href="#external_services.migrations.0001_initial.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0001_initial.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='LinkService',</span> <span class="pre">fields=[('modelwithinheritance_ptr',</span> <span class="pre">&lt;django.db.models.fields.related.OneToOneField&gt;),</span> <span class="pre">('url',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('menu_label',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('menu_icon_class',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('enabled',</span> <span class="pre">&lt;django.db.models.fields.BooleanField&gt;)],</span> <span class="pre">options={'ordering':</span> <span class="pre">['menu_label']},</span> <span class="pre">bases=('inheritance.modelwithinheritance',)&gt;,</span> <span class="pre">&lt;CreateModel</span>&#160; <span class="pre">name='LTIService',</span> <span class="pre">fields=[('linkservice_ptr',</span> <span class="pre">&lt;django.db.models.fields.related.OneToOneField&gt;),</span> <span class="pre">('consumer_key',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('consumer_secret',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;)],</span> <span class="pre">options={},</span> <span class="pre">bases=('external_services.linkservice',)&gt;,</span> <span class="pre">&lt;CreateModel</span>&#160; <span class="pre">name='MenuItem',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.AutoField&gt;),</span> <span class="pre">('menu_label',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('menu_icon_class',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('menu_weight',</span> <span class="pre">&lt;django.db.models.fields.IntegerField&gt;),</span> <span class="pre">('enabled',</span> <span class="pre">&lt;django.db.models.fields.BooleanField&gt;),</span> <span class="pre">('course_instance',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;),</span> <span class="pre">('service',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;)],</span> <span class="pre">options={'ordering':</span> <span class="pre">['course_instance',</span> <span class="pre">'menu_weight',</span> <span class="pre">'menu_label']},</span> <span class="pre">bases=(&lt;class</span> <span class="pre">'django.db.models.base.Model'&gt;,)&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0001_initial.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0002_auto_20150427_1717">
+<span id="external-services-migrations-0002-auto-20150427-1717-module"></span><h2>external_services.migrations.0002_auto_20150427_1717 module<a class="headerlink" href="#module-external_services.migrations.0002_auto_20150427_1717" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0002_auto_20150427_1717.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0002_auto_20150427_1717.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0002_auto_20150427_1717.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0002_auto_20150427_1717.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0002_auto_20150427_1717.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0001_initial')]</span></em><a class="headerlink" href="#external_services.migrations.0002_auto_20150427_1717.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0002_auto_20150427_1717.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='enabled',</span> <span class="pre">field=&lt;django.db.models.fields.BooleanField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='consumer_key',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='consumer_secret',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='course_instance',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_weight',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;,</span> <span class="pre">preserve_default=True&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0002_auto_20150427_1717.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0003_menuitem_access">
+<span id="external-services-migrations-0003-menuitem-access-module"></span><h2>external_services.migrations.0003_menuitem_access module<a class="headerlink" href="#module-external_services.migrations.0003_menuitem_access" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0003_menuitem_access.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0003_menuitem_access.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0003_menuitem_access.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0003_menuitem_access.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0003_menuitem_access.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0002_auto_20150427_1717')]</span></em><a class="headerlink" href="#external_services.migrations.0003_menuitem_access.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0003_menuitem_access.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='access',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;,</span> <span class="pre">preserve_default=True&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0003_menuitem_access.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0004_auto_20150828_1210">
+<span id="external-services-migrations-0004-auto-20150828-1210-module"></span><h2>external_services.migrations.0004_auto_20150828_1210 module<a class="headerlink" href="#module-external_services.migrations.0004_auto_20150828_1210" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0004_auto_20150828_1210.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0004_auto_20150828_1210.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0004_auto_20150828_1210.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0004_auto_20150828_1210.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0004_auto_20150828_1210.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0003_menuitem_access')]</span></em><a class="headerlink" href="#external_services.migrations.0004_auto_20150828_1210.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0004_auto_20150828_1210.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0004_auto_20150828_1210.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0005_auto_20160829_1344">
+<span id="external-services-migrations-0005-auto-20160829-1344-module"></span><h2>external_services.migrations.0005_auto_20160829_1344 module<a class="headerlink" href="#module-external_services.migrations.0005_auto_20160829_1344" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0005_auto_20160829_1344.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0005_auto_20160829_1344.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0005_auto_20160829_1344.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0005_auto_20160829_1344.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0005_auto_20160829_1344.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0004_auto_20150828_1210')]</span></em><a class="headerlink" href="#external_services.migrations.0005_auto_20160829_1344.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0005_auto_20160829_1344.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_group_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AddField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='course_instance',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='service',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;,</span> <span class="pre">preserve_default=True&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0005_auto_20160829_1344.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0006_ltiservice_enable_api_access">
+<span id="external-services-migrations-0006-ltiservice-enable-api-access-module"></span><h2>external_services.migrations.0006_ltiservice_enable_api_access module<a class="headerlink" href="#module-external_services.migrations.0006_ltiservice_enable_api_access" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0006_ltiservice_enable_api_access.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0006_ltiservice_enable_api_access.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0006_ltiservice_enable_api_access.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0006_ltiservice_enable_api_access.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0006_ltiservice_enable_api_access.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0005_auto_20160829_1344')]</span></em><a class="headerlink" href="#external_services.migrations.0006_ltiservice_enable_api_access.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0006_ltiservice_enable_api_access.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='enable_api_access',</span> <span class="pre">field=&lt;django.db.models.fields.BooleanField&gt;,</span> <span class="pre">preserve_default=True&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0006_ltiservice_enable_api_access.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0007_ltiservice_access_settings">
+<span id="external-services-migrations-0007-ltiservice-access-settings-module"></span><h2>external_services.migrations.0007_ltiservice_access_settings module<a class="headerlink" href="#module-external_services.migrations.0007_ltiservice_access_settings" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0007_ltiservice_access_settings.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0007_ltiservice_access_settings.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0007_ltiservice_access_settings.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0007_ltiservice_access_settings.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0007_ltiservice_access_settings.Migration.atomic">
+<span class="sig-name descname"><span class="pre">atomic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#external_services.migrations.0007_ltiservice_access_settings.Migration.atomic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0007_ltiservice_access_settings.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0006_ltiservice_enable_api_access')]</span></em><a class="headerlink" href="#external_services.migrations.0007_ltiservice_access_settings.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0007_ltiservice_access_settings.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='access_settings',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;,</span> <span class="pre">&lt;RunPython</span> <span class="pre">&lt;function</span> <span class="pre">forwards_autoselect&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">backwards_autoselect&gt;&gt;,</span> <span class="pre">&lt;RemoveField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='enable_api_access'&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0007_ltiservice_access_settings.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.migrations.0007_ltiservice_access_settings.backwards_autoselect">
+<span class="sig-prename descclassname"><span class="pre">external_services.migrations.0007_ltiservice_access_settings.</span></span><span class="sig-name descname"><span class="pre">backwards_autoselect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0007_ltiservice_access_settings.html#backwards_autoselect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0007_ltiservice_access_settings.backwards_autoselect" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.migrations.0007_ltiservice_access_settings.forwards_autoselect">
+<span class="sig-prename descclassname"><span class="pre">external_services.migrations.0007_ltiservice_access_settings.</span></span><span class="sig-name descname"><span class="pre">forwards_autoselect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0007_ltiservice_access_settings.html#forwards_autoselect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0007_ltiservice_access_settings.forwards_autoselect" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0008_auto_20180724_1445">
+<span id="external-services-migrations-0008-auto-20180724-1445-module"></span><h2>external_services.migrations.0008_auto_20180724_1445 module<a class="headerlink" href="#module-external_services.migrations.0008_auto_20180724_1445" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0008_auto_20180724_1445.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0008_auto_20180724_1445.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0008_auto_20180724_1445.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0008_auto_20180724_1445.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0008_auto_20180724_1445.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0007_ltiservice_access_settings')]</span></em><a class="headerlink" href="#external_services.migrations.0008_auto_20180724_1445.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0008_auto_20180724_1445.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='access_settings',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0008_auto_20180724_1445.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0009_auto_20180822_1629">
+<span id="external-services-migrations-0009-auto-20180822-1629-module"></span><h2>external_services.migrations.0009_auto_20180822_1629 module<a class="headerlink" href="#module-external_services.migrations.0009_auto_20180822_1629" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0009_auto_20180822_1629.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0009_auto_20180822_1629.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0009_auto_20180822_1629.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0009_auto_20180822_1629.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0009_auto_20180822_1629.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0008_auto_20180724_1445')]</span></em><a class="headerlink" href="#external_services.migrations.0009_auto_20180822_1629.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0009_auto_20180822_1629.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_group_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0009_auto_20180822_1629.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0010_auto_20180918_1916">
+<span id="external-services-migrations-0010-auto-20180918-1916-module"></span><h2>external_services.migrations.0010_auto_20180918_1916 module<a class="headerlink" href="#module-external_services.migrations.0010_auto_20180918_1916" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0010_auto_20180918_1916.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0010_auto_20180918_1916.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0010_auto_20180918_1916.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0010_auto_20180918_1916.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0010_auto_20180918_1916.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0009_auto_20180822_1629')]</span></em><a class="headerlink" href="#external_services.migrations.0010_auto_20180918_1916.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0010_auto_20180918_1916.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='destination_region',</span> <span class="pre">field=&lt;django.db.models.fields.PositiveSmallIntegerField&gt;&gt;,</span> <span class="pre">&lt;AddField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='privacy_notice_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='service',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0010_auto_20180918_1916.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.migrations.0010_auto_20180918_1916.validate_no_domain">
+<span class="sig-prename descclassname"><span class="pre">external_services.migrations.0010_auto_20180918_1916.</span></span><span class="sig-name descname"><span class="pre">validate_no_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0010_auto_20180918_1916.html#validate_no_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0010_auto_20180918_1916.validate_no_domain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0011_menuitem_menu_url">
+<span id="external-services-migrations-0011-menuitem-menu-url-module"></span><h2>external_services.migrations.0011_menuitem_menu_url module<a class="headerlink" href="#module-external_services.migrations.0011_menuitem_menu_url" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0011_menuitem_menu_url.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0011_menuitem_menu_url.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0011_menuitem_menu_url.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0011_menuitem_menu_url.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0011_menuitem_menu_url.Migration.atomic">
+<span class="sig-name descname"><span class="pre">atomic</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#external_services.migrations.0011_menuitem_menu_url.Migration.atomic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0011_menuitem_menu_url.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0010_auto_20180918_1916')]</span></em><a class="headerlink" href="#external_services.migrations.0011_menuitem_menu_url.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0011_menuitem_menu_url.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;RunPython</span> <span class="pre">&lt;function</span> <span class="pre">forwards&gt;,</span> <span class="pre">&lt;function</span> <span class="pre">backwards&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0011_menuitem_menu_url.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.migrations.0011_menuitem_menu_url.backwards">
+<span class="sig-prename descclassname"><span class="pre">external_services.migrations.0011_menuitem_menu_url.</span></span><span class="sig-name descname"><span class="pre">backwards</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0011_menuitem_menu_url.html#backwards"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0011_menuitem_menu_url.backwards" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.migrations.0011_menuitem_menu_url.forwards">
+<span class="sig-prename descclassname"><span class="pre">external_services.migrations.0011_menuitem_menu_url.</span></span><span class="sig-name descname"><span class="pre">forwards</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_editor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0011_menuitem_menu_url.html#forwards"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0011_menuitem_menu_url.forwards" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0012_auto_20201202_1856">
+<span id="external-services-migrations-0012-auto-20201202-1856-module"></span><h2>external_services.migrations.0012_auto_20201202_1856 module<a class="headerlink" href="#module-external_services.migrations.0012_auto_20201202_1856" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0012_auto_20201202_1856.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0012_auto_20201202_1856.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0012_auto_20201202_1856.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0012_auto_20201202_1856.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0012_auto_20201202_1856.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0011_menuitem_menu_url')]</span></em><a class="headerlink" href="#external_services.migrations.0012_auto_20201202_1856.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0012_auto_20201202_1856.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='destination_region',</span> <span class="pre">field=&lt;django.db.models.fields.PositiveSmallIntegerField&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0012_auto_20201202_1856.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0013_auto_20210414_1146">
+<span id="external-services-migrations-0013-auto-20210414-1146-module"></span><h2>external_services.migrations.0013_auto_20210414_1146 module<a class="headerlink" href="#module-external_services.migrations.0013_auto_20210414_1146" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0013_auto_20210414_1146.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0013_auto_20210414_1146.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0013_auto_20210414_1146.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0013_auto_20210414_1146.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0013_auto_20210414_1146.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0012_auto_20201202_1856')]</span></em><a class="headerlink" href="#external_services.migrations.0013_auto_20210414_1146.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0013_auto_20210414_1146.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0013_auto_20210414_1146.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0014_auto_20210701_1730">
+<span id="external-services-migrations-0014-auto-20210701-1730-module"></span><h2>external_services.migrations.0014_auto_20210701_1730 module<a class="headerlink" href="#module-external_services.migrations.0014_auto_20210701_1730" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0014_auto_20210701_1730.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0014_auto_20210701_1730.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0014_auto_20210701_1730.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0014_auto_20210701_1730.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0014_auto_20210701_1730.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('course',</span> <span class="pre">'0049_auto_20210701_1730'),</span> <span class="pre">('external_services',</span> <span class="pre">'0013_auto_20210414_1146')]</span></em><a class="headerlink" href="#external_services.migrations.0014_auto_20210701_1730.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0014_auto_20210701_1730.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='destination_region',</span> <span class="pre">field=&lt;django.db.models.fields.PositiveSmallIntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='enabled',</span> <span class="pre">field=&lt;django.db.models.fields.BooleanField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='privacy_notice_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='access_settings',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='consumer_key',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='consumer_secret',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='access',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='course_instance',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_group_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_weight',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='service',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0014_auto_20210701_1730.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.migrations.0014_auto_20210701_1730.validate_no_domain">
+<span class="sig-prename descclassname"><span class="pre">external_services.migrations.0014_auto_20210701_1730.</span></span><span class="sig-name descname"><span class="pre">validate_no_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0014_auto_20210701_1730.html#validate_no_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0014_auto_20210701_1730.validate_no_domain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0015_auto_20210812_1536">
+<span id="external-services-migrations-0015-auto-20210812-1536-module"></span><h2>external_services.migrations.0015_auto_20210812_1536 module<a class="headerlink" href="#module-external_services.migrations.0015_auto_20210812_1536" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0015_auto_20210812_1536.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0015_auto_20210812_1536.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0015_auto_20210812_1536.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0015_auto_20210812_1536.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0015_auto_20210812_1536.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('course',</span> <span class="pre">'0051_auto_20210812_1536'),</span> <span class="pre">('external_services',</span> <span class="pre">'0014_auto_20210701_1730')]</span></em><a class="headerlink" href="#external_services.migrations.0015_auto_20210812_1536.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0015_auto_20210812_1536.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterModelOptions</span>&#160; <span class="pre">name='linkservice',</span> <span class="pre">options={'ordering':</span> <span class="pre">['menu_label'],</span> <span class="pre">'verbose_name':</span> <span class="pre">'MODEL_NAME_LINK_SERVICE',</span> <span class="pre">'verbose_name_plural':</span> <span class="pre">'MODEL_NAME_LINK_SERVICE_PLURAL'}&gt;,</span> <span class="pre">&lt;AlterModelOptions</span>&#160; <span class="pre">name='ltiservice',</span> <span class="pre">options={'verbose_name':</span> <span class="pre">'MODEL_NAME_LTI_SERVICE',</span> <span class="pre">'verbose_name_plural':</span> <span class="pre">'MODEL_NAME_LTI_SERVICE_PLURAL'}&gt;,</span> <span class="pre">&lt;AlterModelOptions</span>&#160; <span class="pre">name='menuitem',</span> <span class="pre">options={'ordering':</span> <span class="pre">['course_instance',</span> <span class="pre">'menu_weight',</span> <span class="pre">'menu_label'],</span> <span class="pre">'verbose_name':</span> <span class="pre">'MODEL_NAME_MENU_ITEM',</span> <span class="pre">'verbose_name_plural':</span> <span class="pre">'MODEL_NAME_MENU_ITEM_PLURAL'}&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='destination_region',</span> <span class="pre">field=&lt;django.db.models.fields.PositiveSmallIntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='enabled',</span> <span class="pre">field=&lt;django.db.models.fields.BooleanField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='privacy_notice_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='access_settings',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='consumer_key',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='ltiservice',</span> <span class="pre">name='consumer_secret',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='access',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='course_instance',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='enabled',</span> <span class="pre">field=&lt;django.db.models.fields.BooleanField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_group_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_icon_class',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_label',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_weight',</span> <span class="pre">field=&lt;django.db.models.fields.IntegerField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='service',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0015_auto_20210812_1536.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="external_services.migrations.0015_auto_20210812_1536.validate_no_domain">
+<span class="sig-prename descclassname"><span class="pre">external_services.migrations.0015_auto_20210812_1536.</span></span><span class="sig-name descname"><span class="pre">validate_no_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0015_auto_20210812_1536.html#validate_no_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0015_auto_20210812_1536.validate_no_domain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0016_alter_menuitem_service">
+<span id="external-services-migrations-0016-alter-menuitem-service-module"></span><h2>external_services.migrations.0016_alter_menuitem_service module<a class="headerlink" href="#module-external_services.migrations.0016_alter_menuitem_service" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0016_alter_menuitem_service.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0016_alter_menuitem_service.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0016_alter_menuitem_service.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0016_alter_menuitem_service.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0016_alter_menuitem_service.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0015_auto_20210812_1536')]</span></em><a class="headerlink" href="#external_services.migrations.0016_alter_menuitem_service.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0016_alter_menuitem_service.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='service',</span> <span class="pre">field=&lt;lib.fields.DefaultForeignKey&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0016_alter_menuitem_service.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0017_lti1p3service">
+<span id="external-services-migrations-0017-lti1p3service-module"></span><h2>external_services.migrations.0017_lti1p3service module<a class="headerlink" href="#module-external_services.migrations.0017_lti1p3service" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0017_lti1p3service.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0017_lti1p3service.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0017_lti1p3service.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0017_lti1p3service.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0017_lti1p3service.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0016_alter_menuitem_service')]</span></em><a class="headerlink" href="#external_services.migrations.0017_lti1p3service.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0017_lti1p3service.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='LTI1p3Service',</span> <span class="pre">fields=[('linkservice_ptr',</span> <span class="pre">&lt;django.db.models.fields.related.OneToOneField&gt;),</span> <span class="pre">('login_url',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('client_id',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('deployment_id',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('jwks_url',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('share_name',</span> <span class="pre">&lt;django.db.models.fields.BooleanField&gt;)],</span> <span class="pre">options={'verbose_name':</span> <span class="pre">'MODEL_NAME_LTI1P3_SERVICE',</span> <span class="pre">'verbose_name_plural':</span> <span class="pre">'MODEL_NAME_LTI1P3_SERVICE_PLURAL'},</span> <span class="pre">bases=('external_services.linkservice',)&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0017_lti1p3service.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0018_alter_menuitem_menu_url">
+<span id="external-services-migrations-0018-alter-menuitem-menu-url-module"></span><h2>external_services.migrations.0018_alter_menuitem_menu_url module<a class="headerlink" href="#module-external_services.migrations.0018_alter_menuitem_menu_url" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0018_alter_menuitem_menu_url.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0018_alter_menuitem_menu_url.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0018_alter_menuitem_menu_url.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0018_alter_menuitem_menu_url.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0018_alter_menuitem_menu_url.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0017_lti1p3service')]</span></em><a class="headerlink" href="#external_services.migrations.0018_alter_menuitem_menu_url.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0018_alter_menuitem_menu_url.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='menuitem',</span> <span class="pre">name='menu_url',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0018_alter_menuitem_menu_url.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations.0019_alter_linkservice_destination_region">
+<span id="external-services-migrations-0019-alter-linkservice-destination-region-module"></span><h2>external_services.migrations.0019_alter_linkservice_destination_region module<a class="headerlink" href="#module-external_services.migrations.0019_alter_linkservice_destination_region" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="external_services.migrations.0019_alter_linkservice_destination_region.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">external_services.migrations.0019_alter_linkservice_destination_region.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/external_services/migrations/0019_alter_linkservice_destination_region.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#external_services.migrations.0019_alter_linkservice_destination_region.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0019_alter_linkservice_destination_region.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('external_services',</span> <span class="pre">'0018_alter_menuitem_menu_url')]</span></em><a class="headerlink" href="#external_services.migrations.0019_alter_linkservice_destination_region.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="external_services.migrations.0019_alter_linkservice_destination_region.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='linkservice',</span> <span class="pre">name='destination_region',</span> <span class="pre">field=&lt;django.db.models.fields.PositiveSmallIntegerField&gt;&gt;]</span></em><a class="headerlink" href="#external_services.migrations.0019_alter_linkservice_destination_region.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-external_services.migrations">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-external_services.migrations" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
