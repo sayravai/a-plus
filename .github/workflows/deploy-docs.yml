@@ -30,7 +30,7 @@ jobs:
 
       - name: Build documentation
         env:
-          BASE_URL: ${{ env.BASE_URL }}
+          APLUS_BASE_URL: ${{ env.BASE_URL }}
         run: |
           sphinx-build -b html docs/source docs/build/_build/html
 
