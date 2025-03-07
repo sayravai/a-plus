@@ -35,14 +35,8 @@ jobs:
           sphinx-build -b html docs/source docs/build/_build/html
 
       - name: Deploy to GitHub Pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git clone --depth 1 --branch master https://github.com/sayravai/apluslms.github.io.git master
-          rsync -av --delete docs/build/_build/html/ master/code/aplus/
-          cd master
-          git add .
-          git commit -m "Update A+ Sphinx documentation"
-          git push origin master
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/_build/html
+          destination_dir: code/aplus
