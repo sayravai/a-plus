@@ -27,8 +27,10 @@ jobs:
 
       - name: Set environment variables
         run: echo "BASE_URL=http://localhost:8000/" >> $GITHUB_ENV
-        
+
       - name: Build documentation
+        env:
+          BASE_URL: ${{ env.BASE_URL }}
         run: |
           sphinx-build -b html docs/source docs/build/_build/html
 
