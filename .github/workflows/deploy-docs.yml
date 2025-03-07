@@ -25,6 +25,9 @@ jobs:
           pip install -r requirements.txt
           pip install sphinx sphinx-rtd-theme
 
+      - name: Set environment variables
+        run: echo "BASE_URL=http://localhost:8000/" >> $GITHUB_ENV
+        
       - name: Build documentation
         run: |
           sphinx-build -b html docs/source docs/build/_build/html
