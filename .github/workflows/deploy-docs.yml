@@ -3,7 +3,7 @@ name: Deploy A+ Documentation
 on:
   push:
     branches:
-      - docs  # or the branch you want to trigger the deployment
+      - sphinxdocs  # or the branch you want to trigger the deployment
 
 jobs:
   build-and-deploy:
