@@ -1,0 +1,751 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>threshold package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">threshold package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-threshold.admin">threshold.admin module</a><ul>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin.get_course"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin.get_course()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin.list_display_links"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin.list_display_links</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin.list_filter</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin.media"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin.raw_id_fields"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin.raw_id_fields</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementRecentCourseInstanceListFilter"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementRecentCourseInstanceListFilter</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.admin.CourseModuleRequirementRecentCourseInstanceListFilter.course_instance_query"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirementRecentCourseInstanceListFilter.course_instance_query</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin.inlines"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin.inlines</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin.list_display_links"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin.list_display_links</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin.list_filter</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin.media"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin.raw_id_fields"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin.raw_id_fields</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">ThresholdAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdPointsInline"><code class="docutils literal notranslate"><span class="pre">ThresholdPointsInline</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.admin.ThresholdPointsInline.media"><code class="docutils literal notranslate"><span class="pre">ThresholdPointsInline.media</span></code></a></li>
+<li><a class="reference internal" href="#threshold.admin.ThresholdPointsInline.model"><code class="docutils literal notranslate"><span class="pre">ThresholdPointsInline.model</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-threshold.models">threshold.models module</a><ul>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.id"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.id</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.is_passed"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.is_passed()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.module"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.module</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.module_id"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.module_id</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.negative"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.negative</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.objects"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.objects</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.threshold"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.threshold</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.CourseModuleRequirement.threshold_id"><code class="docutils literal notranslate"><span class="pre">CourseModuleRequirement.threshold_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold.models.Threshold"><code class="docutils literal notranslate"><span class="pre">Threshold</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.models.Threshold.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Threshold.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Threshold.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.checks_str"><code class="docutils literal notranslate"><span class="pre">Threshold.checks_str()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.consume_harder_points"><code class="docutils literal notranslate"><span class="pre">Threshold.consume_harder_points</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.course_instance"><code class="docutils literal notranslate"><span class="pre">Threshold.course_instance</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.course_instance_id"><code class="docutils literal notranslate"><span class="pre">Threshold.course_instance_id</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.coursemodulerequirement_set"><code class="docutils literal notranslate"><span class="pre">Threshold.coursemodulerequirement_set</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.id"><code class="docutils literal notranslate"><span class="pre">Threshold.id</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.is_passed"><code class="docutils literal notranslate"><span class="pre">Threshold.is_passed()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.name"><code class="docutils literal notranslate"><span class="pre">Threshold.name</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.objects"><code class="docutils literal notranslate"><span class="pre">Threshold.objects</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.passed_categories"><code class="docutils literal notranslate"><span class="pre">Threshold.passed_categories</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.passed_exercises"><code class="docutils literal notranslate"><span class="pre">Threshold.passed_exercises</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.passed_modules"><code class="docutils literal notranslate"><span class="pre">Threshold.passed_modules</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.Threshold.points"><code class="docutils literal notranslate"><span class="pre">Threshold.points</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.difficulty"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.difficulty</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.id"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.id</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.limit"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.limit</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.objects"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.objects</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.order"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.order</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.threshold"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.threshold</span></code></a></li>
+<li><a class="reference internal" href="#threshold.models.ThresholdPoints.threshold_id"><code class="docutils literal notranslate"><span class="pre">ThresholdPoints.threshold_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-threshold.tests">threshold.tests module</a><ul>
+<li><a class="reference internal" href="#threshold.tests.MockCachedPoints"><code class="docutils literal notranslate"><span class="pre">MockCachedPoints</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.tests.MockCachedPoints.total"><code class="docutils literal notranslate"><span class="pre">MockCachedPoints.total()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#threshold.tests.MockTotals"><code class="docutils literal notranslate"><span class="pre">MockTotals</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest"><code class="docutils literal notranslate"><span class="pre">ThresholdTest</span></code></a><ul>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.GRADE_0"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.GRADE_0</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.GRADE_1"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.GRADE_1</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.GRADE_2"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.GRADE_2</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.GRADE_3"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.GRADE_3</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.GRADE_4"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.GRADE_4</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.GRADE_5"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.GRADE_5</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.setUpTestData"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.setUpTestData()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.test_difficulty_points"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.test_difficulty_points()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.test_difficulty_points_consumed"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.test_difficulty_points_consumed()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.test_normal_points"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.test_normal_points()</span></code></a></li>
+<li><a class="reference internal" href="#threshold.tests.ThresholdTest.test_pass"><code class="docutils literal notranslate"><span class="pre">ThresholdTest.test_pass()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-threshold.views">threshold.views module</a></li>
+<li><a class="reference internal" href="#module-threshold">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">threshold package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/threshold.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="threshold-package">
+<h1>threshold package<a class="headerlink" href="#threshold-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="threshold.migrations.html">threshold.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="threshold.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="threshold.migrations.html#module-threshold.migrations.0001_initial">threshold.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="threshold.migrations.html#module-threshold.migrations.0002_alter_threshold_consume_harder_points">threshold.migrations.0002_alter_threshold_consume_harder_points module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0002_alter_threshold_consume_harder_points.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0002_alter_threshold_consume_harder_points.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0002_alter_threshold_consume_harder_points.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="threshold.migrations.html#module-threshold.migrations.0003_auto_20210812_1536">threshold.migrations.0003_auto_20210812_1536 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0003_auto_20210812_1536.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0003_auto_20210812_1536.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="threshold.migrations.html#threshold.migrations.0003_auto_20210812_1536.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="threshold.migrations.html#module-threshold.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-threshold.admin">
+<span id="threshold-admin-module"></span><h2>threshold.admin module<a class="headerlink" href="#module-threshold.admin" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.admin.</span></span><span class="sig-name descname"><span class="pre">CourseModuleRequirementAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/admin.html#CourseModuleRequirementAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin.get_course">
+<span class="sig-name descname"><span class="pre">get_course</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/admin.html#CourseModuleRequirementAdmin.get_course"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin.get_course" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'get_course',</span> <span class="pre">'module',</span> <span class="pre">'__str__',</span> <span class="pre">'threshold')</span></em><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin.list_display_links">
+<span class="sig-name descname"><span class="pre">list_display_links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'__str__')</span></em><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin.list_display_links" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin.list_filter">
+<span class="sig-name descname"><span class="pre">list_filter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'threshold.admin.CourseModuleRequirementRecentCourseInstanceListFilter'&gt;,</span> <span class="pre">('threshold',</span> <span class="pre">&lt;class</span> <span class="pre">'django.contrib.admin.filters.RelatedOnlyFieldListFilter'&gt;),</span> <span class="pre">'negative')</span></em><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin.list_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin.raw_id_fields">
+<span class="sig-name descname"><span class="pre">raw_id_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('module',</span> <span class="pre">'threshold')</span></em><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin.raw_id_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('module__name',</span> <span class="pre">'module__course_instance__instance_name',</span> <span class="pre">'module__course_instance__course__code',</span> <span class="pre">'module__course_instance__course__name',</span> <span class="pre">'threshold__name')</span></em><a class="headerlink" href="#threshold.admin.CourseModuleRequirementAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementRecentCourseInstanceListFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.admin.</span></span><span class="sig-name descname"><span class="pre">CourseModuleRequirementRecentCourseInstanceListFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_admin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/admin.html#CourseModuleRequirementRecentCourseInstanceListFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.admin.CourseModuleRequirementRecentCourseInstanceListFilter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.admin_helpers.RecentCourseInstanceListFilter" title="lib.admin_helpers.RecentCourseInstanceListFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">RecentCourseInstanceListFilter</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.CourseModuleRequirementRecentCourseInstanceListFilter.course_instance_query">
+<span class="sig-name descname"><span class="pre">course_instance_query</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'module__course_instance'</span></em><a class="headerlink" href="#threshold.admin.CourseModuleRequirementRecentCourseInstanceListFilter.course_instance_query" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.admin.</span></span><span class="sig-name descname"><span class="pre">ThresholdAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/admin.html#ThresholdAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.admin.ThresholdAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin.inlines">
+<span class="sig-name descname"><span class="pre">inlines</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'threshold.admin.ThresholdPointsInline'&gt;,)</span></em><a class="headerlink" href="#threshold.admin.ThresholdAdmin.inlines" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'course_instance',</span> <span class="pre">'__str__',</span> <span class="pre">'consume_harder_points')</span></em><a class="headerlink" href="#threshold.admin.ThresholdAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin.list_display_links">
+<span class="sig-name descname"><span class="pre">list_display_links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'__str__')</span></em><a class="headerlink" href="#threshold.admin.ThresholdAdmin.list_display_links" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin.list_filter">
+<span class="sig-name descname"><span class="pre">list_filter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'lib.admin_helpers.RecentCourseInstanceListFilter'&gt;,</span> <span class="pre">'consume_harder_points')</span></em><a class="headerlink" href="#threshold.admin.ThresholdAdmin.list_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#threshold.admin.ThresholdAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin.raw_id_fields">
+<span class="sig-name descname"><span class="pre">raw_id_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course_instance',</span> <span class="pre">'passed_modules',</span> <span class="pre">'passed_categories',</span> <span class="pre">'passed_exercises')</span></em><a class="headerlink" href="#threshold.admin.ThresholdAdmin.raw_id_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('name',</span> <span class="pre">'course_instance__instance_name',</span> <span class="pre">'course_instance__course__code',</span> <span class="pre">'course_instance__course__name')</span></em><a class="headerlink" href="#threshold.admin.ThresholdAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdPointsInline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.admin.</span></span><span class="sig-name descname"><span class="pre">ThresholdPointsInline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/admin.html#ThresholdPointsInline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.admin.ThresholdPointsInline" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TabularInline</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdPointsInline.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#threshold.admin.ThresholdPointsInline.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.admin.ThresholdPointsInline.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#threshold.admin.ThresholdPointsInline.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#threshold.models.ThresholdPoints" title="threshold.models.ThresholdPoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">ThresholdPoints</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-threshold.models">
+<span id="threshold-models-module"></span><h2>threshold.models module<a class="headerlink" href="#module-threshold.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.models.</span></span><span class="sig-name descname"><span class="pre">CourseModuleRequirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/models.html#CourseModuleRequirement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.models.CourseModuleRequirement" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.is_passed">
+<span class="sig-name descname"><span class="pre">is_passed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cached_points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/models.html#CourseModuleRequirement.is_passed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.models.CourseModuleRequirement.is_passed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.module">
+<span class="sig-name descname"><span class="pre">module</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.module" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.module_id">
+<span class="sig-name descname"><span class="pre">module_id</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.module_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.negative">
+<span class="sig-name descname"><span class="pre">negative</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.negative" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.models.CourseModuleRequirement.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.threshold">
+<span class="sig-name descname"><span class="pre">threshold</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.threshold" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.CourseModuleRequirement.threshold_id">
+<span class="sig-name descname"><span class="pre">threshold_id</span></span><a class="headerlink" href="#threshold.models.CourseModuleRequirement.threshold_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.models.Threshold">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.models.</span></span><span class="sig-name descname"><span class="pre">Threshold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/models.html#Threshold"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.models.Threshold" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Course may set thresholds that signify module access or course grades.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="threshold.models.Threshold.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#threshold.models.Threshold.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="threshold.models.Threshold.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#threshold.models.Threshold.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.models.Threshold.checks_str">
+<span class="sig-name descname"><span class="pre">checks_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/models.html#Threshold.checks_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.models.Threshold.checks_str" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.consume_harder_points">
+<span class="sig-name descname"><span class="pre">consume_harder_points</span></span><a class="headerlink" href="#threshold.models.Threshold.consume_harder_points" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.course_instance">
+<span class="sig-name descname"><span class="pre">course_instance</span></span><a class="headerlink" href="#threshold.models.Threshold.course_instance" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.course_instance_id">
+<span class="sig-name descname"><span class="pre">course_instance_id</span></span><a class="headerlink" href="#threshold.models.Threshold.course_instance_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.coursemodulerequirement_set">
+<span class="sig-name descname"><span class="pre">coursemodulerequirement_set</span></span><a class="headerlink" href="#threshold.models.Threshold.coursemodulerequirement_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#threshold.models.Threshold.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.models.Threshold.is_passed">
+<span class="sig-name descname"><span class="pre">is_passed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cached_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.cache.html#exercise.cache.points.CachedPoints" title="exercise.cache.points.CachedPoints"><span class="pre">CachedPoints</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">unconfirmed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/threshold/models.html#Threshold.is_passed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.models.Threshold.is_passed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#threshold.models.Threshold.name" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.models.Threshold.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.passed_categories">
+<span class="sig-name descname"><span class="pre">passed_categories</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">models.ManyToManyField</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="course.html#course.models.LearningObjectCategory" title="course.models.LearningObjectCategory"><span class="pre">LearningObjectCategory</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Threshold'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#threshold.models.Threshold.passed_categories" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.passed_exercises">
+<span class="sig-name descname"><span class="pre">passed_exercises</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">models.ManyToManyField</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="exercise.html#exercise.exercise_models.BaseExercise" title="exercise.exercise_models.BaseExercise"><span class="pre">BaseExercise</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Threshold'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#threshold.models.Threshold.passed_exercises" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.passed_modules">
+<span class="sig-name descname"><span class="pre">passed_modules</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">models.ManyToManyField</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="course.html#course.models.CourseModule" title="course.models.CourseModule"><span class="pre">CourseModule</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'Threshold'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#threshold.models.Threshold.passed_modules" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.Threshold.points">
+<span class="sig-name descname"><span class="pre">points</span></span><a class="headerlink" href="#threshold.models.Threshold.points" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.models.</span></span><span class="sig-name descname"><span class="pre">ThresholdPoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">difficulty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/models.html#ThresholdPoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.models.ThresholdPoints" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.difficulty">
+<span class="sig-name descname"><span class="pre">difficulty</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.difficulty" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.limit">
+<span class="sig-name descname"><span class="pre">limit</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.limit" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.models.ThresholdPoints.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.order">
+<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.order" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.threshold">
+<span class="sig-name descname"><span class="pre">threshold</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.threshold" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.models.ThresholdPoints.threshold_id">
+<span class="sig-name descname"><span class="pre">threshold_id</span></span><a class="headerlink" href="#threshold.models.ThresholdPoints.threshold_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-threshold.tests">
+<span id="threshold-tests-module"></span><h2>threshold.tests module<a class="headerlink" href="#module-threshold.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.tests.MockCachedPoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.tests.</span></span><span class="sig-name descname"><span class="pre">MockCachedPoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#MockCachedPoints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.MockCachedPoints" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.tests.MockCachedPoints.total">
+<span class="sig-name descname"><span class="pre">total</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#MockCachedPoints.total"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.MockCachedPoints.total" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.tests.MockTotals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.tests.</span></span><span class="sig-name descname"><span class="pre">MockTotals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#MockTotals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.MockTotals" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">threshold.tests.</span></span><span class="sig-name descname"><span class="pre">ThresholdTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#ThresholdTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.ThresholdTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.testdata.CourseTestCase" title="lib.testdata.CourseTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseTestCase</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.GRADE_0">
+<span class="sig-name descname"><span class="pre">GRADE_0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;threshold.tests.MockCachedPoints</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.tests.ThresholdTest.GRADE_0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.GRADE_1">
+<span class="sig-name descname"><span class="pre">GRADE_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;threshold.tests.MockCachedPoints</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.tests.ThresholdTest.GRADE_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.GRADE_2">
+<span class="sig-name descname"><span class="pre">GRADE_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;threshold.tests.MockCachedPoints</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.tests.ThresholdTest.GRADE_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.GRADE_3">
+<span class="sig-name descname"><span class="pre">GRADE_3</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;threshold.tests.MockCachedPoints</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.tests.ThresholdTest.GRADE_3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.GRADE_4">
+<span class="sig-name descname"><span class="pre">GRADE_4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;threshold.tests.MockCachedPoints</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.tests.ThresholdTest.GRADE_4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.GRADE_5">
+<span class="sig-name descname"><span class="pre">GRADE_5</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;threshold.tests.MockCachedPoints</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#threshold.tests.ThresholdTest.GRADE_5" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#ThresholdTest.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.ThresholdTest.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.test_difficulty_points">
+<span class="sig-name descname"><span class="pre">test_difficulty_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#ThresholdTest.test_difficulty_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.ThresholdTest.test_difficulty_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.test_difficulty_points_consumed">
+<span class="sig-name descname"><span class="pre">test_difficulty_points_consumed</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#ThresholdTest.test_difficulty_points_consumed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.ThresholdTest.test_difficulty_points_consumed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.test_normal_points">
+<span class="sig-name descname"><span class="pre">test_normal_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#ThresholdTest.test_normal_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.ThresholdTest.test_normal_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="threshold.tests.ThresholdTest.test_pass">
+<span class="sig-name descname"><span class="pre">test_pass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/threshold/tests.html#ThresholdTest.test_pass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#threshold.tests.ThresholdTest.test_pass" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-threshold.views">
+<span id="threshold-views-module"></span><h2>threshold.views module<a class="headerlink" href="#module-threshold.views" title="Link to this heading"></a></h2>
+</section>
+<section id="module-threshold">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-threshold" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

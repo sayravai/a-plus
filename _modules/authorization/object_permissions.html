@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>authorization.object_permissions &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">authorization.object_permissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for authorization.object_permissions</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TYPE_CHECKING</span><span class="p">,</span>
+    <span class="n">Any</span><span class="p">,</span>
+    <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">Generator</span><span class="p">,</span>
+    <span class="n">Generic</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">TypeVar</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+    <span class="n">overload</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span> <span class="k">as</span> <span class="n">auth_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.payload</span><span class="w"> </span><span class="kn">import</span> <span class="n">Payload</span><span class="p">,</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">PermissionItem</span><span class="p">,</span> <span class="n">PermissionItemList</span><span class="p">,</span> <span class="n">Permissions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationFailed</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTAccessible</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnyUser</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Course</span><span class="p">,</span> <span class="n">CourseInstance</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">exercise.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.authentication&#39;</span><span class="p">)</span>
+
+<span class="n">_jwt_accessible_managers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">JWTAccessible</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<span class="n">TModel</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TModel&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">)</span>
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_jwt_accessible_class</span><span class="p">(</span><span class="n">type_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Type</span><span class="p">[</span><span class="n">TModel</span><span class="p">]],</span> <span class="n">Type</span><span class="p">[</span><span class="n">TModel</span><span class="p">]]:</span> <span class="o">...</span> <span class="c1"># noqa: E704</span>
+<span class="nd">@overload</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_jwt_accessible_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">TModel</span><span class="p">],</span> <span class="n">type_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">TModel</span><span class="p">]:</span> <span class="o">...</span> <span class="c1"># noqa: E704</span>
+<div class="viewcode-block" id="register_jwt_accessible_class">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.register_jwt_accessible_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_jwt_accessible_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">type_id</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span> <span class="c1"># type: ignore</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a decorator to register a model to be accessible through JWT</span>
+
+<span class="sd">    cls.objects must inherit JWTAccessible</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">TModel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">TModel</span><span class="p">]:</span>
+        <span class="k">global</span> <span class="n">_jwt_accessible_managers</span> <span class="c1"># pylint: disable=global-variable-not-assigned</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">objects</span><span class="p">,</span> <span class="n">JWTAccessible</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s2"> does not have a JWTAccessible manager&quot;</span><span class="p">)</span>
+        <span class="n">_jwt_accessible_managers</span><span class="p">[</span><span class="n">type_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">objects</span>
+        <span class="k">return</span> <span class="bp">cls</span>
+
+    <span class="k">if</span> <span class="n">type_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># cls is actually type_id</span>
+        <span class="n">type_id</span> <span class="o">=</span> <span class="bp">cls</span>
+        <span class="k">return</span> <span class="n">wrapper</span>
+    <span class="k">return</span> <span class="n">wrapper</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_objects_from_permission</span><span class="p">(</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">AnyUser</span><span class="p">,</span>
+        <span class="n">payload</span><span class="p">:</span> <span class="n">Payload</span><span class="p">,</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="c1"># pylint: disable=redefined-builtin</span>
+        <span class="n">permission</span><span class="p">:</span> <span class="n">Permission</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets the objects corresponding to a permission.</span>
+<span class="sd">    Raises AuthenticationFailed if the user doesn&#39;t have permission.</span>
+<span class="sd">    Create permissions do not have objects, so they should return empty lists if kwargs are otherwise ok.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_jwt_accessible_managers</span> <span class="c1"># pylint: disable=global-variable-not-assigned</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">_jwt_accessible_managers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">cls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Fail by default</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing jwt class for type </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="c1"># pylint: disable=logging-fstring-interpolation</span>
+        <span class="k">raise</span> <span class="n">AuthenticationFailed</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_PERMISSION -- </span><span class="si">{permission}</span><span class="s2">, </span><span class="si">{type}</span><span class="s2">, </span><span class="si">{kwargs}</span><span class="s2">&quot;</span><span class="p">),</span>
+            <span class="n">permission</span><span class="o">=</span><span class="n">permission</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span>
+        <span class="p">))</span>
+
+    <span class="n">items</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_jwt_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">permission</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">auth_settings</span><span class="p">()</span><span class="o">.</span><span class="n">DISABLE_LOGIN_CHECKS</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span> <span class="c1"># pylint: disable=logging-fstring-interpolation</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">sub</span><span class="si">}</span><span class="s2"> (signed by </span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">iss</span><span class="si">}</span><span class="s2">) tried to get </span><span class="si">{</span><span class="n">permission</span><span class="si">}</span><span class="s2"> access to </span><span class="si">{</span><span class="nb">type</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">kwargs</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">AuthenticationFailed</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_PERMISSION -- </span><span class="si">{permission}</span><span class="s2">, </span><span class="si">{type}</span><span class="s2">, </span><span class="si">{kwargs}</span><span class="s2">&quot;</span><span class="p">),</span>
+            <span class="n">permission</span><span class="o">=</span><span class="n">permission</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span>
+        <span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">items</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_objects_from_permissions</span><span class="p">(</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">AnyUser</span><span class="p">,</span>
+        <span class="n">payload</span><span class="p">:</span> <span class="n">Payload</span><span class="p">,</span>
+        <span class="n">permission_items</span><span class="p">:</span> <span class="n">PermissionItemList</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+            <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Permission</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
+            <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Permission</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+        <span class="p">]:</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+            <span class="k">for</span> <span class="nb">type</span><span class="p">,</span> <span class="n">permission</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">permission_items</span>
+            <span class="k">if</span> <span class="n">permission</span> <span class="o">==</span> <span class="n">Permission</span><span class="o">.</span><span class="n">CREATE</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">_get_objects_from_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">permission</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="p">),</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+            <span class="k">for</span> <span class="nb">type</span><span class="p">,</span> <span class="n">permission</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">permission_items</span>
+            <span class="k">if</span> <span class="n">permission</span> <span class="o">!=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">CREATE</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">_get_objects_from_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">permission</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="n">_objT</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;_objT&quot;</span><span class="p">)</span> <span class="c1"># noqa: N816</span>
+<div class="viewcode-block" id="ObjectPermissionList">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissionList">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectPermissionList</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">_objT</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PermissionItem</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Permission</span><span class="p">,</span> <span class="n">_objT</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="ObjectPermissionList.add_create">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissionList.add_create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">Permission</span><span class="o">.</span><span class="n">CREATE</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissionList.add">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissionList.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_objT</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">permission</span> <span class="o">!=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">CREATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">permission</span><span class="p">,</span> <span class="n">obj</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissionList.get_creates">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissionList.get_creates">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_creates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Permission</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">creates</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">!=</span> <span class="n">v</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissionList.get_create">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissionList.get_create">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_create</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">raise_if_multiple</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">Permission</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_creates</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">raise_if_multiple</span><span class="p">:</span>
+            <span class="n">v2</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Multiple permissions match given conditions&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissionList.has">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissionList.has">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">_objT</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="n">Permission</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">permission</span> <span class="o">!=</span> <span class="n">Permission</span><span class="o">.</span><span class="n">CREATE</span>
+        <span class="k">if</span> <span class="n">permission</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">((</span><span class="n">obj</span> <span class="o">==</span> <span class="n">o</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instances</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_objT</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Permission</span><span class="p">,</span> <span class="n">_objT</span><span class="p">]]):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ObjectPermissionList.from_payload">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissionList.from_payload">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_payload</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">AnyUser</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Payload</span><span class="p">,</span> <span class="n">permission_items</span><span class="p">:</span> <span class="n">PermissionItemList</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">creates</span><span class="p">,</span> <span class="n">perms</span><span class="o">.</span><span class="n">instances</span> <span class="o">=</span> <span class="n">_get_objects_from_permissions</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">permission_items</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ObjectPermissions">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissions">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectPermissions</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create permissions are dicts because the objects don&#39;t exist yet.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">courses</span><span class="p">:</span> <span class="n">ObjectPermissionList</span><span class="p">[</span><span class="s2">&quot;Course&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span> <span class="n">ObjectPermissionList</span><span class="p">[</span><span class="s2">&quot;CourseInstance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">:</span> <span class="n">ObjectPermissionList</span><span class="p">[</span><span class="s2">&quot;BaseExercise&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submissions</span><span class="p">:</span> <span class="n">ObjectPermissionList</span><span class="p">[</span><span class="s2">&quot;Submission&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ObjectPermissions.from_payload">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissions.from_payload">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_payload</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">AnyUser</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Payload</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts object from JWT payload&#39;s permissions and checks access.</span>
+<span class="sd">        Raise AuthenticationFailed if user has no access.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="n">ObjectPermissions</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">courses</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="o">.</span><span class="n">from_payload</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">payload</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">courses</span><span class="p">)</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">instances</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="o">.</span><span class="n">from_payload</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">payload</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="p">)</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">exercises</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="o">.</span><span class="n">from_payload</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">payload</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">exercises</span><span class="p">)</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">submissions</span> <span class="o">=</span> <span class="n">ObjectPermissionList</span><span class="o">.</span><span class="n">from_payload</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">payload</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">submissions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+
+
+<div class="viewcode-block" id="ObjectPermissions.to_payload_permissions">
+<a class="viewcode-back" href="../../authorization.html#authorization.object_permissions.ObjectPermissions.to_payload_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_payload_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Permissions</span><span class="p">:</span>
+        <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permissions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">target</span><span class="p">,</span> <span class="n">source</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">courses</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">courses</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">exercises</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">),</span>
+                    <span class="p">(</span><span class="n">permissions</span><span class="o">.</span><span class="n">submissions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">submissions</span><span class="p">),</span>
+                <span class="p">]:</span>
+            <span class="k">for</span> <span class="n">permission</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">permission</span><span class="p">,</span> <span class="n">kwargs</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">creates</span><span class="p">:</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">permission</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">permissions</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

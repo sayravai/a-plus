@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.fields &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.fields</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.fields</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">exceptions</span><span class="p">,</span> <span class="n">validators</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">related_descriptors</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DurationInput</span><span class="p">,</span> <span class="n">SearchSelect</span>
+
+
+<div class="viewcode-block" id="PercentField">
+<a class="viewcode-back" href="../../lib.html#lib.fields.PercentField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PercentField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A float in range 0.0 to 1.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PercentField.clean">
+<a class="viewcode-back" href="../../lib.html#lib.fields.PercentField.clean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">model_instance</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">model_instance</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">and</span> <span class="p">(</span><span class="n">value</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_NUMBER_MUST_BE_BETWEEN_0_AND_1&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DurationField">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DurationField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DurationField</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">MultiValueField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A field for entering a duration of time.</span>
+
+<span class="sd">    Uses the `lib.widgets.DurationInput` widget, which renders as a row of text</span>
+<span class="sd">    boxes, one for each given unit of time. The units of time are, by default,</span>
+<span class="sd">    days, hours and minutes, but they can also be customized by passing a list</span>
+<span class="sd">    of tuples where the first item is the name of the unit and the second item</span>
+<span class="sd">    is its factor relative to seconds (e.g. 3600 for hours).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DAYS</span> <span class="o">=</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;DURATION_UNIT_DAYS&#39;</span><span class="p">),</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span>
+    <span class="n">HOURS</span> <span class="o">=</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;DURATION_UNIT_HOURS&#39;</span><span class="p">),</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">MINUTES</span> <span class="o">=</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;DURATION_UNIT_MINUTES&#39;</span><span class="p">),</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">SECONDS</span> <span class="o">=</span> <span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;DURATION_UNIT_SECONDS&#39;</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Default units</span>
+    <span class="n">units</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">DAYS</span><span class="p">,</span> <span class="n">HOURS</span><span class="p">,</span> <span class="n">MINUTES</span><span class="p">,</span> <span class="n">SECONDS</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span> <span class="c1"># pylint: disable=keyword-arg-before-vararg</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">units</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">max_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">units</span> <span class="o">=</span> <span class="n">units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">=</span> <span class="n">min_value</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">factor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">widget</span><span class="o">=</span><span class="n">DurationInput</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">validators</span><span class="o">.</span><span class="n">MaxValueValidator</span><span class="p">(</span><span class="n">max_value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">validators</span><span class="o">.</span><span class="n">MinValueValidator</span><span class="p">(</span><span class="n">min_value</span><span class="p">))</span>
+
+<div class="viewcode-block" id="DurationField.compress">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DurationField.compress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the values given in different units into seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">total_seconds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">_name</span><span class="p">,</span> <span class="n">factor</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">total_seconds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">total_seconds</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">total_seconds</span> <span class="o">+=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">factor</span>
+        <span class="k">return</span> <span class="n">total_seconds</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SearchSelectField">
+<a class="viewcode-back" href="../../lib.html#lib.fields.SearchSelectField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SearchSelectField</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelMultipleChoiceField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A generic form field for the AplusSearchSelectAjax jQuery plugin, i.e.,</span>
+<span class="sd">    a form HTML widget that queries the API and supports selecting multiple</span>
+<span class="sd">    values from the search results. The JavaScript code is in the file</span>
+<span class="sd">    assets/js/ajax_search_select.js.</span>
+
+<span class="sd">    This field is mostly the same as the parent class ModelMultipleChoiceField.</span>
+<span class="sd">    It can be used with ModelForms when the model&#39;s ManyToManyField has so</span>
+<span class="sd">    many values that a normal select-multiple HTML widget would be unusable.</span>
+<span class="sd">    For example, selecting users from thousands of options would be infeasible</span>
+<span class="sd">    for the user.</span>
+
+<span class="sd">    The constructor has a new argument initial_queryset that is used to render</span>
+<span class="sd">    choices in the HTML select element instead of using queryset for that.</span>
+<span class="sd">    Queryset is still used for validating the user input. Initial_queryset is</span>
+<span class="sd">    used to supply the initial selection to the JavaScript code so that it can</span>
+<span class="sd">    be rendered on page load. Initial_queryset must not include any other</span>
+<span class="sd">    choices so that the size of the HTML page does not grow too much.</span>
+<span class="sd">    This field class and the JS code were designed to be used with user fields</span>
+<span class="sd">    when the database has thousands of users. Including all users in the options</span>
+<span class="sd">    of the HTML select element would slow down the page load.</span>
+
+<span class="sd">    When you use this field in a form class, you must also define the queryset</span>
+<span class="sd">    and initial_queryset arguments for this field. They can be set in the form</span>
+<span class="sd">    constructor if they depend on the form constructor parameters.</span>
+<span class="sd">    Furthermore, the HTML data attributes for the widget must be set</span>
+<span class="sd">    (usually in the form constructor). Check the documentation for the Javascript</span>
+<span class="sd">    code (assets/js/ajax_search_select.js).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">queryset</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">,</span>
+            <span class="n">initial_queryset</span><span class="p">:</span> <span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The queryset argument is used for validating the user input.</span>
+<span class="sd">        The initial_queryset argument is new to this class and it is used</span>
+<span class="sd">        to render the choices of the HTML select element. It must be set</span>
+<span class="sd">        to only the initially selected values of the model field, i.e.,</span>
+<span class="sd">        the old value of the model field so that the form can render the</span>
+<span class="sd">        initial selection without including massive amounts of data</span>
+<span class="sd">        (all valid choices) in the HTML page. The initial_queryset does not</span>
+<span class="sd">        restrict the user&#39;s choices since the widget queries the API for new</span>
+<span class="sd">        choices and the input is validated using queryset, which should be</span>
+<span class="sd">        &quot;bigger&quot; than initial_queryset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;widget&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;widget&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SearchSelect</span><span class="p">(</span><span class="n">ajax</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_queryset</span> <span class="o">=</span> <span class="n">initial_queryset</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queryset</span><span class="p">):</span>
+        <span class="c1"># This method was copied from the super class ModelChoiceField.</span>
+        <span class="c1"># It is otherwise the same, but we do not modify widget.choices here.</span>
+        <span class="c1"># widget.choices are controlled by the new initial_queryset variable.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queryset</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">queryset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">queryset</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="c1"># widget.choices must not be based on self.queryset.</span>
+        <span class="c1">#self.widget.choices = self.choices</span>
+
+    <span class="c1"># Override the queryset setter with our version.</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelMultipleChoiceField</span><span class="o">.</span><span class="n">_get_queryset</span><span class="p">,</span> <span class="n">_set_queryset</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_initial_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_queryset</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_initial_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_queryset</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initial_queryset</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">initial_queryset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">initial_queryset</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="c1"># Set the widget&#39;s choices to the initial_queryset so that only</span>
+        <span class="c1"># the initial values are rendered into the select-multiple HTML element.</span>
+        <span class="c1"># The parent class uses ModelChoiceIterator for setting widget.choices.</span>
+        <span class="c1"># ModelChoiceIterator uses field.queryset as its queryset, but we can</span>
+        <span class="c1"># overwrite it after constructing the object.</span>
+        <span class="n">choice_iterator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">choice_iterator</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initial_queryset</span>
+        <span class="c1"># The solution for setting widget.choices is copied from the parent class:</span>
+        <span class="c1"># ModelChoiceField, method _get_choices.</span>
+        <span class="c1"># https://github.com/django/django/blob/3ab5235d1dc94f7c8fe37a98c4e2c2337a5e5548/django/forms/models.py#L1231</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="n">choice_iterator</span>
+
+    <span class="n">initial_queryset</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">_get_initial_queryset</span><span class="p">,</span> <span class="n">_set_initial_queryset</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SearchSelectField.clean">
+<a class="viewcode-back" href="../../lib.html#lib.fields.SearchSelectField.clean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initial_queryset</span> <span class="o">=</span> <span class="n">qs</span>
+        <span class="k">return</span> <span class="n">qs</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UsersSearchSelectField">
+<a class="viewcode-back" href="../../lib.html#lib.fields.UsersSearchSelectField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UsersSearchSelectField</span><span class="p">(</span><span class="n">SearchSelectField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Search-select field for users.</span>
+
+<span class="sd">    Because the API uses only user IDs while many models refer to user profiles</span>
+<span class="sd">    and user profiles may have different IDs than the corresponding users,</span>
+<span class="sd">    this field class takes user IDs as input (in the form submission) and</span>
+<span class="sd">    converts them into profile IDs in the validation. The querysets attached</span>
+<span class="sd">    to this field must be of type UserProfile, not User, and likewise,</span>
+<span class="sd">    the corresponding model field must be a ManyToManyField to UserProfile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># to_field_name: use User IDs in the HTML widget since the queryset</span>
+        <span class="c1"># is attached to UserProfiles.</span>
+        <span class="c1"># to_field_name affects both the value attributes in the HTML form and</span>
+        <span class="c1"># the validation of the user&#39;s input.</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;to_field_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span> <span class="c1"># userprofile.user.id</span>
+        <span class="k">if</span> <span class="s1">&#39;widget&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="c1"># Create a search select widget specialized for users.</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;widget&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SearchSelect</span><span class="p">(</span>
+                <span class="n">ajax</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">display_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;full_name&#39;</span><span class="p">,</span> <span class="s1">&#39;student_id&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">],</span>
+                <span class="n">clipboard_fields</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;student_id&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">],</span>
+                <span class="n">field_sources</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s1">&#39;full_name&#39;</span><span class="p">:</span> <span class="s1">&#39;user.get_full_name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;user.email&#39;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">field_labels</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s1">&#39;student_id&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;CLIPBOARD_STUDENT_IDS&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;CLIPBOARD_EMAIL_ADDRESSES&#39;</span><span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="JSONField">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JSONField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores JSON object in a text field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JSONField.parse_json">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONField.parse_json">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_ENTER_VALID_JSON&#39;</span><span class="p">))</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="JSONField.print_json">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONField.print_json">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JSONField.from_db_value">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONField.from_db_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_db_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">expression</span><span class="p">,</span> <span class="n">connection</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONField</span><span class="o">.</span><span class="n">parse_json</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="JSONField.get_prep_value">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONField.get_prep_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_prep_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">JSONField</span><span class="o">.</span><span class="n">print_json</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JSONField.to_python">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONField.to_python">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">JSONField</span><span class="o">.</span><span class="n">parse_json</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JSONField.formfield">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONField.formfield">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">formfield</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;form_class&#39;</span><span class="p">:</span> <span class="n">JSONFormField</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">formfield</span><span class="p">(</span><span class="o">**</span><span class="n">defaults</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">field</span><span class="o">.</span><span class="n">help_text</span><span class="p">:</span>
+            <span class="n">field</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_ENTER_VALID_JSON&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">field</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="JSONFormField">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONFormField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JSONFormField</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A JSON text area.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="JSONFormField.to_python">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONFormField.to_python">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_python</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">JSONField</span><span class="o">.</span><span class="n">parse_json</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JSONFormField.prepare_value">
+<a class="viewcode-back" href="../../lib.html#lib.fields.JSONFormField.prepare_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prepare_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">JSONField</span><span class="o">.</span><span class="n">print_json</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># Overridden versions of Django&#39;s related descriptors.</span>
+<span class="c1"># Used by `DefaultForeignKey` and `DefaultOneToOneField`.</span>
+
+
+<div class="viewcode-block" id="DefaultForwardManyToOneDescriptor">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultForwardManyToOneDescriptor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultForwardManyToOneDescriptor</span><span class="p">(</span><span class="n">related_descriptors</span><span class="o">.</span><span class="n">ForwardManyToOneDescriptor</span><span class="p">):</span>
+<div class="viewcode-block" id="DefaultForwardManyToOneDescriptor.get_queryset">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultForwardManyToOneDescriptor.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">remote_field</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">db_manager</span><span class="p">(</span><span class="n">hints</span><span class="o">=</span><span class="n">hints</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DefaultForwardOneToOneDescriptor">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultForwardOneToOneDescriptor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultForwardOneToOneDescriptor</span><span class="p">(</span><span class="n">related_descriptors</span><span class="o">.</span><span class="n">ForwardOneToOneDescriptor</span><span class="p">):</span>
+<div class="viewcode-block" id="DefaultForwardOneToOneDescriptor.get_queryset">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultForwardOneToOneDescriptor.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="o">.</span><span class="n">remote_field</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">db_manager</span><span class="p">(</span><span class="n">hints</span><span class="o">=</span><span class="n">hints</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DefaultReverseOneToOneDescriptor">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultReverseOneToOneDescriptor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultReverseOneToOneDescriptor</span><span class="p">(</span><span class="n">related_descriptors</span><span class="o">.</span><span class="n">ReverseOneToOneDescriptor</span><span class="p">):</span>
+<div class="viewcode-block" id="DefaultReverseOneToOneDescriptor.get_queryset">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultReverseOneToOneDescriptor.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">hints</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">related</span><span class="o">.</span><span class="n">related_model</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">db_manager</span><span class="p">(</span><span class="n">hints</span><span class="o">=</span><span class="n">hints</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DefaultForeignKey">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultForeignKey">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultForeignKey</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A `ForeignKey` that uses `objects` to access the related object.</span>
+
+<span class="sd">    Django&#39;s `ForeignKey` uses the related model&#39;s base manager (which is</span>
+<span class="sd">    usually `django.db.models.manager.Manager`) when accessing the related</span>
+<span class="sd">    object. This means custom managers are not used. When using</span>
+<span class="sd">    `DefaultForeignKey`, the related model&#39;s default manager (usually</span>
+<span class="sd">    `objects`) is used when accessing the related object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">forward_related_accessor_class</span> <span class="o">=</span> <span class="n">DefaultForwardManyToOneDescriptor</span></div>
+
+
+
+<div class="viewcode-block" id="DefaultOneToOneField">
+<a class="viewcode-back" href="../../lib.html#lib.fields.DefaultOneToOneField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DefaultOneToOneField</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">OneToOneField</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A `OneToOneField` that uses `objects` to access the related object.</span>
+
+<span class="sd">    Django&#39;s `OneToOneField` uses the related model&#39;s base manager (which is</span>
+<span class="sd">    usually `django.db.models.manager.Manager`) when accessing the related</span>
+<span class="sd">    object. This means custom managers are not used. When using</span>
+<span class="sd">    `DefaultOneToOneField`, the related model&#39;s default manager (usually</span>
+<span class="sd">    `objects`) is used when accessing the related object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">related_accessor_class</span> <span class="o">=</span> <span class="n">DefaultReverseOneToOneDescriptor</span>
+    <span class="n">forward_related_accessor_class</span> <span class="o">=</span> <span class="n">DefaultForwardOneToOneDescriptor</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

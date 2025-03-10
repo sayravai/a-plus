@@ -1,0 +1,775 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.cache.basetypes &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.cache.basetypes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.cache.basetypes</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">InitVar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Prefetch</span><span class="p">,</span> <span class="n">QuerySet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseInstanceProto</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">CourseModuleProto</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.cache.cached</span><span class="w"> </span><span class="kn">import</span> <span class="n">CacheBase</span><span class="p">,</span> <span class="n">DBDataManager</span><span class="p">,</span> <span class="n">Dependencies</span><span class="p">,</span> <span class="n">ProxyManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threshold.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseModuleRequirement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.invalidate_util</span><span class="w"> </span><span class="kn">import</span> <span class="n">category_learning_objects</span><span class="p">,</span> <span class="n">module_learning_objects</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span><span class="p">,</span> <span class="n">CourseChapter</span><span class="p">,</span> <span class="n">LearningObject</span><span class="p">,</span> <span class="n">LearningObjectCategory</span><span class="p">,</span> <span class="n">LearningObjectProto</span>
+
+
+<div class="viewcode-block" id="add_by_difficulty">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.add_by_difficulty">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_by_difficulty</span><span class="p">(</span><span class="n">to</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">difficulty</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">difficulty</span> <span class="ow">in</span> <span class="n">to</span><span class="p">:</span>
+        <span class="n">to</span><span class="p">[</span><span class="n">difficulty</span><span class="p">]</span> <span class="o">+=</span> <span class="n">points</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">to</span><span class="p">[</span><span class="n">difficulty</span><span class="p">]</span> <span class="o">=</span> <span class="n">points</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_to</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ModuleEntryBase</span><span class="p">,</span> <span class="n">CategoryEntryBase</span><span class="p">,</span> <span class="n">TotalsBase</span><span class="p">],</span> <span class="n">exercise</span><span class="p">:</span> <span class="n">BaseExercise</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">exercise_count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">max_points</span> <span class="o">+=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span>
+    <span class="n">add_by_difficulty</span><span class="p">(</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">max_points_by_difficulty</span><span class="p">,</span>
+        <span class="n">exercise</span><span class="o">.</span><span class="n">difficulty</span><span class="p">,</span>
+        <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="EqById">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.EqById">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EqById</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Implements equality operator by comparing the id attribute&quot;&quot;&quot;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span> <span class="c1"># pylint: disable=unidiomatic-typecheck # noqa: E721</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span></div>
+
+
+
+<span class="n">LearningObjectEntry</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;LearningObjectEntry&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;LearningObjectEntryBase&quot;</span><span class="p">)</span>
+<span class="n">ModuleEntry</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;ModuleEntry&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;ModuleEntryBase&quot;</span><span class="p">)</span>
+<span class="n">CategoryEntry</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;CategoryEntry&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;CategoryEntryBase&quot;</span><span class="p">)</span>
+<span class="n">Totals</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Totals&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;TotalsBase&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ContentDBData">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ContentDBData</span><span class="p">(</span><span class="n">DBDataManager</span><span class="p">):</span>
+    <span class="n">exercises</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">LearningObject</span><span class="p">]</span>
+    <span class="n">needed_exercises</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">modules</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">]</span>
+    <span class="n">needed_modules</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">instances</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">CourseInstance</span><span class="p">]</span>
+    <span class="n">needed_instances</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">exercise_children</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]]</span>
+    <span class="n">module_children</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]]</span>
+    <span class="n">module_exercises</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]]</span>
+    <span class="n">instance_modules</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">CourseModule</span><span class="p">]]</span>
+    <span class="n">instance_exercises</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">needed_exercises</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">needed_modules</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">needed_instances</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise_children</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_children</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_exercises</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance_modules</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance_exercises</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="ContentDBData.add">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.add">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proxy</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">CachedDataBase</span><span class="p">,</span> <span class="n">ModuleEntryBase</span><span class="p">,</span> <span class="n">LearningObjectEntryBase</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">model_id</span> <span class="o">=</span> <span class="n">proxy</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">CachedDataBase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">model_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needed_instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">ModuleEntryBase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">model_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needed_modules</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proxy</span><span class="p">,</span> <span class="n">LearningObjectEntryBase</span><span class="p">)</span> <span class="ow">and</span> <span class="n">model_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needed_exercises</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_modules_qs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_qs</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">CourseModule</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CourseModule</span><span class="p">]:</span>
+        <span class="n">new_modules</span> <span class="o">=</span> <span class="n">module_qs</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+            <span class="n">Prefetch</span><span class="p">(</span>
+                <span class="s2">&quot;requirements&quot;</span><span class="p">,</span>
+                <span class="n">queryset</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">CourseModuleRequirement</span><span class="o">.</span><span class="n">objects</span>
+                    <span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;threshold&quot;</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+                        <span class="s2">&quot;passed_modules&quot;</span>
+                        <span class="s2">&quot;passed_categories&quot;</span><span class="p">,</span>
+                        <span class="n">Prefetch</span><span class="p">(</span>
+                            <span class="s2">&quot;passed_exercises&quot;</span><span class="p">,</span>
+                            <span class="n">queryset</span><span class="o">=</span><span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;parent&quot;</span><span class="p">),</span>
+                        <span class="p">),</span>
+                        <span class="s2">&quot;points&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">new_modules</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">new_modules</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance_modules</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">course_instance_id</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+        <span class="n">new_exercises</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module__in</span><span class="o">=</span><span class="n">new_modules</span><span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">exercise</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">new_exercises</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">needed_exercises</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">new_exercises</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">new_exercises</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exercise</span><span class="o">.</span><span class="n">parent_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">exercise_children</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">parent_id</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exercise</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">new_exercises</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">module_exercises</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module_id</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exercise</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">exercise</span><span class="o">.</span><span class="n">parent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">module_children</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">course_module_id</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exercise</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_modules</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_ids</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CourseModule</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_modules_qs</span><span class="p">(</span><span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="n">module_ids</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ContentDBData.fetch">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.fetch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needed_instances</span><span class="p">:</span>
+            <span class="n">new_instances</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">needed_instances</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">new_instances</span>
+            <span class="p">)</span>
+
+            <span class="n">new_modules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_modules_qs</span><span class="p">(</span><span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_instance__in</span><span class="o">=</span><span class="n">new_instances</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needed_modules</span><span class="o">.</span><span class="n">difference_update</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">new_modules</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needed_instances</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needed_modules</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_modules</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">needed_modules</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needed_modules</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">needed_exercises</span><span class="p">:</span>
+            <span class="n">new_exercises</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">id__in</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">needed_exercises</span><span class="p">)</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+            <span class="c1"># This also sets the exercises we just loaded in self.exercises</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_modules</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">course_module_id</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">new_exercises</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">course_module_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">needed_exercises</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_instance">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_instance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CourseInstance</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">instance_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instances</span><span class="p">[</span><span class="n">instance_id</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_module">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_module">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CourseModule</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">module_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">module_id</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_exercise">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_exercise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exercise_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LearningObject</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">exercise_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">[</span><span class="n">exercise_id</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_exercise_children">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_exercise_children">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercise_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_children</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parent_id</span><span class="p">,</span> <span class="p">[])</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_module_children">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_module_children">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_module_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_children</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module_id</span><span class="p">,</span> <span class="p">[])</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_module_exercises">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_module_exercises">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_module_exercises</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_exercises</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module_id</span><span class="p">,</span> <span class="p">[])</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_instance_modules">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_instance_modules">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_instance_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CourseModule</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance_modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">instance_id</span><span class="p">,</span> <span class="p">[])</span></div>
+
+
+<div class="viewcode-block" id="ContentDBData.get_instance_exercises">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ContentDBData.get_instance_exercises">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_instance_exercises</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]:</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance_modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">instance_id</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">exercise</span>
+            <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span>
+            <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_module_exercises</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LearningObjectEntryBase">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.LearningObjectEntryBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearningObjectEntryBase</span><span class="p">(</span><span class="n">LearningObjectProto</span><span class="p">,</span> <span class="n">CacheBase</span><span class="p">,</span> <span class="n">EqById</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ModuleEntry</span><span class="p">,</span> <span class="n">LearningObjectEntry</span><span class="p">]):</span>
+    <span class="n">PROTO_BASES</span> <span class="o">=</span> <span class="p">(</span><span class="n">LearningObjectProto</span><span class="p">,)</span>
+    <span class="n">DBCLS</span> <span class="o">=</span> <span class="n">ContentDBData</span>
+    <span class="n">KEY_PREFIX</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+    <span class="n">NUM_PARAMS</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">INVALIDATORS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">LearningObject</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,)),</span>
+        <span class="p">(</span><span class="n">LearningObject</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;parent_id&quot;</span><span class="p">,)),</span> <span class="c1"># In case the parent changed</span>
+        <span class="p">(</span><span class="n">LearningObjectCategory</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="n">category_learning_objects</span><span class="p">(</span><span class="k">lambda</span> <span class="n">lobj</span><span class="p">:</span> <span class="p">[</span><span class="n">lobj</span><span class="o">.</span><span class="n">id</span><span class="p">])),</span>
+        <span class="p">(</span><span class="n">CourseModule</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="n">module_learning_objects</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;exercise&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+    <span class="c1"># Disable repr for ancestors so there are no infinite loops</span>
+    <span class="n">module</span><span class="p">:</span> <span class="n">ModuleEntry</span>
+    <span class="n">parent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LearningObjectEntry</span><span class="p">]</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">category_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">category_status</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">confirm_the_level</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">module_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">module_status</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">order</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">hierarchical_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">number</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">link</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">submissions_link</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">requirements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">opening_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">reading_opening_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="n">closing_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">late_allowed</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">late_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">late_percent</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">is_empty</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">points_to_pass</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">difficulty</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">max_submissions</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">allow_assistant_viewing</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObjectEntry</span><span class="p">]</span>
+    <span class="n">submittable</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">grading_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">model_answer_modules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ModuleEntry</span><span class="p">]</span>
+    <span class="n">has_submittable_files</span><span class="p">:</span> <span class="nb">bool</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">course_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span>
+
+<div class="viewcode-block" id="LearningObjectEntryBase.parent_list">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.LearningObjectEntryBase.parent_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parent_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent_list</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="LearningObjectEntryBase.get_child_proxies">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.LearningObjectEntryBase.get_child_proxies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_child_proxies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">CacheBase</span><span class="p">]:</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">children</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">precreated</span><span class="p">:</span> <span class="n">ProxyManager</span><span class="p">,</span>
+            <span class="n">prefetched_data</span><span class="p">:</span> <span class="n">LearningObjectEntryBase</span><span class="o">.</span><span class="n">DBCLS</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dependencies</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns object that is cached into self.data &quot;&quot;&quot;</span>
+        <span class="n">lobj_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lobj</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_exercise</span><span class="p">(</span><span class="n">lobj_id</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">lobj</span><span class="o">.</span><span class="n">course_module_id</span><span class="p">)</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_exercise_children</span><span class="p">(</span><span class="n">lobj_id</span><span class="p">)</span>
+
+        <span class="n">category</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">category</span>
+
+        <span class="n">exercise_info</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">exercise_info</span>
+        <span class="n">has_submittable_files</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">bool</span><span class="p">(</span><span class="n">exercise_info</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">exercise_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;form_spec&#39;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exercise_info</span><span class="p">[</span><span class="s1">&#39;form_spec&#39;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="n">exercise_info</span><span class="p">[</span><span class="s1">&#39;form_spec&#39;</span><span class="p">]))</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">ModuleEntryBase</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lobj</span><span class="o">.</span><span class="n">parent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">LearningObjectEntryBase</span><span class="p">,</span> <span class="n">lobj</span><span class="o">.</span><span class="n">parent_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_submittable_files</span> <span class="o">=</span> <span class="n">has_submittable_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category_id</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category_status</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm_the_level</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">confirm_the_level</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_id</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_status</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">lobj</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hierarchical_name</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">hierarchical_name</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">order</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">lobj</span><span class="o">.</span><span class="n">number</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submissions_link</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">get_submission_list_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requirements</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reading_opening_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">reading_opening_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closing_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">late_allowed</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">late_submissions_allowed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">late_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">late_submission_deadline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">late_percent</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_late_submission_point_worth</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">is_empty</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">LearningObjectEntryBase</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">children</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lobj</span><span class="p">,</span> <span class="n">CourseChapter</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_answer_modules</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">ModuleEntryBase</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">lobj</span><span class="o">.</span><span class="n">model_answer_modules</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_answer_modules</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lobj</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">submittable</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">points_to_pass</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">points_to_pass</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">difficulty</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">difficulty</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_submissions</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">max_submissions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_points</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">max_points</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">allow_assistant_viewing</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">allow_assistant_viewing</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grading_mode</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">grading_mode</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">submittable</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">points_to_pass</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">difficulty</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_submissions</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_points</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">allow_assistant_viewing</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grading_mode</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># This is required so that dependency detection doesn&#39;t trigger</span>
+        <span class="c1"># when loaded the next time.</span>
+        <span class="n">precreated</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+
+        <span class="c1"># We cannot rely on INVALIDATORS as the parent of a child might change,</span>
+        <span class="c1"># in which case this object wouldn&#39;t be invalidated (and the children would be wrong)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">LearningObjectEntryBase</span><span class="p">:</span> <span class="p">[</span><span class="n">proxy</span><span class="o">.</span><span class="n">_params</span> <span class="k">for</span> <span class="n">proxy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">]}</span></div>
+
+
+
+<div class="viewcode-block" id="ModuleEntryBase">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ModuleEntryBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModuleEntryBase</span><span class="p">(</span><span class="n">CourseModuleProto</span><span class="p">,</span> <span class="n">CacheBase</span><span class="p">,</span> <span class="n">EqById</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">LearningObjectEntry</span><span class="p">]):</span>
+    <span class="n">PROTO_BASES</span> <span class="o">=</span> <span class="p">(</span><span class="n">CourseModuleProto</span><span class="p">,)</span>
+    <span class="n">DBCLS</span> <span class="o">=</span> <span class="n">ContentDBData</span>
+    <span class="n">KEY_PREFIX</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;module&#39;</span>
+    <span class="n">NUM_PARAMS</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">INVALIDATORS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">CourseModule</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,)),</span>
+        <span class="p">(</span><span class="n">LearningObject</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;course_module_id&quot;</span><span class="p">,)),</span>
+        <span class="p">(</span>
+            <span class="n">LearningObjectCategory</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span>
+            <span class="n">category_learning_objects</span><span class="p">(</span><span class="k">lambda</span> <span class="n">lobj</span><span class="p">:</span> <span class="p">[</span><span class="n">lobj</span><span class="o">.</span><span class="n">course_module_id</span><span class="p">]),</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;module&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;module&#39;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">order</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">number</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">introduction</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">link</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">requirements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">opening_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">reading_opening_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="n">closing_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">late_allowed</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">late_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">late_percent</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">points_to_pass</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">exercise_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_points_by_difficulty</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">instance</span><span class="p">:</span> <span class="s2">&quot;CachedDataBase&quot;</span>
+    <span class="n">children</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">LearningObjectEntry</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">course_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CachedDataBase&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+
+<div class="viewcode-block" id="ModuleEntryBase.is_visible">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ModuleEntryBase.is_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span></div>
+
+
+<div class="viewcode-block" id="ModuleEntryBase.is_listed">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ModuleEntryBase.is_listed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_listed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_visible</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNLISTED</span></div>
+
+
+<div class="viewcode-block" id="ModuleEntryBase.is_in_maintenance">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ModuleEntryBase.is_in_maintenance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_in_maintenance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">MAINTENANCE</span></div>
+
+
+<div class="viewcode-block" id="ModuleEntryBase.get_child_proxies">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.ModuleEntryBase.get_child_proxies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_child_proxies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CacheBase</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_data</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">precreated</span><span class="p">:</span> <span class="n">ProxyManager</span><span class="p">,</span>
+            <span class="n">prefetched_data</span><span class="p">:</span> <span class="n">ModuleEntryBase</span><span class="o">.</span><span class="n">DBCLS</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dependencies</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns object that is cached into self.data &quot;&quot;&quot;</span>
+        <span class="n">module_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">module_id</span><span class="p">)</span>
+        <span class="n">lobjs</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_module_exercises</span><span class="p">(</span><span class="n">module_id</span><span class="p">)</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_module_children</span><span class="p">(</span><span class="n">module_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">introduction</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">introduction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requirements</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">all</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reading_opening_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">reading_opening_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closing_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">late_allowed</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">late_submissions_allowed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">late_time</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">late_submission_deadline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">late_percent</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">get_late_submission_point_worth</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points_to_pass</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">points_to_pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">CachedDataBase</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">course_instance_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">LearningObjectEntryBase</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_points</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_points_by_difficulty</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">lobjs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exercise</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">confirm_the_level</span> <span class="ow">and</span> <span class="n">exercise</span><span class="o">.</span><span class="n">is_visible</span><span class="p">():</span>
+                    <span class="n">_add_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exercise</span><span class="p">)</span>
+
+        <span class="c1"># We rely on the module of an exercise never changing, so the invalidators do the work</span>
+        <span class="c1"># without the need for dependencies</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+
+
+<div class="viewcode-block" id="CategoryEntryBase">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CategoryEntryBase">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CategoryEntryBase</span><span class="p">(</span><span class="n">EqById</span><span class="p">):</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;category&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;category&#39;</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">points_to_pass</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">exercise_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_points_by_difficulty</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CategoryEntryBase.is_visible">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CategoryEntryBase.is_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span><span class="p">,</span>
+            <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">NOTOTAL</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CategoryEntryBase.is_listed">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CategoryEntryBase.is_listed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_listed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_visible</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CategoryEntryBase.is_in_maintenance">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CategoryEntryBase.is_in_maintenance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_in_maintenance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TotalsBase">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.TotalsBase">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TotalsBase</span><span class="p">:</span>
+    <span class="n">exercise_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_points_by_difficulty</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">min_group_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100000</span>
+    <span class="n">max_group_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span></div>
+
+
+
+<span class="n">CachedDataBaseType</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;CachedDataBaseType&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;CachedDataBase&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="CachedDataBase">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CachedDataBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedDataBase</span><span class="p">(</span><span class="n">CourseInstanceProto</span><span class="p">,</span> <span class="n">CacheBase</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">ModuleEntry</span><span class="p">,</span> <span class="n">LearningObjectEntry</span><span class="p">,</span> <span class="n">CategoryEntry</span><span class="p">,</span> <span class="n">Totals</span><span class="p">]):</span>
+    <span class="n">PROTO_BASES</span> <span class="o">=</span> <span class="p">(</span><span class="n">CourseInstanceProto</span><span class="p">,)</span>
+    <span class="n">DBCLS</span> <span class="o">=</span> <span class="n">ContentDBData</span>
+    <span class="n">KEY_PREFIX</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;instance&#39;</span>
+    <span class="n">NUM_PARAMS</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">INVALIDATORS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">CourseInstance</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,)),</span>
+        <span class="p">(</span><span class="n">CourseModule</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;course_instance_id&quot;</span><span class="p">,)),</span>
+        <span class="p">(</span><span class="n">LearningObject</span><span class="p">,</span> <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span> <span class="p">([</span><span class="s2">&quot;course_module&quot;</span><span class="p">,</span> <span class="s2">&quot;course_instance_id&quot;</span><span class="p">],)),</span>
+        <span class="p">(</span>
+            <span class="n">LearningObjectCategory</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">post_delete</span><span class="p">,</span> <span class="n">post_save</span><span class="p">],</span>
+            <span class="n">category_learning_objects</span><span class="p">(</span><span class="k">lambda</span> <span class="n">lobj</span><span class="p">:</span> <span class="p">[</span><span class="n">lobj</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance_id</span><span class="p">]),</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">instance_id</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">course_url_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+    <span class="n">created</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">module_index</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">ModuleEntry</span><span class="p">]</span>
+    <span class="n">exercise_index</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">LearningObjectEntry</span><span class="p">]</span>
+    <span class="n">paths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span>
+    <span class="n">modules</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ModuleEntry</span><span class="p">]</span>
+    <span class="n">is_on_lifesupport</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">lifesupport_start</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="n">categories</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">CategoryEntry</span><span class="p">]</span>
+    <span class="n">total</span><span class="p">:</span> <span class="n">Totals</span>
+
+<div class="viewcode-block" id="CachedDataBase.get_course_url_kwargs">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CachedDataBase.get_course_url_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_url_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_url_kwargs</span></div>
+
+
+<div class="viewcode-block" id="CachedDataBase.get">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CachedDataBase.get">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span> <span class="c1"># pylint: disable=arguments-differ</span>
+            <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">CachedDataBaseType</span><span class="p">],</span>
+            <span class="n">instance</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">CourseInstance</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+            <span class="n">prefetch_children</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CachedDataBaseType</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span>
+            <span class="n">params</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">parameter_ids</span><span class="p">(</span><span class="n">instance</span><span class="p">),</span>
+            <span class="n">prefetch_children</span><span class="o">=</span><span class="n">prefetch_children</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedDataBase.get_child_proxies">
+<a class="viewcode-back" href="../../../exercise.cache.html#exercise.cache.basetypes.CachedDataBase.get_child_proxies">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_child_proxies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CacheBase</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_index</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_data</span><span class="p">(</span> <span class="c1"># pylint: disable=too-many-locals</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">precreated</span><span class="p">:</span> <span class="n">ProxyManager</span><span class="p">,</span>
+            <span class="n">prefetched_data</span><span class="p">:</span> <span class="n">CachedDataBase</span><span class="o">.</span><span class="n">DBCLS</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dependencies</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns object that is cached into self.data &quot;&quot;&quot;</span>
+        <span class="n">instance_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_instance</span><span class="p">(</span><span class="n">instance_id</span><span class="p">)</span>
+        <span class="n">module_objs</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_instance_modules</span><span class="p">(</span><span class="n">instance_id</span><span class="p">)</span>
+        <span class="n">lobjs</span> <span class="o">=</span> <span class="n">prefetched_data</span><span class="o">.</span><span class="n">get_instance_exercises</span><span class="p">(</span><span class="n">instance_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_url_kwargs</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">get_url_kwargs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_on_lifesupport</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">is_on_lifesupport</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lifesupport_start</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">lifesupport_start</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">exercise_index</span> <span class="o">=</span> <span class="n">exercise_index</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_index</span> <span class="o">=</span> <span class="n">module_index</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="n">paths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="n">categories</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total</span> <span class="o">=</span> <span class="n">total</span> <span class="o">=</span> <span class="n">TotalsBase</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">lobj</span> <span class="ow">in</span> <span class="n">lobjs</span><span class="p">:</span>
+            <span class="n">exercise_index</span><span class="p">[</span><span class="n">lobj</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">LearningObjectEntryBase</span><span class="p">,</span> <span class="n">lobj</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">category</span> <span class="o">=</span> <span class="n">lobj</span><span class="o">.</span><span class="n">category</span>
+            <span class="k">if</span> <span class="n">category</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+                <span class="n">categories</span><span class="p">[</span><span class="n">category</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">CategoryEntryBase</span><span class="p">(</span>
+                    <span class="nb">id</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">status</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">category</span><span class="p">),</span>
+                    <span class="n">points_to_pass</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">points_to_pass</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Collect each module.</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">module_objs</span><span class="p">:</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">precreated</span><span class="o">.</span><span class="n">get_or_create_proxy</span><span class="p">(</span><span class="n">ModuleEntryBase</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+            <span class="n">module_index</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span>
+            <span class="n">paths</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">precreated</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_child_proxies</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">exercise_index</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">paths</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="n">entry</span><span class="o">.</span><span class="n">get_path</span><span class="p">()]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">id</span>
+
+        <span class="c1"># Augment submittable exercise parameters.</span>
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">lobjs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exercise</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">):</span>
+                <span class="n">entry</span> <span class="o">=</span> <span class="n">exercise_index</span><span class="p">[</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+                <span class="c1"># TODO: should this be is_listed?</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">entry</span><span class="o">.</span><span class="n">confirm_the_level</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_visible</span><span class="p">():</span>
+                    <span class="n">_add_to</span><span class="p">(</span><span class="n">categories</span><span class="p">[</span><span class="n">entry</span><span class="o">.</span><span class="n">category_id</span><span class="p">],</span> <span class="n">exercise</span><span class="p">)</span>
+                    <span class="n">_add_to</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">exercise</span><span class="p">)</span>
+
+                    <span class="n">total</span><span class="o">.</span><span class="n">max_group_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">total</span><span class="o">.</span><span class="n">max_group_size</span><span class="p">,</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_group_size</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_group_size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">exercise</span><span class="o">.</span><span class="n">min_group_size</span> <span class="o">&lt;</span> <span class="n">total</span><span class="o">.</span><span class="n">min_group_size</span><span class="p">:</span>
+                        <span class="n">total</span><span class="o">.</span><span class="n">min_group_size</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">min_group_size</span>
+
+        <span class="k">if</span> <span class="n">total</span><span class="o">.</span><span class="n">min_group_size</span> <span class="o">&gt;</span> <span class="n">total</span><span class="o">.</span><span class="n">max_group_size</span><span class="p">:</span>
+            <span class="n">total</span><span class="o">.</span><span class="n">min_group_size</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c1"># We rely on the instance of a module never changing, so the invalidators do the work</span>
+        <span class="c1"># without the need for dependencies</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

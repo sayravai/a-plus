@@ -1,0 +1,488 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lti_tool package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">lti_tool package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-lti_tool.urls">lti_tool.urls module</a></li>
+<li><a class="reference internal" href="#module-lti_tool.utils">lti_tool.utils module</a><ul>
+<li><a class="reference internal" href="#lti_tool.utils.get_launch_data_storage"><code class="docutils literal notranslate"><span class="pre">get_launch_data_storage()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.utils.get_launch_url"><code class="docutils literal notranslate"><span class="pre">get_launch_url()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.utils.get_tool_conf"><code class="docutils literal notranslate"><span class="pre">get_tool_conf()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.utils.has_lti_access_to_course"><code class="docutils literal notranslate"><span class="pre">has_lti_access_to_course()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.utils.parse_lti_session_params"><code class="docutils literal notranslate"><span class="pre">parse_lti_session_params()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.utils.send_lti_points"><code class="docutils literal notranslate"><span class="pre">send_lti_points()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lti_tool.views">lti_tool.views module</a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView.access_mode"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView.dispatch"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView.dispatch()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView.exercise_url_name"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView.exercise_url_name</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView.post"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView.post()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView.post_url_name"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView.post_url_name</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView.submission_url_name"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView.submission_url_name</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiExerciseView.template_name"><code class="docutils literal notranslate"><span class="pre">LtiExerciseView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiInstanceView"><code class="docutils literal notranslate"><span class="pre">LtiInstanceView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiInstanceView.access_mode"><code class="docutils literal notranslate"><span class="pre">LtiInstanceView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiInstanceView.get"><code class="docutils literal notranslate"><span class="pre">LtiInstanceView.get()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiInstanceView.template_name"><code class="docutils literal notranslate"><span class="pre">LtiInstanceView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiLaunchView"><code class="docutils literal notranslate"><span class="pre">LtiLaunchView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiLaunchView.access_mode"><code class="docutils literal notranslate"><span class="pre">LtiLaunchView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiLaunchView.dispatch"><code class="docutils literal notranslate"><span class="pre">LtiLaunchView.dispatch()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiLaunchView.post"><code class="docutils literal notranslate"><span class="pre">LtiLaunchView.post()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiModuleView"><code class="docutils literal notranslate"><span class="pre">LtiModuleView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiModuleView.access_mode"><code class="docutils literal notranslate"><span class="pre">LtiModuleView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiModuleView.get"><code class="docutils literal notranslate"><span class="pre">LtiModuleView.get()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiModuleView.template_name"><code class="docutils literal notranslate"><span class="pre">LtiModuleView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin"><code class="docutils literal notranslate"><span class="pre">LtiSelectContentMixin</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin.access_mode"><code class="docutils literal notranslate"><span class="pre">LtiSelectContentMixin.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin.get_common_objects"><code class="docutils literal notranslate"><span class="pre">LtiSelectContentMixin.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin.get_resource_objects"><code class="docutils literal notranslate"><span class="pre">LtiSelectContentMixin.get_resource_objects()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectContentView"><code class="docutils literal notranslate"><span class="pre">LtiSelectContentView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectContentView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">LtiSelectContentView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectContentView.template_name"><code class="docutils literal notranslate"><span class="pre">LtiSelectContentView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectCourseView"><code class="docutils literal notranslate"><span class="pre">LtiSelectCourseView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectCourseView.get"><code class="docutils literal notranslate"><span class="pre">LtiSelectCourseView.get()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectCourseView.post"><code class="docutils literal notranslate"><span class="pre">LtiSelectCourseView.post()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectCourseView.template_name"><code class="docutils literal notranslate"><span class="pre">LtiSelectCourseView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectExerciseView"><code class="docutils literal notranslate"><span class="pre">LtiSelectExerciseView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectExerciseView.post"><code class="docutils literal notranslate"><span class="pre">LtiSelectExerciseView.post()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectModuleView"><code class="docutils literal notranslate"><span class="pre">LtiSelectModuleView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectModuleView.get"><code class="docutils literal notranslate"><span class="pre">LtiSelectModuleView.get()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectModuleView.post"><code class="docutils literal notranslate"><span class="pre">LtiSelectModuleView.post()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSelectModuleView.template_name"><code class="docutils literal notranslate"><span class="pre">LtiSelectModuleView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSessionMixin"><code class="docutils literal notranslate"><span class="pre">LtiSessionMixin</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiSessionMixin.dispatch"><code class="docutils literal notranslate"><span class="pre">LtiSessionMixin.dispatch()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSessionMixin.get_common_objects"><code class="docutils literal notranslate"><span class="pre">LtiSessionMixin.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSessionMixin.get_resource_objects"><code class="docutils literal notranslate"><span class="pre">LtiSessionMixin.get_resource_objects()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSubmissionView"><code class="docutils literal notranslate"><span class="pre">LtiSubmissionView</span></code></a><ul>
+<li><a class="reference internal" href="#lti_tool.views.LtiSubmissionView.access_mode"><code class="docutils literal notranslate"><span class="pre">LtiSubmissionView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSubmissionView.exercise_url_name"><code class="docutils literal notranslate"><span class="pre">LtiSubmissionView.exercise_url_name</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSubmissionView.submission_url_name"><code class="docutils literal notranslate"><span class="pre">LtiSubmissionView.submission_url_name</span></code></a></li>
+<li><a class="reference internal" href="#lti_tool.views.LtiSubmissionView.template_name"><code class="docutils literal notranslate"><span class="pre">LtiSubmissionView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lti_tool.views.lti_login"><code class="docutils literal notranslate"><span class="pre">lti_login()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lti_tool">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">lti_tool package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lti_tool.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lti-tool-package">
+<h1>lti_tool package<a class="headerlink" href="#lti-tool-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lti_tool.urls">
+<span id="lti-tool-urls-module"></span><h2>lti_tool.urls module<a class="headerlink" href="#module-lti_tool.urls" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lti_tool.utils">
+<span id="lti-tool-utils-module"></span><h2>lti_tool.utils module<a class="headerlink" href="#module-lti_tool.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="lti_tool.utils.get_launch_data_storage">
+<span class="sig-prename descclassname"><span class="pre">lti_tool.utils.</span></span><span class="sig-name descname"><span class="pre">get_launch_data_storage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/utils.html#get_launch_data_storage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.utils.get_launch_data_storage" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lti_tool.utils.get_launch_url">
+<span class="sig-prename descclassname"><span class="pre">lti_tool.utils.</span></span><span class="sig-name descname"><span class="pre">get_launch_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/utils.html#get_launch_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.utils.get_launch_url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lti_tool.utils.get_tool_conf">
+<span class="sig-prename descclassname"><span class="pre">lti_tool.utils.</span></span><span class="sig-name descname"><span class="pre">get_tool_conf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/utils.html#get_tool_conf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.utils.get_tool_conf" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lti_tool.utils.has_lti_access_to_course">
+<span class="sig-prename descclassname"><span class="pre">lti_tool.utils.</span></span><span class="sig-name descname"><span class="pre">has_lti_access_to_course</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HttpRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_course_instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/lti_tool/utils.html#has_lti_access_to_course"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.utils.has_lti_access_to_course" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lti_tool.utils.parse_lti_session_params">
+<span class="sig-prename descclassname"><span class="pre">lti_tool.utils.</span></span><span class="sig-name descname"><span class="pre">parse_lti_session_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HttpRequest</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">DjangoMessageLaunch</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">TLaunchData</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/lti_tool/utils.html#parse_lti_session_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.utils.parse_lti_session_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lti_tool.utils.send_lti_points">
+<span class="sig-prename descclassname"><span class="pre">lti_tool.utils.</span></span><span class="sig-name descname"><span class="pre">send_lti_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submission</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/utils.html#send_lti_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.utils.send_lti_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-lti_tool.views">
+<span id="lti-tool-views-module"></span><h2>lti_tool.views module<a class="headerlink" href="#module-lti_tool.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiExerciseView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiExerciseView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiExerciseView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSessionMixin" title="lti_tool.views.LtiSessionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSessionMixin</span></code></a>, <a class="reference internal" href="exercise.html#exercise.views.ExerciseView" title="exercise.views.ExerciseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExerciseView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#lti_tool.views.LtiExerciseView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView.dispatch">
+<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiExerciseView.dispatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiExerciseView.dispatch" title="Link to this definition"></a></dt>
+<dd><p>Hook to dispatch chain. This method is called before View.dispatch
+routes the http method call to actual handler (done by super().dispatch())</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView.exercise_url_name">
+<span class="sig-name descname"><span class="pre">exercise_url_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti-exercise'</span></em><a class="headerlink" href="#lti_tool.views.LtiExerciseView.exercise_url_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiExerciseView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiExerciseView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView.post_url_name">
+<span class="sig-name descname"><span class="pre">post_url_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti-exercise'</span></em><a class="headerlink" href="#lti_tool.views.LtiExerciseView.post_url_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView.submission_url_name">
+<span class="sig-name descname"><span class="pre">submission_url_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti-submission'</span></em><a class="headerlink" href="#lti_tool.views.LtiExerciseView.submission_url_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiExerciseView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti_tool/lti_exercise.html'</span></em><a class="headerlink" href="#lti_tool.views.LtiExerciseView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiInstanceView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiInstanceView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiInstanceView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiInstanceView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSessionMixin" title="lti_tool.views.LtiSessionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSessionMixin</span></code></a>, <a class="reference internal" href="course.html#course.views.InstanceView" title="course.views.InstanceView"><code class="xref py py-class docutils literal notranslate"><span class="pre">InstanceView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiInstanceView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#lti_tool.views.LtiInstanceView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiInstanceView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiInstanceView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiInstanceView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiInstanceView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti_tool/lti_course.html'</span></em><a class="headerlink" href="#lti_tool.views.LtiInstanceView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiLaunchView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiLaunchView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiLaunchView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiLaunchView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.viewbase.BaseRedirectView" title="lib.viewbase.BaseRedirectView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRedirectView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiLaunchView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lti_tool.views.LtiLaunchView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiLaunchView.dispatch">
+<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#lti_tool.views.LtiLaunchView.dispatch" title="Link to this definition"></a></dt>
+<dd><p>Hook to dispatch chain. This method is called before View.dispatch
+routes the http method call to actual handler (done by super().dispatch())</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiLaunchView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiLaunchView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiLaunchView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiModuleView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiModuleView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiModuleView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiModuleView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSessionMixin" title="lti_tool.views.LtiSessionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSessionMixin</span></code></a>, <a class="reference internal" href="course.html#course.views.ModuleView" title="course.views.ModuleView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiModuleView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#lti_tool.views.LtiModuleView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiModuleView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiModuleView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiModuleView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiModuleView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti_tool/lti_module.html'</span></em><a class="headerlink" href="#lti_tool.views.LtiModuleView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectContentMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiSelectContentMixin</span></span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectContentMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectContentMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSessionMixin" title="lti_tool.views.LtiSessionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSessionMixin</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectContentMixin.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#lti_tool.views.LtiSelectContentMixin.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectContentMixin.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectContentMixin.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectContentMixin.get_common_objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectContentMixin.get_resource_objects">
+<span class="sig-name descname"><span class="pre">get_resource_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectContentMixin.get_resource_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectContentMixin.get_resource_objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectContentView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiSelectContentView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectContentView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectContentView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin" title="lti_tool.views.LtiSelectContentMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSelectContentMixin</span></code></a>, <a class="reference internal" href="lib.html#lib.viewbase.BaseTemplateView" title="lib.viewbase.BaseTemplateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTemplateView</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectContentView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectContentView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectContentView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectContentView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti_tool/course_list.html'</span></em><a class="headerlink" href="#lti_tool.views.LtiSelectContentView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectCourseView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiSelectCourseView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectCourseView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectCourseView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin" title="lti_tool.views.LtiSelectContentMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSelectContentMixin</span></code></a>, <a class="reference internal" href="course.html#course.viewbase.CourseInstanceBaseView" title="course.viewbase.CourseInstanceBaseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseInstanceBaseView</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectCourseView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectCourseView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectCourseView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectCourseView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectCourseView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectCourseView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectCourseView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti_tool/module_list.html'</span></em><a class="headerlink" href="#lti_tool.views.LtiSelectCourseView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectExerciseView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiSelectExerciseView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectExerciseView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectExerciseView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin" title="lti_tool.views.LtiSelectContentMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSelectContentMixin</span></code></a>, <a class="reference internal" href="exercise.html#exercise.viewbase.ExerciseBaseView" title="exercise.viewbase.ExerciseBaseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExerciseBaseView</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectExerciseView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectExerciseView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectExerciseView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectModuleView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiSelectModuleView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectModuleView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectModuleView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSelectContentMixin" title="lti_tool.views.LtiSelectContentMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSelectContentMixin</span></code></a>, <a class="reference internal" href="course.html#course.viewbase.CourseModuleBaseView" title="course.viewbase.CourseModuleBaseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseModuleBaseView</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectModuleView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectModuleView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectModuleView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectModuleView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSelectModuleView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSelectModuleView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSelectModuleView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti_tool/exercise_list.html'</span></em><a class="headerlink" href="#lti_tool.views.LtiSelectModuleView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSessionMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiSessionMixin</span></span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSessionMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSessionMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.viewbase.BaseMixin" title="lib.viewbase.BaseMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMixin</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSessionMixin.dispatch">
+<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSessionMixin.dispatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSessionMixin.dispatch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSessionMixin.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSessionMixin.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSessionMixin.get_common_objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSessionMixin.get_resource_objects">
+<span class="sig-name descname"><span class="pre">get_resource_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSessionMixin.get_resource_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSessionMixin.get_resource_objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSubmissionView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">LtiSubmissionView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#LtiSubmissionView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.LtiSubmissionView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lti_tool.views.LtiSessionMixin" title="lti_tool.views.LtiSessionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">LtiSessionMixin</span></code></a>, <a class="reference internal" href="exercise.html#exercise.views.SubmissionView" title="exercise.views.SubmissionView"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubmissionView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSubmissionView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#lti_tool.views.LtiSubmissionView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSubmissionView.exercise_url_name">
+<span class="sig-name descname"><span class="pre">exercise_url_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti-exercise'</span></em><a class="headerlink" href="#lti_tool.views.LtiSubmissionView.exercise_url_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSubmissionView.submission_url_name">
+<span class="sig-name descname"><span class="pre">submission_url_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti-submission'</span></em><a class="headerlink" href="#lti_tool.views.LtiSubmissionView.submission_url_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lti_tool.views.LtiSubmissionView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lti_tool/lti_submission.html'</span></em><a class="headerlink" href="#lti_tool.views.LtiSubmissionView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lti_tool.views.lti_login">
+<span class="sig-prename descclassname"><span class="pre">lti_tool.views.</span></span><span class="sig-name descname"><span class="pre">lti_login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lti_tool/views.html#lti_login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lti_tool.views.lti_login" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-lti_tool">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-lti_tool" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

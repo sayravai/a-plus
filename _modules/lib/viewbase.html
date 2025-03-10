@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.viewbase &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.viewbase</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.viewbase</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines base views for extending and mixing to higher level views.</span>
+<span class="sd">The structure was created for handling nested models.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_has_allowed_host_and_scheme</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateResponseMixin</span><span class="p">,</span> <span class="n">TemplateView</span><span class="p">,</span> <span class="n">View</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic.edit</span><span class="w"> </span><span class="kn">import</span> <span class="n">FormMixin</span><span class="p">,</span> <span class="n">FormView</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthorizedResourceMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AccessModePermission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">is_ajax</span>
+
+
+<div class="viewcode-block" id="BaseMixin">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extend to handle data and mixin with one of the views implementing</span>
+<span class="sd">    get/post methods. Calling the super method is required when overriding</span>
+<span class="sd">    the base methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># NOTE: access_mode is not defined here, so if any derived class forgets to</span>
+    <span class="c1"># define it AccessModePermission will raise assertion error</span>
+    <span class="c1">#access_mode = ACCESS.ANONYMOUS</span>
+    <span class="n">base_permission_classes</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">AccessModePermission</span><span class="p">,</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="BaseMixin.get_permissions">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseMixin.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">Perm</span><span class="p">()</span> <span class="k">for</span> <span class="n">Perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_permission_classes</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+
+
+<div class="viewcode-block" id="BaseMixin.get_access_mode">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseMixin.get_access_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_access_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_mode</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kw</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kw</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;Missing argument from URL pattern: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">kw</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">arg</span></div>
+
+
+
+<div class="viewcode-block" id="BaseViewMixin">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseViewMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseViewMixin</span><span class="p">(</span><span class="n">AuthorizedResourceMixin</span><span class="p">):</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># common come from BaseMixin and this drops NoPermission default</span></div>
+
+
+
+<div class="viewcode-block" id="BaseView">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseView</span><span class="p">(</span><span class="n">BaseViewMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="BaseTemplateMixin">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseTemplateMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseTemplateMixin</span><span class="p">(</span><span class="n">BaseMixin</span><span class="p">,</span> <span class="n">TemplateResponseMixin</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ajax_template_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">force_ajax_template</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="BaseTemplateMixin.get_template_names">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseTemplateMixin.get_template_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_template_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_ajax_template</span> <span class="ow">or</span> <span class="n">is_ajax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ajax_template_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ajax_template_name</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_template_names</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BaseTemplateView">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseTemplateView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseTemplateView</span><span class="p">(</span><span class="n">BaseTemplateMixin</span><span class="p">,</span> <span class="n">BaseViewMixin</span><span class="p">,</span> <span class="n">TemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="BaseRedirectMixin">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseRedirectMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseRedirectMixin</span><span class="p">(</span><span class="n">BaseMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BaseRedirectMixin.redirect_kwarg">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseRedirectMixin.redirect_kwarg">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">redirect_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kw</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">kw</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">to</span><span class="p">,</span> <span class="n">backup</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseRedirectMixin.redirect">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseRedirectMixin.redirect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="p">,</span> <span class="n">backup</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url_has_allowed_host_and_scheme</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">to</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()}):</span>
+            <span class="k">if</span> <span class="n">backup</span><span class="p">:</span>
+                <span class="n">to</span> <span class="o">=</span> <span class="n">backup</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Redirect attempt to unsafe url: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">to</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BaseRedirectView">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseRedirectView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseRedirectView</span><span class="p">(</span><span class="n">BaseRedirectMixin</span><span class="p">,</span> <span class="n">BaseViewMixin</span><span class="p">,</span> <span class="n">View</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="BaseFormMixin">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseFormMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseFormMixin</span><span class="p">(</span><span class="n">BaseRedirectMixin</span><span class="p">,</span> <span class="n">BaseTemplateMixin</span><span class="p">,</span> <span class="n">FormMixin</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseFormMixin.form_valid">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseFormMixin.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_success_url</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BaseFormView">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseFormView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseFormView</span><span class="p">(</span><span class="n">BaseFormMixin</span><span class="p">,</span> <span class="n">BaseViewMixin</span><span class="p">,</span> <span class="n">FormView</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseFormView.get_initial_get_param_spec">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseFormView.get_initial_get_param_spec">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_initial_get_param_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return (Field name -&gt; converter callable) -dict that will be used to</span>
+<span class="sd">        populate the initial values from the GET parameters.</span>
+
+<span class="sd">        E.g. {&quot;instance&quot;: int} will set the initial value of field &quot;instance&quot; to</span>
+<span class="sd">        int(request.GET[&quot;instance&quot;]). Set the converter to None if no conversion</span>
+<span class="sd">        is needed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="BaseFormView.get_initial">
+<a class="viewcode-back" href="../../lib.html#lib.viewbase.BaseFormView.get_initial">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_initial</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">initial</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_initial</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">converter</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_initial_get_param_spec</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">converter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span> <span class="c1"># pylint: disable=bare-except</span>
+                    <span class="k">pass</span>
+            <span class="n">initial</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">initial</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

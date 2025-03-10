@@ -1,0 +1,648 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.api.csv.views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.api.csv.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.api.csv.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Exists</span><span class="p">,</span>
+    <span class="n">ExpressionWrapper</span><span class="p">,</span>
+    <span class="n">F</span><span class="p">,</span>
+    <span class="n">IntegerField</span><span class="p">,</span>
+    <span class="n">OuterRef</span><span class="p">,</span>
+    <span class="n">Q</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.aggregates</span><span class="w"> </span><span class="kn">import</span> <span class="n">Count</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.query</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuerySet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">viewsets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">api_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework_csv.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CSVRenderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework_extensions.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedViewSetMixin</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CSVExcelRenderer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeUserMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">REGEX_INT_ME</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.api.mixins</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseResourceMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">IsCourseAdminOrUserObjIsSelf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SubmissionQuerySet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">...cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedPoints</span><span class="p">,</span> <span class="n">ExercisePoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.submission_sheet</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_best_submissions</span><span class="p">,</span> <span class="n">submissions_sheet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.aggregate_sheet</span><span class="w"> </span><span class="kn">import</span> <span class="n">aggregate_sheet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.aggregate_points</span><span class="w"> </span><span class="kn">import</span> <span class="n">aggregate_points</span>
+
+
+<div class="viewcode-block" id="CourseSubmissionDataViewSet">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseSubmissionDataViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseSubmissionDataViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                                  <span class="n">MeUserMixin</span><span class="p">,</span>
+                                  <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                                  <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `submissiondata` endpoint returns information in CSV format about the</span>
+<span class="sd">    users&#39; submissions in exercises in the course.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/submissiondata/`:</span>
+<span class="sd">        returns the submission data of all users as CSV.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/submissiondata/&lt;user_id&gt;`:</span>
+<span class="sd">        returns the submission data of a specific user as CSV.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/submissiondata/me`:</span>
+<span class="sd">        returns the submission data of the current user as CSV.</span>
+
+<span class="sd">    All operations support the following URL parameters for filtering:</span>
+
+<span class="sd">    - `filter`: the exercise number as a string, including module and chapter numbers</span>
+<span class="sd">        (format N.N.N)</span>
+<span class="sd">    - `category_id`: id of the exercise category</span>
+<span class="sd">    - `module_id`: id of the course module</span>
+<span class="sd">    - `exercise_id`: id of the exercise</span>
+<span class="sd">    - `best`: &quot;yes&quot; or &quot;no&quot;; &quot;no&quot; includes all different submissions from same submitters</span>
+<span class="sd">    - `field`: return submission data only for the given field, e.g., &quot;field_0&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">filter_backends</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">renderer_classes</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">CSVRenderer</span><span class="p">,</span>
+        <span class="n">CSVExcelRenderer</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">+</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_RENDERER_CLASSES</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;enrollment.course_instance.id&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="CourseSubmissionDataViewSet.get_queryset">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseSubmissionDataViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_staff_and_students</span></div>
+
+
+<div class="viewcode-block" id="CourseSubmissionDataViewSet.get_search_args">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseSubmissionDataViewSet.get_search_args">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_search_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filter&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;category_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;module_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;module_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;filter_for_assistant&#39;</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">,</span>
+            <span class="s1">&#39;best&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;best&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="CourseSubmissionDataViewSet.list">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseSubmissionDataViewSet.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span> <span class="c1"># pylint: disable=arguments-differ</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># pylint: disable=unused-argument</span>
+            <span class="n">course_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># pylint: disable=unused-argument</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="n">profiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">())</span>
+        <span class="n">search_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_search_args</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="c1"># Here, CachedPoints is only used to find the exercises whose feedback</span>
+        <span class="c1"># is visible to the request user, and not the points for that user.</span>
+        <span class="c1"># Therefore it is okay to use CachedPoints, even though this view</span>
+        <span class="c1"># includes many users and CachedPoints includes only one.</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">search_exercises</span><span class="p">(</span><span class="o">**</span><span class="n">search_args</span><span class="p">)]</span>
+        <span class="n">revealed_ids</span> <span class="o">=</span> <span class="n">get_revealed_exercise_ids</span><span class="p">(</span><span class="n">search_args</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise_id__in</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span>
+            <span class="n">submitters__in</span><span class="o">=</span><span class="n">profiles</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="s1">&#39;notifications&#39;</span><span class="p">,</span> <span class="s1">&#39;files&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_submissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">,</span> <span class="n">revealed_ids</span><span class="p">,</span> <span class="n">best</span><span class="o">=</span><span class="n">search_args</span><span class="p">[</span><span class="s1">&#39;best&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="CourseSubmissionDataViewSet.retrieve">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseSubmissionDataViewSet.retrieve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span> <span class="c1"># pylint: disable=arguments-differ</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+            <span class="n">version</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># pylint: disable=unused-argument</span>
+            <span class="n">course_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># pylint: disable=unused-argument</span>
+            <span class="n">user_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># pylint: disable=unused-argument</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="n">search_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_search_args</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">submission_ids</span><span class="p">(</span><span class="o">**</span><span class="n">search_args</span><span class="p">)</span>
+        <span class="n">revealed_ids</span> <span class="o">=</span> <span class="n">get_revealed_exercise_ids</span><span class="p">(</span><span class="n">search_args</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">id__in</span><span class="o">=</span><span class="n">ids</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="s1">&#39;notifications&#39;</span><span class="p">,</span> <span class="s1">&#39;files&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_submissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">,</span> <span class="n">revealed_ids</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseSubmissionDataViewSet.serialize_submissions">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseSubmissionDataViewSet.serialize_submissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_submissions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+            <span class="n">queryset</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">Submission</span><span class="p">],</span>
+            <span class="n">revealed_ids</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+            <span class="n">best</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="n">submissions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">queryset</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">best</span><span class="p">:</span>
+            <span class="n">submissions</span> <span class="o">=</span> <span class="n">filter_best_submissions</span><span class="p">(</span><span class="n">submissions</span><span class="p">,</span> <span class="n">revealed_ids</span><span class="p">)</span>
+
+        <span class="c1"># Pick out a single field.</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">field</span><span class="p">:</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">submitted_field</span><span class="p">(</span><span class="n">submission</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="p">(</span><span class="n">submission</span><span class="o">.</span><span class="n">submission_data</span> <span class="ow">or</span> <span class="p">[]):</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">val</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">submitted_field</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">submissions</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">Response</span><span class="p">([</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vals</span> <span class="k">if</span> <span class="n">v</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">])</span>
+
+        <span class="n">data</span><span class="p">,</span><span class="n">fields</span> <span class="o">=</span> <span class="n">submissions_sheet</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">submissions</span><span class="p">,</span> <span class="n">revealed_ids</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer_fields</span> <span class="o">=</span> <span class="n">fields</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accepted_renderer&#39;</span><span class="p">),</span> <span class="n">CSVRenderer</span><span class="p">):</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;submissions.csv&quot;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;submissions.json&quot;&#39;</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="CourseSubmissionDataViewSet.get_renderer_context">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseSubmissionDataViewSet.get_renderer_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_renderer_context</span><span class="p">()</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;renderer_fields&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseAggregateDataViewSet">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseAggregateDataViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseAggregateDataViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                                 <span class="n">MeUserMixin</span><span class="p">,</span>
+                                 <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                                 <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `aggregatedata` endpoint returns aggregate information in CSV format</span>
+<span class="sd">    about the users&#39; submissions in exercises in the course.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/aggregatedata/`:</span>
+<span class="sd">        returns the aggregate submission data of all users as CSV.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/aggregatedata/&lt;user_id&gt;`:</span>
+<span class="sd">        returns the aggregate submission data of a specific user as CSV.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/aggregatedata/me`:</span>
+<span class="sd">        returns the aggregate submission data of the current user as CSV.</span>
+
+<span class="sd">    All operations support the following URL parameters for filtering:</span>
+
+<span class="sd">    - `filter`: the exercise number as a string, including module and chapter numbers</span>
+<span class="sd">        (format N.N.N)</span>
+<span class="sd">    - `category_id`: id of the exercise category</span>
+<span class="sd">    - `module_id`: id of the course module</span>
+<span class="sd">    - `exercise_id`: id of the exercise</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># submission_count, total_points, max_points, (time_usage) / exercise / chapter / module</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">filter_backends</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">renderer_classes</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">CSVRenderer</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">+</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_RENDERER_CLASSES</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;enrollment.course_instance.id&#39;</span><span class="p">}</span>
+
+<div class="viewcode-block" id="CourseAggregateDataViewSet.get_queryset">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseAggregateDataViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_staff_and_students</span></div>
+
+
+<div class="viewcode-block" id="CourseAggregateDataViewSet.get_search_args">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseAggregateDataViewSet.get_search_args">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_search_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filter&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;category_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;module_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;module_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;filter_for_assistant&#39;</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+    <span class="c1"># pylint: disable-next=arguments-differ unused-argument</span>
+<div class="viewcode-block" id="CourseAggregateDataViewSet.list">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseAggregateDataViewSet.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">profiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_profiles</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">profiles</span><span class="p">)</span></div>
+
+    <span class="c1"># pylint: disable-next=arguments-differ unused-argument</span>
+<div class="viewcode-block" id="CourseAggregateDataViewSet.retrieve">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseAggregateDataViewSet.retrieve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_profiles</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()])</span></div>
+
+
+<div class="viewcode-block" id="CourseAggregateDataViewSet.serialize_profiles">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseAggregateDataViewSet.serialize_profiles">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">profiles</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="n">search_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_search_args</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">entry</span><span class="p">,</span> <span class="n">exercises</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">search_entries</span><span class="p">(</span><span class="o">**</span><span class="n">search_args</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exercises</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;exercise&#39;</span><span class="p">]</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">)</span>
+        <span class="n">revealed_ids</span> <span class="o">=</span> <span class="n">get_revealed_exercise_ids</span><span class="p">(</span><span class="n">search_args</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span>
+        <span class="n">aggr</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercise__in</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span> <span class="n">submitters__in</span><span class="o">=</span><span class="n">profiles</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status__in</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">,</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">REJECTED</span><span class="p">,</span>
+            <span class="p">))</span>
+            <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;submitters__user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;exercise_id&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">annotate_submitter_points</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="n">revealed_ids</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span><span class="n">fields</span> <span class="o">=</span> <span class="n">aggregate_sheet</span><span class="p">(</span>
+            <span class="n">profiles</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">taggings</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="n">exercises</span><span class="p">,</span>
+            <span class="n">aggr</span><span class="p">,</span>
+            <span class="n">entry</span><span class="o">.</span><span class="n">number</span> <span class="k">if</span> <span class="n">entry</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer_fields</span> <span class="o">=</span> <span class="n">fields</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accepted_renderer&#39;</span><span class="p">),</span> <span class="n">CSVRenderer</span><span class="p">):</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;aggregate.csv&quot;&#39;</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="CourseAggregateDataViewSet.get_renderer_context">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseAggregateDataViewSet.get_renderer_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_renderer_context</span><span class="p">()</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;renderer_fields&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseResultsDataViewSet">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseResultsDataViewSet</span><span class="p">(</span><span class="n">NestedViewSetMixin</span><span class="p">,</span>
+                               <span class="n">CourseResourceMixin</span><span class="p">,</span>
+                               <span class="n">viewsets</span><span class="o">.</span><span class="n">ReadOnlyModelViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The `resultsdata` endpoint returns the students&#39; points in the course</span>
+<span class="sd">    in CSV format.</span>
+
+<span class="sd">    Operations</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/resultsdata/`:</span>
+<span class="sd">        returns the points of all users as CSV.</span>
+
+<span class="sd">    `GET /courses/&lt;course_id&gt;/resultsdata/&lt;user_id&gt;`:</span>
+<span class="sd">        returns the points of a specific user as CSV.</span>
+
+<span class="sd">    All operations support the following URL parameters for filtering:</span>
+
+<span class="sd">    - `filter`: the exercise number as a string, including module and chapter numbers</span>
+<span class="sd">        (format N.N.N)</span>
+<span class="sd">    - `category_id`: id of the exercise category</span>
+<span class="sd">    - `module_id`: id of the course module</span>
+<span class="sd">    - `exercise_id`: id of the exercise</span>
+<span class="sd">    - `show_unofficial`: if &quot;true&quot;, unofficial submissions are included in the results</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># submission_count, total_points, max_points, (time_usage) / exercise / chapter / module</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_PERMISSION_CLASSES</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">filter_backends</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">IsCourseAdminOrUserObjIsSelf</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">renderer_classes</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">CSVRenderer</span><span class="p">,</span>
+    <span class="p">]</span> <span class="o">+</span> <span class="n">api_settings</span><span class="o">.</span><span class="n">DEFAULT_RENDERER_CLASSES</span>
+    <span class="n">lookup_field</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_url_kwarg</span> <span class="o">=</span> <span class="s1">&#39;user_id&#39;</span>
+    <span class="n">lookup_value_regex</span> <span class="o">=</span> <span class="n">REGEX_INT_ME</span>
+    <span class="n">parent_lookup_map</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="s1">&#39;enrollment.course_instance.id&#39;</span><span class="p">}</span>
+
+    <span class="n">point_annotator</span> <span class="o">=</span> <span class="s2">&quot;annotate_submitter_points&quot;</span>
+
+<div class="viewcode-block" id="CourseResultsDataViewSet.get_queryset">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;list&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_staff_and_students</span></div>
+
+
+<div class="viewcode-block" id="CourseResultsDataViewSet.get_search_args">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet.get_search_args">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_search_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;filter&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;category_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;category_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;module_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;module_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="n">int_or_none</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">)),</span>
+            <span class="s1">&#39;filter_for_assistant&#39;</span><span class="p">:</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">,</span>
+       <span class="p">}</span></div>
+
+    <span class="c1"># pylint: disable-next=arguments-differ unused-argument</span>
+<div class="viewcode-block" id="CourseResultsDataViewSet.list">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">profiles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_profiles</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">profiles</span><span class="p">)</span></div>
+
+    <span class="c1"># pylint: disable-next=arguments-differ unused-argument</span>
+<div class="viewcode-block" id="CourseResultsDataViewSet.retrieve">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet.retrieve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">course_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serialize_profiles</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_object</span><span class="p">()])</span></div>
+
+
+    <span class="c1"># pylint: disable-next=too-many-arguments</span>
+<div class="viewcode-block" id="CourseResultsDataViewSet.get_submissions_query">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet.get_submissions_query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_submissions_query</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+            <span class="n">profiles</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">],</span>
+            <span class="n">exclude_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="c1"># Submission.STATUS</span>
+            <span class="n">revealed_ids</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+            <span class="n">show_unofficial</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="n">show_unconfirmed</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SubmissionQuerySet</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercise__in</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span> <span class="n">submitters__in</span><span class="o">=</span><span class="n">profiles</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status__in</span><span class="o">=</span><span class="p">(</span><span class="n">exclude_list</span><span class="p">))</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_unconfirmed</span><span class="p">:</span>
+            <span class="c1"># Select mandatory sibling exercises</span>
+            <span class="n">need_to_confirm</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span>
+                <span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                    <span class="c1"># ExpressionWrapper is needed due to https://code.djangoproject.com/ticket/31714</span>
+                    <span class="n">outer_parent_id</span><span class="o">=</span><span class="n">ExpressionWrapper</span><span class="p">(</span>
+                        <span class="n">OuterRef</span><span class="p">(</span><span class="s2">&quot;exercise__parent_id&quot;</span><span class="p">),</span>
+                        <span class="n">output_field</span><span class="o">=</span><span class="n">IntegerField</span><span class="p">(),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">Q</span><span class="p">(</span><span class="n">parent_id</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s2">&quot;outer_parent_id&quot;</span><span class="p">))</span>
+                    <span class="c1"># Exercises directly under a module have NULL parents</span>
+                    <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">parent_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outer_parent_id</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">course_module__course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span>
+                    <span class="n">category__confirm_the_level</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">course_module_id</span><span class="o">=</span><span class="n">OuterRef</span><span class="p">(</span><span class="s2">&quot;exercise__course_module_id&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># Select submissions that pass mandatory sibling exercises</span>
+            <span class="n">confirmed</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span>
+                <span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+                    <span class="c1"># ExpressionWrapper is needed due to https://code.djangoproject.com/ticket/31714</span>
+                    <span class="n">outer_parent_id</span><span class="o">=</span><span class="n">ExpressionWrapper</span><span class="p">(</span>
+                        <span class="n">OuterRef</span><span class="p">(</span><span class="s2">&quot;exercise__parent_id&quot;</span><span class="p">),</span>
+                        <span class="n">output_field</span><span class="o">=</span><span class="n">IntegerField</span><span class="p">(),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">Q</span><span class="p">(</span><span class="n">exercise__parent_id</span><span class="o">=</span><span class="n">F</span><span class="p">(</span><span class="s2">&quot;outer_parent_id&quot;</span><span class="p">))</span>
+                    <span class="c1"># Exercises directly under a module have NULL parents</span>
+                    <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">exercise__parent_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outer_parent_id</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">submitters</span><span class="o">=</span><span class="n">OuterRef</span><span class="p">(</span><span class="s2">&quot;submitters&quot;</span><span class="p">),</span>
+                    <span class="n">exercise__category__confirm_the_level</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">exercise__course_module_id</span><span class="o">=</span><span class="n">OuterRef</span><span class="p">(</span><span class="s2">&quot;exercise__course_module_id&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">passes</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="c1"># Exclude unconfirmed submissions: a submission is unconfirmed</span>
+            <span class="c1"># if it has at least one mandatory exercise sibling (including the exercise itself)</span>
+            <span class="c1"># and none of them have been completed yet</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="o">~</span><span class="n">Exists</span><span class="p">(</span><span class="n">need_to_confirm</span><span class="p">)</span> <span class="o">|</span> <span class="n">Exists</span><span class="p">(</span><span class="n">confirmed</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">query</span>
+            <span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s1">&#39;submitters__user_id&#39;</span><span class="p">,</span> <span class="s1">&#39;exercise_id&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Call annotate_best_submitter_points or annotate_submitter_points depending on the selection</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">point_annotator</span><span class="p">)(</span><span class="s1">&#39;total&#39;</span><span class="p">,</span> <span class="n">revealed_ids</span><span class="p">,</span> <span class="n">show_unofficial</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseResultsDataViewSet.serialize_profiles">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet.serialize_profiles">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">serialize_profiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">profiles</span><span class="p">:</span> <span class="n">QuerySet</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+        <span class="n">search_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_search_args</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">exercises</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">search_exercises</span><span class="p">(</span><span class="o">**</span><span class="n">search_args</span><span class="p">)</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">]</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">)</span>
+        <span class="n">revealed_ids</span> <span class="o">=</span> <span class="n">get_revealed_exercise_ids</span><span class="p">(</span><span class="n">search_args</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span>
+        <span class="n">exclude_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">REJECTED</span><span class="p">]</span>
+        <span class="n">show_unofficial</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;show_unofficial&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_unofficial</span><span class="p">:</span>
+            <span class="n">exclude_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">)</span>
+        <span class="n">show_unconfirmed</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;show_unconfirmed&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;true&#39;</span>
+        <span class="n">aggr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_submissions_query</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">profiles</span><span class="p">,</span> <span class="n">exclude_list</span><span class="p">,</span> <span class="n">revealed_ids</span><span class="p">,</span> <span class="n">show_unofficial</span><span class="p">,</span> <span class="n">show_unconfirmed</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span><span class="n">fields</span> <span class="o">=</span> <span class="n">aggregate_points</span><span class="p">(</span>
+            <span class="n">profiles</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">taggings</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+            <span class="n">exercises</span><span class="p">,</span>
+            <span class="n">aggr</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer_fields</span> <span class="o">=</span> <span class="n">fields</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">Response</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accepted_renderer&#39;</span><span class="p">),</span> <span class="n">CSVRenderer</span><span class="p">):</span>
+            <span class="n">response</span><span class="p">[</span><span class="s1">&#39;Content-Disposition&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;attachment; filename=&quot;aggregate.csv&quot;&#39;</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="CourseResultsDataViewSet.get_renderer_context">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseResultsDataViewSet.get_renderer_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_renderer_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_renderer_context</span><span class="p">()</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;renderer_fields&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">context</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseBestResultsDataViewSet">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.CourseBestResultsDataViewSet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseBestResultsDataViewSet</span><span class="p">(</span><span class="n">CourseResultsDataViewSet</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is only a temporary experiment to fix the `resultdata` endpoint&#39;s performance problems.</span>
+<span class="sd">    External applications should not depend on this API endpoint</span>
+<span class="sd">    as this will be eventually removed.</span>
+
+<span class="sd">    This is similar to the `resultsdata` endpoint,</span>
+<span class="sd">    but this endpoint ignores the exercise grading mode.</span>
+<span class="sd">    The results are returned as if all exercises used the BEST mode</span>
+<span class="sd">    and the LAST mode is ignored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">point_annotator</span> <span class="o">=</span> <span class="s2">&quot;annotate_best_submitter_points&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="int_or_none">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.int_or_none">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">int_or_none</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_revealed_exercise_ids">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.views.get_revealed_exercise_ids">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_revealed_exercise_ids</span><span class="p">(</span><span class="n">search_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">points</span><span class="p">:</span> <span class="n">CachedPoints</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper function that returns the IDs of the exercises whose feedback has</span>
+<span class="sd">    been revealed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">exercises</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">search_entries</span><span class="p">(</span><span class="o">**</span><span class="n">search_args</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exercises</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">ExercisePoints</span><span class="p">)</span> <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">feedback_revealed</span>
+    <span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.management.commands.list_exercises_services &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.management.commands.list_exercises_services</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.management.commands.list_exercises_services</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="kn">import</span> <span class="n">dumps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlsplit</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.management.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCommand</span><span class="p">,</span> <span class="n">CommandError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.localization_syntax</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_localized</span>
+
+
+<div class="viewcode-block" id="Command">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.list_exercises_services.Command">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Collects information about exercise services courses use&#39;</span>
+
+<div class="viewcode-block" id="Command.add_arguments">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.list_exercises_services.Command.add_arguments">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--format&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FORMAT&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="s1">&#39;plain&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set output format (default: plain). &quot;</span>
+                 <span class="s2">&quot;Can be set to &#39;json&#39; for machine readable output.&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--max-age&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;DAYS&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Limit results to courses, which have started within given &quot;</span>
+                 <span class="s2">&quot;time. Value is days be default, but you may use suffixes: &quot;</span>
+                 <span class="s2">&quot;m for months and y for years.&quot;</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-V&#39;</span><span class="p">,</span> <span class="s1">&#39;--visible&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Limit results to courses, which are currently visible &quot;</span>
+                 <span class="s2">&quot;to students&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Command.handle">
+<a class="viewcode-back" href="../../../../exercise.management.commands.html#exercise.management.commands.list_exercises_services.Command.handle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span> <span class="c1"># pylint: disable=too-many-locals # noqa: MC0001</span>
+        <span class="n">services</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">content_types</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># all object, which do have a service_url</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">service_url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="c1"># limit with max age</span>
+        <span class="n">after</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_age&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">after</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">after</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">num</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">after</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">after</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">suffixes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mi">365</span><span class="p">}</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">num</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">CommandError</span><span class="p">(</span><span class="s2">&quot;Invalid value &#39;</span><span class="si">%s</span><span class="s2">&#39; for --max-age&quot;</span> <span class="o">%</span> <span class="c1"># pylint: disable=raise-missing-from</span>
+                        <span class="p">(</span><span class="n">after</span><span class="p">,))</span>
+                <span class="k">if</span> <span class="n">suffix</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">suffixes</span><span class="p">:</span>
+                    <span class="c1"># pylint: disable-next=raise-missing-from</span>
+                    <span class="k">raise</span> <span class="n">CommandError</span><span class="p">(</span><span class="s2">&quot;Unknown suffix in --max-age=</span><span class="si">%s</span><span class="s2">; valid: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">after</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">suffixes</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span> <span class="c1"># pylint: disable=consider-iterating-dictionary</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">num</span> <span class="o">*</span> <span class="n">suffixes</span><span class="p">[</span><span class="n">suffix</span><span class="p">]</span>
+            <span class="n">after</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">num</span><span class="p">)</span>
+            <span class="n">qs</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module__course_instance__starting_time__gt</span><span class="o">=</span><span class="n">after</span><span class="p">)</span>
+
+        <span class="c1"># limit with visibility</span>
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;visible&#39;</span><span class="p">):</span>
+            <span class="n">qs</span> <span class="o">=</span> <span class="n">qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module__course_instance__visible_to_students</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># group</span>
+        <span class="k">for</span> <span class="n">lo</span> <span class="ow">in</span> <span class="n">qs</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="c1"># track content type</span>
+            <span class="n">cid</span> <span class="o">=</span> <span class="n">lo</span><span class="o">.</span><span class="n">content_type_id</span>
+            <span class="k">if</span> <span class="n">cid</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content_types</span><span class="p">:</span>
+                <span class="n">content_types</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="n">lo</span><span class="o">.</span><span class="n">content_type</span><span class="o">.</span><span class="n">model_class</span><span class="p">()</span><span class="o">.</span><span class="vm">__name__</span>
+
+            <span class="n">course</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">lo</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)</span>
+
+            <span class="n">service_urls</span> <span class="o">=</span> <span class="n">parse_localized</span><span class="p">(</span><span class="n">lo</span><span class="o">.</span><span class="n">service_url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">content_types</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;LTIExercise&#39;</span><span class="p">:</span>
+                <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">lo</span><span class="o">.</span><span class="n">get_service_url</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span> <span class="k">for</span> <span class="n">lang</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">service_urls</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">url</span> <span class="k">for</span> <span class="n">lang</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">service_urls</span><span class="p">]</span>
+            <span class="n">domains</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">netloc</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">domains</span><span class="p">:</span>
+                <span class="n">service</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">service_cont</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">cid</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="n">service_cont</span><span class="p">[</span><span class="n">course</span><span class="p">]</span> <span class="o">=</span> <span class="n">service_cont</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">course</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># calculate sums</span>
+        <span class="n">domains</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">services</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">domains</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">domains</span><span class="p">:</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span>
+
+            <span class="n">cid_stats</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">service_cont</span> <span class="ow">in</span> <span class="n">service</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">total_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">service_cont</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">courses_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">service_cont</span><span class="p">)</span>
+
+                <span class="n">cid_stats</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">cid</span><span class="p">,</span> <span class="n">total_count</span><span class="p">,</span> <span class="n">courses_count</span><span class="p">,</span> <span class="n">service_cont</span><span class="p">))</span>
+            <span class="n">cid_stats</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">total</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cid_stats</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">domain</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">cid_stats</span><span class="p">))</span>
+
+        <span class="n">results</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Collect results to a data object</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;not_before&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">after</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;exercises&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exercises_by_domain</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">domain</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">cid_stats</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">domain_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;domain&#39;</span><span class="p">:</span> <span class="n">domain</span><span class="p">,</span>
+                <span class="s1">&#39;exercises_count&#39;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cid_stats</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="n">domain_data</span><span class="p">[</span><span class="s1">&#39;exercises&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exercises_for_domain</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">exercises_by_domain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">domain_data</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">cid</span><span class="p">,</span> <span class="n">total_count</span><span class="p">,</span> <span class="n">courses_count</span><span class="p">,</span> <span class="n">service_cont</span> <span class="ow">in</span> <span class="n">cid_stats</span><span class="p">:</span>
+                <span class="n">content_type</span> <span class="o">=</span> <span class="n">content_types</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span>
+                <span class="n">exercise_data</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">content_type</span><span class="p">,</span>
+                    <span class="s1">&#39;exercises_count&#39;</span><span class="p">:</span> <span class="n">total_count</span><span class="p">,</span>
+                    <span class="s1">&#39;courses_count&#39;</span><span class="p">:</span> <span class="n">courses_count</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">exercise_data</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">course</span><span class="p">,</span>
+                        <span class="s1">&#39;exercises_count&#39;</span><span class="p">:</span> <span class="n">count</span><span class="p">,</span>
+                    <span class="p">}</span>
+                    <span class="k">for</span> <span class="n">course</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                        <span class="n">service_cont</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+                        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">exercises_for_domain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exercise_data</span><span class="p">)</span>
+
+        <span class="c1"># Export results</span>
+        <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;format&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
+            <span class="c1"># Export as json</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Export as plain / human readable</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Listing exercise statistics from courses started after </span><span class="si">{after}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">after</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;not_before&#39;</span><span class="p">],</span>
+            <span class="p">))</span>
+            <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;exercises&#39;</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{total:4d}</span><span class="s2"> exercises on </span><span class="si">{domain}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">[</span><span class="s1">&#39;domain&#39;</span><span class="p">],</span>
+                    <span class="n">total</span><span class="o">=</span><span class="n">domain</span><span class="p">[</span><span class="s1">&#39;exercises_count&#39;</span><span class="p">],</span>
+                <span class="p">))</span>
+                <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">domain</span><span class="p">[</span><span class="s1">&#39;exercises&#39;</span><span class="p">]:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    </span><span class="si">{exercises:4d}</span><span class="s2"> of </span><span class="si">{type}</span><span class="s2">: </span><span class="si">{courses}</span><span class="s2"> courses&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="n">exercise</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">],</span>
+                        <span class="n">exercises</span><span class="o">=</span><span class="n">exercise</span><span class="p">[</span><span class="s1">&#39;exercises_count&#39;</span><span class="p">],</span>
+                        <span class="n">courses</span><span class="o">=</span><span class="n">exercise</span><span class="p">[</span><span class="s1">&#39;courses_count&#39;</span><span class="p">],</span>
+                    <span class="p">))</span>
+                    <span class="k">for</span> <span class="n">course</span> <span class="ow">in</span> <span class="n">exercise</span><span class="p">[</span><span class="s1">&#39;courses&#39;</span><span class="p">][:</span><span class="mi">3</span><span class="p">]:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;        </span><span class="si">{count:4d}</span><span class="s2"> </span><span class="si">{course}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">course</span><span class="o">=</span><span class="n">course</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                            <span class="n">count</span><span class="o">=</span><span class="n">course</span><span class="p">[</span><span class="s1">&#39;exercises_count&#39;</span><span class="p">],</span>
+                        <span class="p">))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

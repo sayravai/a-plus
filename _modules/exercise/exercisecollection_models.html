@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.exercisecollection_models &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.exercisecollection_models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.exercisecollection_models</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">receiver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">post_save</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExercisePoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectCategory</span>
+
+
+<div class="viewcode-block" id="ExerciseCollection">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.ExerciseCollection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseCollection</span><span class="p">(</span><span class="n">BaseExercise</span><span class="p">):</span>
+    <span class="c1"># Submissions must persist even if the target course or category</span>
+    <span class="c1">#  gets destroyed.</span>
+    <span class="n">target_category</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">LearningObjectCategory</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TARGET_CATEGORY&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">SET_NULL</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXERCISE_COLLECTION&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_EXERCISE_COLLECTION_PLURAL&#39;</span><span class="p">)</span>
+
+
+    <span class="c1"># Clearing possible sources for erronous functionality</span>
+<div class="viewcode-block" id="ExerciseCollection.clean">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.ExerciseCollection.clean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_category</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+            <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;target_category&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Cannot set own category as target category.&#39;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_submissions</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;max_submissions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Exercise Collection can have only 1 submission.&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_group_size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;max_group_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Exercise Collection can have only 1 submitter&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_group_size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;min_group_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Exercise Collection can have only 1 submitter&#39;</span>
+
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
+
+
+    <span class="c1"># Allows viewing of submissions</span>
+    <span class="c1"># Not actually user submittable</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_submittable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+
+    <span class="c1"># Calculates the sum of best submissions in target category</span>
+    <span class="c1">#</span>
+    <span class="c1"># returns None:</span>
+    <span class="c1">#  * Timing doesn&#39;t allow submissions</span>
+    <span class="c1">#  * Target category doesn&#39;t have exercises with points</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="ExerciseCollection.get_points">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.ExerciseCollection.get_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">no_scaling</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">total_points</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">tc_max_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_category_maxpoints</span>
+        <span class="n">max_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_points</span>
+
+        <span class="k">if</span> <span class="n">tc_max_points</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+
+        <span class="n">timing</span><span class="p">,</span> <span class="n">_d1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timing</span><span class="p">([</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">],</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">timing</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">CLOSED_AFTER</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">ARCHIVED</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">CLOSED_BEFORE</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">UNOFFICIAL</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get_many</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">best_submission</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">total_points</span> <span class="o">+=</span> <span class="n">entry</span><span class="o">.</span><span class="n">best_submission</span><span class="o">.</span><span class="n">points</span>
+
+        <span class="k">if</span> <span class="n">timing</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIMING</span><span class="o">.</span><span class="n">LATE</span><span class="p">:</span>
+            <span class="n">total_points</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_points</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">late_submission_penalty</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">tc_max_points</span> <span class="o">==</span> <span class="n">max_points</span> <span class="ow">or</span> <span class="n">no_scaling</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">total_points</span>
+
+        <span class="n">total_points</span> <span class="o">=</span> <span class="n">total_points</span> <span class="o">/</span> <span class="p">(</span><span class="n">tc_max_points</span> <span class="o">/</span> <span class="n">max_points</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">total_points</span></div>
+
+
+
+    <span class="c1"># Used when staff forces regrading</span>
+<div class="viewcode-block" id="ExerciseCollection.grade">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.ExerciseCollection.grade">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grade</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">submission</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-differ</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_submission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+    <span class="c1"># Updates submission for ExerciseCollection</span>
+    <span class="c1"># Updated submission is saved only if grade has changed</span>
+    <span class="c1"># Parameters:</span>
+    <span class="c1">#   * no_update: Doesn&#39;t update grade if submission exists</span>
+    <span class="c1">#   * forced: Updates submission even if grade hasn&#39;t changed</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="ExerciseCollection.check_submission">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.ExerciseCollection.check_submission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">no_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">forced</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">no_update</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_submitted</span><span class="p">(</span><span class="n">user</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">forced</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Create new submission or use previous</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_submitted</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+            <span class="n">current_submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+            <span class="n">feedback</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">grade</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">current_submission</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+            <span class="n">current_submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">submissions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_submissions_for_student</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+            <span class="n">current_submission</span> <span class="o">=</span> <span class="n">submissions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+        <span class="n">new_grade</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_points</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">new_grade</span> <span class="o">==</span> <span class="n">current_submission</span><span class="o">.</span><span class="n">grade</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">forced</span><span class="p">:</span>
+            <span class="k">return</span>
+
+
+        <span class="n">grading_data</span><span class="p">,</span> <span class="n">feedback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_grading_data</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+
+
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">grade</span> <span class="o">=</span> <span class="n">new_grade</span>
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">submission_time</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span>
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">])</span>
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">grading_data</span> <span class="o">=</span> <span class="n">grading_data</span>
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">feedback</span> <span class="o">=</span> <span class="n">feedback</span>
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span>
+        <span class="n">current_submission</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+
+
+    <span class="c1"># Check if user has a submission for this exercise</span>
+<div class="viewcode-block" id="ExerciseCollection.is_submitted">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.ExerciseCollection.is_submitted">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_submitted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">User</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_submissions_for_student</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+
+
+    <span class="c1"># Property to access max_points in target category</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">target_category_maxpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">max_points</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">:</span>
+            <span class="n">max_points</span> <span class="o">+=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span>
+
+        <span class="k">return</span> <span class="n">max_points</span>
+
+
+    <span class="c1"># Property to access exercises in target category</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exercises</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_category</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+
+    <span class="c1"># There are always submissions left from system&#39;s point of view</span>
+<div class="viewcode-block" id="ExerciseCollection.one_has_submissions">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.ExerciseCollection.one_has_submissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">one_has_submissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">students</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="c1"># Generates feedback and grading_data</span>
+    <span class="c1"># Feedback is in HTML format</span>
+    <span class="c1"># grading_data is currently blank</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_grading_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="n">feedback</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">grading_data</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">exercise_counter</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">exercise_entries</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get_many</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">exercise</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercises</span><span class="p">,</span> <span class="n">exercise_entries</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">best_submission</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">grade</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">grade</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">best_submission</span><span class="o">.</span><span class="n">points</span>
+
+            <span class="n">feedback</span> <span class="o">+=</span> <span class="s2">&quot;Exercise </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="se">\n</span><span class="s2">  Course: </span><span class="si">{}</span><span class="s2"> - </span><span class="si">{}</span><span class="se">\n</span><span class="s2">  Exercise: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">exercise_counter</span><span class="p">,</span>
+                <span class="n">grade</span><span class="p">,</span>
+                <span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">,</span>
+                <span class="n">exercise</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">exercise</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">instance_name</span><span class="p">,</span>
+                <span class="n">exercise</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">exercise_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">feedback</span> <span class="o">=</span> <span class="s2">&quot;&lt;pre&gt;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">feedback</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&lt;/pre&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;grading_data&quot;</span><span class="p">:</span> <span class="n">grading_data</span><span class="p">},</span> <span class="n">feedback</span></div>
+
+
+
+
+<span class="c1"># Updates submissions if new submission is in any ExerciseCollection&#39;s target category.</span>
+<span class="c1"># ! Probably needs Cache-optimization</span>
+<div class="viewcode-block" id="update_exercise_collection_submission">
+<a class="viewcode-back" href="../../exercise.html#exercise.exercisecollection_models.update_exercise_collection_submission">[docs]</a>
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">post_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">Submission</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_exercise_collection_submission</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="n">collections</span> <span class="o">=</span> <span class="n">ExerciseCollection</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">target_category</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">category</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">collections</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+        <span class="n">collection</span><span class="o">.</span><span class="n">check_submission</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

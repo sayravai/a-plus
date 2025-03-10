@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lti_tool.utils &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lti_tool.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lti_tool.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.grade</span><span class="w"> </span><span class="kn">import</span> <span class="n">Grade</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.contrib.django</span><span class="w"> </span><span class="kn">import</span> <span class="n">DjangoMessageLaunch</span><span class="p">,</span> <span class="n">DjangoCacheDataStorage</span><span class="p">,</span> <span class="n">DjangoDbToolConf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.lineitem</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineItem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.message_launch</span><span class="w"> </span><span class="kn">import</span> <span class="n">TLaunchData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">LtiException</span><span class="p">,</span> <span class="n">LtiServiceException</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.lti_tool&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="get_launch_url">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.utils.get_launch_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_launch_url</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">target_link_uri</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_link_uri&#39;</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;target_link_uri&#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_link_uri</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Missing &quot;target_link_uri&quot; param&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Missing &quot;target_link_uri&quot; param&#39;</span><span class="p">)</span> <span class="c1"># pylint: disable=broad-exception-raised</span>
+    <span class="k">return</span> <span class="n">target_link_uri</span></div>
+
+
+<div class="viewcode-block" id="get_tool_conf">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.utils.get_tool_conf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_tool_conf</span><span class="p">():</span>
+    <span class="c1"># Cannot default to DjangoDbToolConf() in settings.py due to models not being initialized yet</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s2">&quot;LTI_TOOL_CONF&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">settings</span><span class="o">.</span><span class="n">LTI_TOOL_CONF</span>
+    <span class="k">return</span> <span class="n">DjangoDbToolConf</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_launch_data_storage">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.utils.get_launch_data_storage">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_launch_data_storage</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">DjangoCacheDataStorage</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="parse_lti_session_params">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.utils.parse_lti_session_params">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_lti_session_params</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">DjangoMessageLaunch</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TLaunchData</span><span class="p">]]:</span>
+    <span class="n">launch_id</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lti-launch-id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">launch_id</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">tool_conf</span> <span class="o">=</span> <span class="n">get_tool_conf</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">message_launch</span> <span class="o">=</span> <span class="n">DjangoMessageLaunch</span><span class="o">.</span><span class="n">from_cache</span><span class="p">(</span>
+            <span class="n">launch_id</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="n">tool_conf</span><span class="p">,</span>
+            <span class="n">launch_data_storage</span><span class="o">=</span><span class="n">get_launch_data_storage</span><span class="p">(),</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">LtiException</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="n">message_launch_data</span> <span class="o">=</span> <span class="n">message_launch</span><span class="o">.</span><span class="n">get_launch_data</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">message_launch</span><span class="p">,</span> <span class="n">message_launch_data</span></div>
+
+
+<div class="viewcode-block" id="has_lti_access_to_course">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.utils.has_lti_access_to_course">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">has_lti_access_to_course</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span>
+        <span class="n">view</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
+        <span class="n">target_course_instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">lti_scope</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="s1">&#39;lti_scope&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lti_scope</span><span class="p">:</span>
+        <span class="n">_message_launch</span><span class="p">,</span> <span class="n">message_launch_data</span> <span class="o">=</span> <span class="n">parse_lti_session_params</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">message_launch_data</span><span class="p">:</span>
+            <span class="n">lti_scope</span> <span class="o">=</span> <span class="n">message_launch_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/custom&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">lti_scope</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">lti_scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;course_slug&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">target_course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span>
+        <span class="ow">and</span> <span class="n">lti_scope</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instance_slug&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">target_course_instance</span><span class="o">.</span><span class="n">url</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="send_lti_points">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.utils.send_lti_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">send_lti_points</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">submission</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExercisePoints</span> <span class="c1"># pylint: disable=import-outside-toplevel</span>
+    <span class="n">exercise</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">exercise</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">COOKIES</span><span class="p">[</span><span class="s1">&#39;lti1p3-session-id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">meta_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lti-session-id&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">launch</span> <span class="o">=</span> <span class="n">DjangoMessageLaunch</span><span class="o">.</span><span class="n">from_cache</span><span class="p">(</span>
+            <span class="n">submission</span><span class="o">.</span><span class="n">lti_launch_id</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="n">get_tool_conf</span><span class="p">(),</span>
+            <span class="n">launch_data_storage</span><span class="o">=</span><span class="n">get_launch_data_storage</span><span class="p">(),</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">LtiException</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Failed to send LTI points for submission id &#39;</span><span class="si">%s</span><span class="s2">&#39; &quot;</span>
+            <span class="s2">&quot;because the LTI launch data was not found. &quot;</span>
+            <span class="s2">&quot;The LTI launch id saved in the submission may have &quot;</span>
+            <span class="s2">&quot;expired in the cache.&quot;</span><span class="p">,</span>
+            <span class="n">submission</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">launch</span><span class="o">.</span><span class="n">get_launch_data</span><span class="p">()[</span><span class="s1">&#39;https://purl.imsglobal.org/spec/lti/claim/ext&#39;</span><span class="p">][</span><span class="s1">&#39;user_username&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">launch</span><span class="o">.</span><span class="n">get_launch_data</span><span class="p">()[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Tried to send LTI points for a non-existing user &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Moodle does not have gradebook entries for teachers - don&#39;t send result if submitter is a teacher</span>
+    <span class="n">is_course_teacher</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_course_teacher</span><span class="p">:</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">ExercisePoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">exercise</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+        <span class="n">best_submission</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">best_submission</span>
+        <span class="k">if</span> <span class="n">best_submission</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="n">launch</span><span class="o">.</span><span class="n">get_ags</span><span class="p">()</span>
+        <span class="n">grade</span> <span class="o">=</span> <span class="n">Grade</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">grade</span><span class="o">.</span><span class="n">set_score_given</span><span class="p">(</span><span class="n">best_submission</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">set_timestamp</span><span class="p">(</span><span class="n">best_submission</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S+0000&#39;</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">set_score_maximum</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">set_activity_progress</span><span class="p">(</span><span class="s1">&#39;Completed&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">set_grading_progress</span><span class="p">(</span><span class="s1">&#39;FullyGraded&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">set_user_id</span><span class="p">(</span><span class="n">launch</span><span class="o">.</span><span class="n">get_launch_data</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sub&#39;</span><span class="p">)))</span>
+        <span class="n">line_item</span> <span class="o">=</span> <span class="n">LineItem</span><span class="p">()</span>
+        <span class="n">line_item</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ags</span><span class="o">.</span><span class="n">put_grade</span><span class="p">(</span><span class="n">grade</span><span class="p">,</span> <span class="n">line_item</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">LtiServiceException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># At least Moodle sends a 409 when trying to save</span>
+            <span class="c1"># a grade with same timestamp as an existing grade</span>
+            <span class="k">if</span> <span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">409</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Grade for submission has already been saved through LTI; continuing&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                    <span class="s2">&quot;LTI Tool could not send grade to the Platform. &quot;</span>
+                    <span class="s2">&quot;Tool user id: </span><span class="si">%s</span><span class="s2">. Tool exercise id: </span><span class="si">%s</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;Grade userId: </span><span class="si">%s</span><span class="s2">. Grade timestamp: </span><span class="si">%s</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;Line item id: </span><span class="si">%s</span><span class="s2">. Line item tag: </span><span class="si">%s</span><span class="s2">. &quot;</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">pk</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">grade</span><span class="o">.</span><span class="n">get_user_id</span><span class="p">()),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">grade</span><span class="o">.</span><span class="n">get_timestamp</span><span class="p">()),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">line_item</span><span class="o">.</span><span class="n">get_id</span><span class="p">()),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">line_item</span><span class="o">.</span><span class="n">get_tag</span><span class="p">()),</span>
+                <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

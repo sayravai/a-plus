@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>apps.app_renderers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">apps.app_renderers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for apps.app_renderers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">App renderers are objects that wrap an instance of an AbstractApp and the</span>
+<span class="sd">the context where the app will be rendered into a single object. App renderers</span>
+<span class="sd">can then passed to templates where their render method should be called to</span>
+<span class="sd">render the html of the app.</span>
+
+<span class="sd">App renderers are most useful with BasePlugin apps since they can be rendered</span>
+<span class="sd">in many different views with different contexts. A helper function</span>
+<span class="sd">build_plugin_renderers is provided for consistent and simple renderer building</span>
+<span class="sd">in views.</span>
+
+<span class="sd">Plugin view is a term that is used as an abstraction of the apps architecture</span>
+<span class="sd">of A+. It consists of a name and definition of the context in that view. For</span>
+<span class="sd">example, a in the course_instance view, plugins have the UserProfile of the</span>
+<span class="sd">user logged in and the CourseInstance being viewed available for the plugin</span>
+<span class="sd">renderer to use while rendering the plugin for the course_instance view. If the</span>
+<span class="sd">plugin would for example just render a greeting for the user, it could use the</span>
+<span class="sd">user&#39;s name in the greeting as it is available through the UserProfile object.</span>
+
+<span class="sd">The available plugin views are</span>
+<span class="sd">- submission</span>
+<span class="sd">- exercise</span>
+<span class="sd">- course_instance</span>
+
+<span class="sd">The definition of the context of each plugin view can read from the code. The</span>
+<span class="sd">code that calls the build_plugin_renderers is responsible of giving the</span>
+<span class="sd">data required by the plugin view.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template.loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_template</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_url_params</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;aplus.apps&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="build_plugin_renderers">
+<a class="viewcode-back" href="../../apps.html#apps.app_renderers.build_plugin_renderers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_plugin_renderers</span><span class="p">(</span><span class="n">plugins</span><span class="p">,</span> <span class="c1"># pylint: disable=too-many-arguments</span>
+                           <span class="n">view_name</span><span class="p">,</span>
+                           <span class="n">user_profile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">submission</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">exercise</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">course_instance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                           <span class="n">course</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># pylint: disable=unused-argument</span>
+                           <span class="n">course_module</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># pylint: disable=unused-argument</span>
+                           <span class="n">category</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">view_name</span> <span class="o">==</span> <span class="s2">&quot;submission&quot;</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;user_profile&quot;</span><span class="p">:</span> <span class="n">user_profile</span><span class="p">,</span>
+                <span class="s2">&quot;course_instance&quot;</span><span class="p">:</span> <span class="n">course_instance</span><span class="p">,</span>
+                <span class="s2">&quot;exercise&quot;</span><span class="p">:</span> <span class="n">exercise</span><span class="p">,</span>
+                <span class="s2">&quot;submission&quot;</span><span class="p">:</span> <span class="n">submission</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">view_name</span> <span class="o">==</span> <span class="s2">&quot;exercise&quot;</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;user_profile&quot;</span><span class="p">:</span> <span class="n">user_profile</span><span class="p">,</span>
+                <span class="s2">&quot;course_instance&quot;</span><span class="p">:</span> <span class="n">course_instance</span><span class="p">,</span>
+                <span class="s2">&quot;exercise&quot;</span><span class="p">:</span> <span class="n">exercise</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="c1">#elif view_name == &quot;course_instance&quot;:</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;user_profile&quot;</span><span class="p">:</span> <span class="n">user_profile</span><span class="p">,</span>
+                <span class="s2">&quot;course_instance&quot;</span><span class="p">:</span> <span class="n">course_instance</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="c1">#else:</span>
+        <span class="c1">#    raise ValueError(view_name + &quot; is not supported for plugins.&quot;)</span>
+
+        <span class="n">plugins</span> <span class="o">=</span> <span class="n">plugins</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">views__contains</span><span class="o">=</span><span class="n">view_name</span><span class="p">)</span>
+
+        <span class="n">renderers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">plugins</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;get_renderer_class&quot;</span><span class="p">):</span>
+                <span class="n">renderers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_renderer_class</span><span class="p">()(</span><span class="n">p</span><span class="p">,</span> <span class="n">view_name</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">renderers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">renderers</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># If anything goes wrong, just return an empty list so that this isn&#39;t</span>
+        <span class="c1"># a show-stopper for the A+ core functionality.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed to create plugin renderers.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+
+
+<div class="viewcode-block" id="ExternalIFramePluginRenderer">
+<a class="viewcode-back" href="../../apps.html#apps.app_renderers.ExternalIFramePluginRenderer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExternalIFramePluginRenderer</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plugin</span><span class="p">,</span> <span class="n">view_name</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plugin</span> <span class="o">=</span> <span class="n">plugin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span> <span class="o">=</span> <span class="n">view_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_src</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">params</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="s2">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">return</span> <span class="n">update_url_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugin</span><span class="o">.</span><span class="n">service_url</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalIFramePluginRenderer.render">
+<a class="viewcode-back" href="../../apps.html#apps.app_renderers.ExternalIFramePluginRenderer.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;plugins/iframe_to_service_plugin.html&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">({</span>
+                <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugin</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugin</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+                <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_src</span><span class="p">(),</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugin</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                <span class="s2">&quot;view_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_name</span>
+            <span class="p">})</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># If anything goes wrong, just return an empty string so that this</span>
+            <span class="c1"># isn&#39;t a show-stopper for the A+ core functionality.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Failed to render an external iframe plugin.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ExternalIFrameTabRenderer">
+<a class="viewcode-back" href="../../apps.html#apps.app_renderers.ExternalIFrameTabRenderer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExternalIFrameTabRenderer</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab</span><span class="p">,</span> <span class="n">user_profile</span><span class="p">,</span> <span class="n">course_instance</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab</span> <span class="o">=</span> <span class="n">tab</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_profile</span> <span class="o">=</span> <span class="n">user_profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">course_instance</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_src</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;course_instance_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s2">&quot;user_profile_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_profile</span><span class="o">.</span><span class="n">id</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">update_url_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">content_url</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExternalIFrameTabRenderer.render">
+<a class="viewcode-back" href="../../apps.html#apps.app_renderers.ExternalIFrameTabRenderer.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;plugins/external_iframe_tab.html&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">({</span>
+            <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+            <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+            <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_src</span><span class="p">(),</span>
+        <span class="p">})</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TabRenderer">
+<a class="viewcode-back" href="../../apps.html#apps.app_renderers.TabRenderer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TabRenderer</span><span class="p">:</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab</span><span class="p">,</span> <span class="n">user_profile</span><span class="p">,</span> <span class="n">course_instance</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab</span> <span class="o">=</span> <span class="n">tab</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_profile</span> <span class="o">=</span> <span class="n">user_profile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">course_instance</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_src</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;course_instance_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="s2">&quot;user_profile_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_profile</span><span class="o">.</span><span class="n">id</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">update_url_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">content_url</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TabRenderer.render">
+<a class="viewcode-back" href="../../apps.html#apps.app_renderers.TabRenderer.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_src</span><span class="p">()</span>
+        <span class="n">opener</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">build_opener</span><span class="p">()</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="c1"># If there&#39;s no element specified, use the BODY.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">element_id</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tab</span><span class="o">.</span><span class="n">element_id</span><span class="p">))</span>
+
+        <span class="c1"># TODO: should make relative link addresses absolute</span>
+
+        <span class="k">return</span> <span class="n">html</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.api.authentication &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.api.authentication</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.api.authentication</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">oauthlib.oauth1.rfc5849</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.authentication</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseAuthentication</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationFailed</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">external_services.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIService</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.oauth_nonce_cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">OAuthNonceCache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_sourced_id</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIServiceUser</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.external_services.api&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="verify_oauth_body_hash_and_signature">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.authentication.verify_oauth_body_hash_and_signature">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">verify_oauth_body_hash_and_signature</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">req_body_hash</span><span class="p">,</span> <span class="n">lti_exercise</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># pylint: disable=too-many-locals</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Verify that the request has valid OAuth 1.0 signature and body hash.</span>
+<span class="sd">    @param request Django HttpRequest</span>
+<span class="sd">    @param req_body_hash base64-encoded SHA-1 hash of the request body (string)</span>
+<span class="sd">    @param lti_exercise the instance of the LTIExercise is used to verify that</span>
+<span class="sd">    the LTI service set for the exercise matches the oauth_consumer_key parameter</span>
+<span class="sd">    of the request.</span>
+<span class="sd">    @return tuple (boolean, error_message) boolean is True if verification succeeded,</span>
+<span class="sd">    False otherwise.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">content_type</span><span class="p">,</span>
+        <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_AUTHORIZATION&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;Host&#39;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_HOST&#39;</span><span class="p">),</span>
+    <span class="p">}</span>
+    <span class="c1"># all OAuth parameters must be given in the HTTP Authorization header</span>
+    <span class="c1"># (not in POST data or GET query parameters) when a body hash is used</span>
+    <span class="c1"># to secure the request body</span>
+    <span class="n">all_req_oauth_params</span> <span class="o">=</span> <span class="n">oauthlib</span><span class="o">.</span><span class="n">oauth1</span><span class="o">.</span><span class="n">rfc5849</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">collect_parameters</span><span class="p">(</span>
+        <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">exclude_oauth_signature</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># collect_parameters returns a list of key-value pairs</span>
+    <span class="n">req_oauth_params_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">all_req_oauth_params</span><span class="p">)</span>
+
+    <span class="c1"># check oauth_consumer_key and find the corresponding secret</span>
+    <span class="n">consumer_key</span> <span class="o">=</span> <span class="n">req_oauth_params_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;oauth_consumer_key&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">consumer_key</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_consumer_key missing&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">lti_service</span> <span class="o">=</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">consumer_key</span><span class="o">=</span><span class="n">consumer_key</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">LTIService</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">,</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">MultipleObjectsReturned</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;unknown oauth_consumer_key&#39;</span>
+
+    <span class="k">if</span> <span class="n">lti_exercise</span> <span class="ow">and</span> <span class="n">lti_exercise</span><span class="o">.</span><span class="n">lti_service</span><span class="o">.</span><span class="n">pk</span> <span class="o">!=</span> <span class="n">lti_service</span><span class="o">.</span><span class="n">pk</span><span class="p">:</span>
+        <span class="c1"># the consumer key refers to a different LTI service than the exercise</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_consumer_key mismatch&#39;</span>
+    <span class="n">client_secret</span> <span class="o">=</span> <span class="n">lti_service</span><span class="o">.</span><span class="n">consumer_secret</span>
+
+    <span class="c1"># check the OAuth timestamp. Do not allow old requests in order to prevent replay attacks.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">req_oauth_params_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;oauth_timestamp&#39;</span><span class="p">)),</span>
+                                                    <span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+        <span class="c1"># oauth_timestamp: seconds since January 1, 1970 00:00:00 GMT</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_timestamp is missing or has an invalid format&#39;</span>
+
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">OAuthNonceCache</span><span class="o">.</span><span class="n">CACHE_TIMEOUT_SECONDS</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="n">timestamp</span> <span class="ow">and</span> <span class="n">timestamp</span> <span class="o">&lt;</span> <span class="n">now</span> <span class="o">+</span> <span class="n">delta</span><span class="p">):</span> <span class="c1"># pylint: disable=chained-comparison</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_timestamp has expired&#39;</span>
+
+    <span class="c1"># check OAuth nonce: The nonce value MUST be unique across all requests with</span>
+    <span class="c1"># the same timestamp, client credentials, and token combinations.</span>
+    <span class="c1"># Previously seen nonces are kept in the cache for a few minutes</span>
+    <span class="c1"># (the duration must match the accepted timestamp age).</span>
+    <span class="n">nonce</span> <span class="o">=</span> <span class="n">req_oauth_params_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;oauth_nonce&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">nonce</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_nonce missing&#39;</span>
+    <span class="n">nonce_cache</span> <span class="o">=</span> <span class="n">OAuthNonceCache</span><span class="p">(</span><span class="n">nonce</span><span class="p">,</span> <span class="n">req_oauth_params_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;oauth_timestamp&#39;</span><span class="p">),</span> <span class="n">client_secret</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nonce_cache</span><span class="o">.</span><span class="n">nonce_used</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_nonce has been used&#39;</span>
+
+    <span class="k">if</span> <span class="n">req_body_hash</span> <span class="o">!=</span> <span class="n">req_oauth_params_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;oauth_body_hash&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_body_hash verification failed&#39;</span>
+
+    <span class="c1"># verify the signature</span>
+    <span class="n">oauth_request</span> <span class="o">=</span> <span class="n">oauthlib</span><span class="o">.</span><span class="n">common</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(),</span> <span class="n">http_method</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+    <span class="c1"># unfortunately, the request class is simple and we have to set the OAuth parameters manually like this</span>
+    <span class="n">oauth_signature</span> <span class="o">=</span> <span class="n">req_oauth_params_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;oauth_signature&#39;</span><span class="p">)</span>
+    <span class="c1"># list of key-value pairs; must not include oauth_signature</span>
+    <span class="n">oauth_request</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">req_oauth_params_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="n">oauth_request</span><span class="o">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">oauth_signature</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">oauthlib</span><span class="o">.</span><span class="n">oauth1</span><span class="o">.</span><span class="n">rfc5849</span><span class="o">.</span><span class="n">signature</span><span class="o">.</span><span class="n">verify_hmac_sha1</span><span class="p">(</span><span class="n">oauth_request</span><span class="p">,</span> <span class="n">client_secret</span><span class="o">=</span><span class="n">client_secret</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oauth_signature verification failed&#39;</span>
+
+    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="OAuthBodyHashAuthentication">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.authentication.OAuthBodyHashAuthentication">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OAuthBodyHashAuthentication</span><span class="p">(</span><span class="n">BaseAuthentication</span><span class="p">):</span>
+<div class="viewcode-block" id="OAuthBodyHashAuthentication.authenticate">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.authentication.OAuthBodyHashAuthentication.authenticate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;HTTP_AUTHORIZATION&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span> <span class="c1"># activates the request body parser if the body has not been parsed yet</span>
+        <span class="c1"># assume that the request was parsed with the LTI Outcome parser, so</span>
+        <span class="c1"># the request.data contains the following keys</span>
+        <span class="n">exercise</span><span class="p">,</span> <span class="n">user_profile</span> <span class="o">=</span> <span class="n">parse_sourced_id</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourced_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">exercise</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">user_profile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># can not find the exercise or user corresponding to the sourced id</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Invalid sourcedId in LTI Outcomes request: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                           <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourced_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">AuthenticationFailed</span><span class="p">(</span><span class="s1">&#39;Invalid sourcedId&#39;</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;exercise&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">exercise</span>
+        <span class="n">data</span><span class="p">[</span><span class="s1">&#39;submitter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_profile</span>
+
+        <span class="n">req_body_hash</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;body_hash&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">req_body_hash</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;Request body hash can not be verified&#39;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AuthenticationFailed</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">lti_service</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;No LTI service set for the exercise&#39;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AuthenticationFailed</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+
+        <span class="n">oauth_ok</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">verify_oauth_body_hash_and_signature</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">req_body_hash</span><span class="p">,</span> <span class="n">exercise</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">oauth_ok</span><span class="p">:</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;OAuth verification failed: &#39;</span> <span class="o">+</span> <span class="n">msg</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AuthenticationFailed</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">LTIServiceUser</span><span class="p">(</span><span class="n">exercise</span><span class="o">=</span><span class="n">exercise</span><span class="p">,</span> <span class="n">lti_service</span><span class="o">=</span><span class="n">exercise</span><span class="o">.</span><span class="n">lti_service</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

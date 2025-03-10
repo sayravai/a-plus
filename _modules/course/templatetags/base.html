@@ -1,0 +1,243 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.templatetags.base &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.templatetags.base</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.templatetags.base</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resolver404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.safestring</span><span class="w"> </span><span class="kn">import</span> <span class="n">mark_safe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_language</span><span class="p">,</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">remove_query_param_from_url</span><span class="p">,</span> <span class="n">settings_text</span><span class="p">,</span> <span class="n">update_url_params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">PendingSubmission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">site_alert.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SiteAlert</span>
+
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="pick_localized">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.pick_localized">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pick_localized</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">message</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">get_language</span><span class="p">())</span> <span class="ow">or</span>
+                <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_CODE</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span> <span class="ow">or</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">message</span></div>
+
+
+
+<div class="viewcode-block" id="get_date">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.get_date">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_date</span><span class="p">(</span><span class="n">cont</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">cont</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">cont</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="login_next">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.login_next">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span><span class="p">(</span><span class="n">takes_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">login_next</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;request&quot;</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">matched_url_name</span> <span class="o">=</span> <span class="n">resolve</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">url_name</span>
+        <span class="n">next_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;?next=</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">matched_url_name</span> <span class="o">!=</span> <span class="s1">&#39;logout&#39;</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">next_path</span>
+    <span class="k">except</span> <span class="n">Resolver404</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="brand_name">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.brand_name">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">brand_name</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">BRAND_NAME</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="brand_name_long">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.brand_name_long">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">brand_name_long</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">BRAND_NAME_LONG</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="brand_institution_name">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.brand_institution_name">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">brand_institution_name</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;BRAND_INSTITUTION_NAME&#39;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="course_alert">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.course_alert">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">course_alert</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+    <span class="n">exercises</span> <span class="o">=</span> <span class="n">PendingSubmission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_exercise_names_if_grader_is_unstable</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">exercises</span><span class="p">:</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s1">&#39;GRADER_PROBLEMS_ALERT -- </span><span class="si">{exercises}</span><span class="s1">&#39;</span><span class="p">),</span>
+            <span class="n">exercises</span><span class="o">=</span><span class="n">exercises</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span><span class="s1">&#39;&lt;div class=&quot;alert alert-danger sticky-alert&quot;&gt;</span><span class="si">{message}</span><span class="s1">&lt;/div&gt;&#39;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">))</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="site_alert">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.site_alert">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">site_alert</span><span class="p">():</span>
+    <span class="n">alerts</span> <span class="o">=</span> <span class="n">SiteAlert</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">SiteAlert</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span>
+        <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="s1">&#39;&lt;div class=&quot;alert alert-danger&quot;&gt;</span><span class="si">{}</span><span class="s1">&lt;/div&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pick_localized</span><span class="p">(</span><span class="n">alert</span><span class="o">.</span><span class="n">alert</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="n">alerts</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="site_advert">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.site_advert">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">site_advert</span><span class="p">():</span> <span class="c1"># pylint: disable=inconsistent-return-statements</span>
+    <span class="n">advert</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">SITEWIDE_ADVERT</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">advert</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">advert</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span>
+    <span class="n">not_before</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">(</span><span class="n">advert</span><span class="p">,</span> <span class="s1">&#39;not-before&#39;</span><span class="p">)</span>
+    <span class="n">not_after</span> <span class="o">=</span> <span class="n">get_date</span><span class="p">(</span><span class="n">advert</span><span class="p">,</span> <span class="s1">&#39;not-after&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">not_before</span> <span class="ow">or</span> <span class="n">not_after</span><span class="p">:</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">not_before</span> <span class="ow">and</span> <span class="n">not_before</span> <span class="o">&gt;</span> <span class="n">now</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">not_after</span> <span class="ow">and</span> <span class="n">not_after</span> <span class="o">&lt;</span> <span class="n">now</span><span class="p">:</span>
+            <span class="k">return</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">pick_localized</span><span class="p">(</span><span class="n">advert</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">)}</span></div>
+
+
+
+<div class="viewcode-block" id="tracking_html">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.tracking_html">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tracking_html</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">TRACKING_HTML</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="localized_url">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.base.localized_url">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">localized_url</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">language</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">base_url</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">BASE_URL</span>
+    <span class="k">if</span> <span class="n">base_url</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">language</span><span class="p">:</span>
+        <span class="n">language</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_CODE</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">update_url_params</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{</span> <span class="s1">&#39;hl&#39;</span><span class="p">:</span> <span class="n">language</span> <span class="p">})</span>
+    <span class="k">return</span> <span class="n">base_url</span> <span class="o">+</span> <span class="n">path</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

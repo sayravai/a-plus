@@ -1,0 +1,181 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.cache &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.cache</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.cache</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">post_save</span><span class="p">,</span> <span class="n">post_delete</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedAbstract</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MenuItem</span>
+
+
+<div class="viewcode-block" id="CachedCourseMenu">
+<a class="viewcode-back" href="../../external_services.html#external_services.cache.CachedCourseMenu">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedCourseMenu</span><span class="p">(</span><span class="n">CachedAbstract</span><span class="p">):</span>
+    <span class="n">KEY_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;coursemenu&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_instance</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">course_instance</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">course_instance</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-differ</span>
+        <span class="n">student_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">student_order</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">staff_groups</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">staff_order</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">append_to_group</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="n">group_order</span><span class="p">,</span> <span class="n">group_label</span><span class="p">,</span> <span class="n">menu_entry</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">group_label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">group_order</span><span class="p">:</span>
+                <span class="n">group_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_label</span><span class="p">)</span>
+                <span class="n">groups</span><span class="p">[</span><span class="n">group_label</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">group_label</span><span class="p">,</span>
+                    <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="p">}</span>
+            <span class="n">groups</span><span class="p">[</span><span class="n">group_label</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">menu_entry</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">menu</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">ext_services</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">url</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;enabled&#39;</span><span class="p">:</span> <span class="n">menu</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">,</span>
+                <span class="s1">&#39;access&#39;</span><span class="p">:</span> <span class="n">menu</span><span class="o">.</span><span class="n">access</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">menu</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
+                <span class="s1">&#39;icon_class&#39;</span><span class="p">:</span> <span class="n">menu</span><span class="o">.</span><span class="n">icon_class</span><span class="p">,</span>
+                <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="n">url</span><span class="p">,</span>
+                <span class="s1">&#39;blank&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">service</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">menu_group_label</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="n">menu</span><span class="o">.</span><span class="n">access</span> <span class="o">&gt;</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span><span class="p">:</span>
+                <span class="n">append_to_group</span><span class="p">(</span><span class="n">staff_groups</span><span class="p">,</span> <span class="n">staff_order</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">append_to_group</span><span class="p">(</span><span class="n">student_groups</span><span class="p">,</span> <span class="n">student_order</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;student_groups&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">student_groups</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">student_order</span><span class="p">],</span>
+            <span class="s1">&#39;staff_groups&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">staff_groups</span><span class="p">[</span><span class="n">g</span><span class="p">]</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">staff_order</span><span class="p">],</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="CachedCourseMenu.student_link_groups">
+<a class="viewcode-back" href="../../external_services.html#external_services.cache.CachedCourseMenu.student_link_groups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">student_link_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;student_groups&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CachedCourseMenu.staff_link_groups">
+<a class="viewcode-back" href="../../external_services.html#external_services.cache.CachedCourseMenu.staff_link_groups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">staff_link_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;staff_groups&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CachedCourseMenu.is_assistant_link">
+<a class="viewcode-back" href="../../external_services.html#external_services.cache.CachedCourseMenu.is_assistant_link">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_assistant_link</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">entry</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;access&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="invalidate_content">
+<a class="viewcode-back" href="../../external_services.html#external_services.cache.invalidate_content">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">invalidate_content</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="n">CachedCourseMenu</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Automatically invalidate cached menu when edited.</span>
+<span class="n">post_save</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">invalidate_content</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">MenuItem</span><span class="p">)</span>
+<span class="n">post_delete</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">invalidate_content</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">MenuItem</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

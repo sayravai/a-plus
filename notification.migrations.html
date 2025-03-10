@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>notification.migrations package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">notification.migrations package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-notification.migrations.0001_initial">notification.migrations.0001_initial module</a><ul>
+<li><a class="reference internal" href="#notification.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#notification.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#notification.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-notification.migrations.0002_auto_20160912_1341">notification.migrations.0002_auto_20160912_1341 module</a><ul>
+<li><a class="reference internal" href="#notification.migrations.0002_auto_20160912_1341.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#notification.migrations.0002_auto_20160912_1341.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#notification.migrations.0002_auto_20160912_1341.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-notification.migrations.0003_auto_20160914_1051">notification.migrations.0003_auto_20160914_1051 module</a><ul>
+<li><a class="reference internal" href="#notification.migrations.0003_auto_20160914_1051.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#notification.migrations.0003_auto_20160914_1051.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#notification.migrations.0003_auto_20160914_1051.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-notification.migrations.0004_auto_20190426_1731">notification.migrations.0004_auto_20190426_1731 module</a><ul>
+<li><a class="reference internal" href="#notification.migrations.0004_auto_20190426_1731.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#notification.migrations.0004_auto_20190426_1731.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#notification.migrations.0004_auto_20190426_1731.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-notification.migrations.0005_auto_20210812_1536">notification.migrations.0005_auto_20210812_1536 module</a><ul>
+<li><a class="reference internal" href="#notification.migrations.0005_auto_20210812_1536.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#notification.migrations.0005_auto_20210812_1536.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#notification.migrations.0005_auto_20210812_1536.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-notification.migrations.0006_notification_regrade_when_seen">notification.migrations.0006_notification_regrade_when_seen module</a><ul>
+<li><a class="reference internal" href="#notification.migrations.0006_notification_regrade_when_seen.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li><a class="reference internal" href="#notification.migrations.0006_notification_regrade_when_seen.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li><a class="reference internal" href="#notification.migrations.0006_notification_regrade_when_seen.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-notification.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">notification.migrations package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/notification.migrations.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="notification-migrations-package">
+<h1>notification.migrations package<a class="headerlink" href="#notification-migrations-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-notification.migrations.0001_initial">
+<span id="notification-migrations-0001-initial-module"></span><h2>notification.migrations.0001_initial module<a class="headerlink" href="#module-notification.migrations.0001_initial" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="notification.migrations.0001_initial.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">notification.migrations.0001_initial.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notification/migrations/0001_initial.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#notification.migrations.0001_initial.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0001_initial.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('userprofile',</span> <span class="pre">'0001_initial'),</span> <span class="pre">('course',</span> <span class="pre">'0001_initial')]</span></em><a class="headerlink" href="#notification.migrations.0001_initial.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0001_initial.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;CreateModel</span>&#160; <span class="pre">name='Notification',</span> <span class="pre">fields=[('id',</span> <span class="pre">&lt;django.db.models.fields.AutoField&gt;),</span> <span class="pre">('subject',</span> <span class="pre">&lt;django.db.models.fields.CharField&gt;),</span> <span class="pre">('notification',</span> <span class="pre">&lt;django.db.models.fields.TextField&gt;),</span> <span class="pre">('timestamp',</span> <span class="pre">&lt;django.db.models.fields.DateTimeField&gt;),</span> <span class="pre">('seen',</span> <span class="pre">&lt;django.db.models.fields.BooleanField&gt;),</span> <span class="pre">('course_instance',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;),</span> <span class="pre">('recipient',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;),</span> <span class="pre">('sender',</span> <span class="pre">&lt;django.db.models.fields.related.ForeignKey&gt;)],</span> <span class="pre">options={'ordering':</span> <span class="pre">['-timestamp']},</span> <span class="pre">bases=(&lt;class</span> <span class="pre">'django.db.models.base.Model'&gt;,)&gt;]</span></em><a class="headerlink" href="#notification.migrations.0001_initial.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-notification.migrations.0002_auto_20160912_1341">
+<span id="notification-migrations-0002-auto-20160912-1341-module"></span><h2>notification.migrations.0002_auto_20160912_1341 module<a class="headerlink" href="#module-notification.migrations.0002_auto_20160912_1341" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="notification.migrations.0002_auto_20160912_1341.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">notification.migrations.0002_auto_20160912_1341.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notification/migrations/0002_auto_20160912_1341.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#notification.migrations.0002_auto_20160912_1341.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0002_auto_20160912_1341.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('exercise',</span> <span class="pre">'0022_auto_20160906_1401'),</span> <span class="pre">('notification',</span> <span class="pre">'0001_initial')]</span></em><a class="headerlink" href="#notification.migrations.0002_auto_20160912_1341.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0002_auto_20160912_1341.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='submission',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='notification',</span> <span class="pre">field=&lt;django.db.models.fields.TextField&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='sender',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;,</span> <span class="pre">preserve_default=True&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='subject',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;,</span> <span class="pre">preserve_default=True&gt;]</span></em><a class="headerlink" href="#notification.migrations.0002_auto_20160912_1341.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-notification.migrations.0003_auto_20160914_1051">
+<span id="notification-migrations-0003-auto-20160914-1051-module"></span><h2>notification.migrations.0003_auto_20160914_1051 module<a class="headerlink" href="#module-notification.migrations.0003_auto_20160914_1051" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="notification.migrations.0003_auto_20160914_1051.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">notification.migrations.0003_auto_20160914_1051.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notification/migrations/0003_auto_20160914_1051.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#notification.migrations.0003_auto_20160914_1051.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0003_auto_20160914_1051.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('notification',</span> <span class="pre">'0002_auto_20160912_1341')]</span></em><a class="headerlink" href="#notification.migrations.0003_auto_20160914_1051.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0003_auto_20160914_1051.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='submission',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;,</span> <span class="pre">preserve_default=True&gt;]</span></em><a class="headerlink" href="#notification.migrations.0003_auto_20160914_1051.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-notification.migrations.0004_auto_20190426_1731">
+<span id="notification-migrations-0004-auto-20190426-1731-module"></span><h2>notification.migrations.0004_auto_20190426_1731 module<a class="headerlink" href="#module-notification.migrations.0004_auto_20190426_1731" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="notification.migrations.0004_auto_20190426_1731.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">notification.migrations.0004_auto_20190426_1731.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notification/migrations/0004_auto_20190426_1731.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#notification.migrations.0004_auto_20190426_1731.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0004_auto_20190426_1731.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('notification',</span> <span class="pre">'0003_auto_20160914_1051')]</span></em><a class="headerlink" href="#notification.migrations.0004_auto_20190426_1731.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0004_auto_20190426_1731.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='sender',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;]</span></em><a class="headerlink" href="#notification.migrations.0004_auto_20190426_1731.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-notification.migrations.0005_auto_20210812_1536">
+<span id="notification-migrations-0005-auto-20210812-1536-module"></span><h2>notification.migrations.0005_auto_20210812_1536 module<a class="headerlink" href="#module-notification.migrations.0005_auto_20210812_1536" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="notification.migrations.0005_auto_20210812_1536.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">notification.migrations.0005_auto_20210812_1536.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notification/migrations/0005_auto_20210812_1536.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#notification.migrations.0005_auto_20210812_1536.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0005_auto_20210812_1536.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('userprofile',</span> <span class="pre">'0006_auto_20210812_1536'),</span> <span class="pre">('course',</span> <span class="pre">'0051_auto_20210812_1536'),</span> <span class="pre">('exercise',</span> <span class="pre">'0039_auto_20210812_1536'),</span> <span class="pre">('notification',</span> <span class="pre">'0004_auto_20190426_1731')]</span></em><a class="headerlink" href="#notification.migrations.0005_auto_20210812_1536.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0005_auto_20210812_1536.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AlterModelOptions</span>&#160; <span class="pre">name='notification',</span> <span class="pre">options={'ordering':</span> <span class="pre">['-timestamp'],</span> <span class="pre">'verbose_name':</span> <span class="pre">'MODEL_NAME_NOTIFICATION',</span> <span class="pre">'verbose_name_plural':</span> <span class="pre">'MODEL_NAME_NOTIFICATION_PLURAL'}&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='course_instance',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='notification',</span> <span class="pre">field=&lt;django.db.models.fields.TextField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='recipient',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='seen',</span> <span class="pre">field=&lt;django.db.models.fields.BooleanField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='sender',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='subject',</span> <span class="pre">field=&lt;django.db.models.fields.CharField&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='submission',</span> <span class="pre">field=&lt;django.db.models.fields.related.ForeignKey&gt;&gt;,</span> <span class="pre">&lt;AlterField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='timestamp',</span> <span class="pre">field=&lt;django.db.models.fields.DateTimeField&gt;&gt;]</span></em><a class="headerlink" href="#notification.migrations.0005_auto_20210812_1536.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-notification.migrations.0006_notification_regrade_when_seen">
+<span id="notification-migrations-0006-notification-regrade-when-seen-module"></span><h2>notification.migrations.0006_notification_regrade_when_seen module<a class="headerlink" href="#module-notification.migrations.0006_notification_regrade_when_seen" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="notification.migrations.0006_notification_regrade_when_seen.Migration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">notification.migrations.0006_notification_regrade_when_seen.</span></span><span class="sig-name descname"><span class="pre">Migration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/notification/migrations/0006_notification_regrade_when_seen.html#Migration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#notification.migrations.0006_notification_regrade_when_seen.Migration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Migration</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0006_notification_regrade_when_seen.Migration.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('notification',</span> <span class="pre">'0005_auto_20210812_1536')]</span></em><a class="headerlink" href="#notification.migrations.0006_notification_regrade_when_seen.Migration.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="notification.migrations.0006_notification_regrade_when_seen.Migration.operations">
+<span class="sig-name descname"><span class="pre">operations</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;AddField</span>&#160; <span class="pre">model_name='notification',</span> <span class="pre">name='regrade_when_seen',</span> <span class="pre">field=&lt;django.db.models.fields.BooleanField&gt;&gt;]</span></em><a class="headerlink" href="#notification.migrations.0006_notification_regrade_when_seen.Migration.operations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-notification.migrations">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-notification.migrations" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

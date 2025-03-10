@@ -1,0 +1,569 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.cache.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.cache.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.cache.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">transaction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleTestCase</span><span class="p">,</span> <span class="n">TransactionTestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Event</span><span class="p">,</span> <span class="n">Barrier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">unittest.mock</span><span class="w"> </span><span class="kn">import</span> <span class="n">patch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.cache.cached</span><span class="w"> </span><span class="kn">import</span> <span class="n">DBDataManager</span><span class="p">,</span> <span class="n">ProxyManager</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.cache.cached_old</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedAbstract</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cached</span><span class="w"> </span><span class="kn">import</span> <span class="n">CacheBase</span>
+
+
+<span class="n">mock_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="mock_delete">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.mock_delete">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_delete</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="n">mock_cache</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mock_set">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.mock_set">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="n">mock_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="mock_get">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.mock_get">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mock_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mock_get_many">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.mock_get_many">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_get_many</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">mock_cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mock_cache</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="mock_set_many">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.mock_set_many">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_set_many</span><span class="p">(</span><span class="n">items</span><span class="p">):</span>
+    <span class="n">mock_cache</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">items</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="mock_add">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.mock_add">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mock_add</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mock_cache</span><span class="p">:</span>
+        <span class="n">mock_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="cache_patcher">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.cache_patcher">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cache_patcher</span><span class="p">(</span><span class="n">loc</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">patch</span><span class="o">.</span><span class="n">multiple</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;lib.cache.</span><span class="si">{</span><span class="n">loc</span><span class="si">}</span><span class="s1">.cache&#39;</span><span class="p">,</span>
+        <span class="n">add</span><span class="o">=</span><span class="n">mock_add</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="n">mock_delete</span><span class="p">,</span>
+        <span class="n">get</span><span class="o">=</span><span class="n">mock_get</span><span class="p">,</span> <span class="nb">set</span><span class="o">=</span><span class="n">mock_set</span><span class="p">,</span>
+        <span class="n">get_many</span><span class="o">=</span><span class="n">mock_get_many</span><span class="p">,</span> <span class="n">set_many</span><span class="o">=</span><span class="n">mock_set_many</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Rollback">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.Rollback">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Rollback</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<div class="viewcode-block" id="MockCache">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.MockCache">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockCache</span><span class="p">(</span><span class="n">CacheBase</span><span class="p">):</span>
+    <span class="n">KEY_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;cachetest&quot;</span>
+    <span class="n">NUM_PARAMS</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">INVALIDATORS</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">precreated</span><span class="p">:</span> <span class="n">ProxyManager</span><span class="p">,</span> <span class="n">prefetched_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DBDataManager</span><span class="p">]):</span>
+        <span class="k">return</span></div>
+
+
+
+<div class="viewcode-block" id="TransactionTest">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest">[docs]</a>
+<span class="nd">@cache_patcher</span><span class="p">(</span><span class="s1">&#39;transact&#39;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TransactionTest</span><span class="p">(</span><span class="n">TransactionTestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TransactionTest.test_rollback">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_rollback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_rollback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+                <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">Rollback</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">Rollback</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="n">original2</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">original2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransactionTest.test_commit">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_commit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_commit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+            <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">new2</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransactionTest.test_no_transaction">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_no_transaction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="n">original2</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">original2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransactionTest.test_within_transaction">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_within_transaction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_within_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+            <span class="n">original2</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">original2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+            <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransactionTest.test_nested_transaction">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_nested_transaction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_nested_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+            <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+                <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+                <span class="n">newer</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newer</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+            <span class="n">newer2</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newer</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newer2</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+                    <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+                    <span class="n">newerer</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">newer</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newerer</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">Rollback</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">Rollback</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+            <span class="n">newer3</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newer</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newer3</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+
+        <span class="n">newer4</span> <span class="o">=</span> <span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newer</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newer4</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransactionTest.test_changed_during_transaction">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_changed_during_transaction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_changed_during_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">newer</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">newerer</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">t1</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+                <span class="n">original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="c1"># cache was invalidated in t2</span>
+                <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+            <span class="c1"># newer[0] should be newer than t1 new. This results in a conflict</span>
+            <span class="c1"># and it should have been invalidated on commit</span>
+            <span class="n">newerer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">t2</span><span class="p">():</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="c1"># t1 changes haven&#39;t been saved yet, so this generates a new object</span>
+            <span class="n">newer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="n">syncs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Barrier</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)]</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">th2</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+        <span class="n">th2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">th2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newerer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newerer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">newer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">newerer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = original[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = new[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">newer</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = newer[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">newerer</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">newerer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = newerer[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">original</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newer</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">newerer</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransactionTest.test_invalidating_transaction">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_invalidating_transaction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidating_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">t1</span><span class="p">():</span>
+            <span class="n">original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+                <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="c1"># Invalidation is applied here</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">t2</span><span class="p">():</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="c1"># This is after t1 calls invalidate(), but the invalidation</span>
+            <span class="c1"># hasn&#39;t been applied yet</span>
+            <span class="n">original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+        <span class="n">syncs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Barrier</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">th2</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+        <span class="n">th2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">th2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = original[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = new[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">original</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TransactionTest.test_overridden_invalidate_transaction">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TransactionTest.test_overridden_invalidate_transaction">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_overridden_invalidate_transaction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">original</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">t1</span><span class="p">():</span>
+            <span class="n">original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+                <span class="n">MockCache</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">syncs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">t2</span><span class="p">():</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">original</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">syncs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="c1"># t1 generates a new one after invalidating: that should be the one saved to cache</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MockCache</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+
+        <span class="n">syncs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Barrier</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">t1</span><span class="p">)</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">th2</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">t2</span><span class="p">)</span>
+        <span class="n">th2</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">th2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">original</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = original[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">_generated_on</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;c = new[</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">original</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TestCached">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.TestCached">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TestCached</span><span class="p">(</span><span class="n">CachedAbstract</span><span class="p">):</span>
+
+    <span class="n">__test__</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1"># Prevents this class from being picked up by pytest</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fake_func</span> <span class="o">=</span> <span class="n">func</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">models</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fake_func</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CachedTest">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest">[docs]</a>
+<span class="nd">@cache_patcher</span><span class="p">(</span><span class="s1">&#39;cached_old&#39;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CachedTest</span><span class="p">(</span><span class="n">SimpleTestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="CachedTest.setUp">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mock_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CachedTest.test_gen_value">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest.test_gen_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_gen_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cache should return the generated value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="s2">&quot;Some data&quot;</span>
+        <span class="n">cached</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedTest.test_gen_invalidated">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest.test_gen_invalidated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_gen_invalidated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cache should return the value generated, also after cache is invalidated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">TestCached</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="s2">&quot;First data&quot;</span>
+        <span class="n">cached1</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data1</span><span class="p">)</span>
+
+        <span class="c1"># Repeat, to ensure invalidate works correctly too</span>
+        <span class="n">TestCached</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+        <span class="n">data2</span> <span class="o">=</span> <span class="s2">&quot;Second data&quot;</span>
+        <span class="n">cached2</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached2</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedTest.test_cache_stores_value">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest.test_cache_stores_value">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cache_stores_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cache should store the generated value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="s2">&quot;Correct data&quot;</span>
+        <span class="n">cached1</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached1</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data1</span><span class="p">)</span>
+
+        <span class="n">cached2</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;Ignored data&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached2</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedTest.test_invalidate">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest.test_invalidate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalidate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If cache is invalidated during a data generation, then the data should not be cached.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="s2">&quot;Wrong data&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">data</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+            <span class="n">TestCached</span><span class="o">.</span><span class="n">invalidate</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">data1</span>
+
+        <span class="c1"># thread 1 starts to create some data</span>
+        <span class="n">cached1</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="n">create</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
+        <span class="c1"># thread 2 invalidates the cache (in create)</span>
+        <span class="c1"># thread 1 completes data generation</span>
+        <span class="c1"># thread 3 retrieves empty cache, thus generates new data</span>
+        <span class="n">data3</span> <span class="o">=</span> <span class="s2">&quot;Correct data&quot;</span>
+        <span class="n">cached3</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached3</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data3</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedTest.test_out_of_order_update">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest.test_out_of_order_update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_out_of_order_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cached should store the data, which generation was started at the latest point in time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># thread 1 starts to create some data</span>
+        <span class="c1"># thread 2 starts and sets data to someting else</span>
+        <span class="c1"># thread 1 completes data generation</span>
+        <span class="c1"># thread 3 reads data from thread 2</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="s2">&quot;Wrong data&quot;</span>
+        <span class="n">data2</span> <span class="o">=</span> <span class="s2">&quot;Correct Data&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="n">data</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+            <span class="n">cached2</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">data2</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
+            <span class="k">return</span> <span class="n">data1</span>
+
+        <span class="n">cached1</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="n">create</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
+        <span class="n">cached3</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;Ignored&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached3</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CachedTest.test_latest_data">
+<a class="viewcode-back" href="../../../lib.cache.html#lib.cache.tests.CachedTest.test_latest_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_latest_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cached should store the data, which generation was started at the latest point in time.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_generator</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">sync</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">generator</span><span class="p">(</span><span class="n">_old_data</span><span class="p">):</span>
+                <span class="n">sync</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">data</span>
+            <span class="k">return</span> <span class="n">generator</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_thread</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">():</span>
+                <span class="k">with</span> <span class="n">cache_patcher</span><span class="p">(</span><span class="s1">&#39;cached_old&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cache</span><span class="p">:</span> <span class="c1"># pylint: disable=unused-variable</span>
+                    <span class="n">cached</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">run</span><span class="p">)</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">th</span>
+        <span class="c1"># thread 1 starts to create some data</span>
+        <span class="n">event1</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+        <span class="n">sync1</span> <span class="o">=</span> <span class="n">Barrier</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">data1</span> <span class="o">=</span> <span class="s2">&quot;Wrong data&quot;</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">create_thread</span><span class="p">(</span><span class="n">create_generator</span><span class="p">(</span><span class="n">event1</span><span class="p">,</span> <span class="n">sync1</span><span class="p">,</span> <span class="n">data1</span><span class="p">))</span>
+        <span class="n">sync1</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="c1"># thread 2 starts to create some data</span>
+        <span class="n">event2</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+        <span class="n">sync2</span> <span class="o">=</span> <span class="n">Barrier</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">data2</span> <span class="o">=</span> <span class="s2">&quot;Correct data&quot;</span>
+        <span class="n">t2</span> <span class="o">=</span> <span class="n">create_thread</span><span class="p">(</span><span class="n">create_generator</span><span class="p">(</span><span class="n">event2</span><span class="p">,</span> <span class="n">sync2</span><span class="p">,</span> <span class="n">data2</span><span class="p">))</span>
+        <span class="n">sync2</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="c1"># thread 1 completes and stores data</span>
+        <span class="n">event1</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="n">t1</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="c1"># thread 2 completes and stores updated data</span>
+        <span class="n">event2</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="n">t2</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="c1"># thread 3 reads data from thread 2</span>
+        <span class="n">cached3</span> <span class="o">=</span> <span class="n">TestCached</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;Ignored data&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cached3</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data2</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

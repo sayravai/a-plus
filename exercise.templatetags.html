@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.templatetags package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">exercise.templatetags package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-exercise.templatetags.exercise">exercise.templatetags.exercise module</a><ul>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.adddeviationsbutton"><code class="docutils literal notranslate"><span class="pre">adddeviationsbutton()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.category_points"><code class="docutils literal notranslate"><span class="pre">category_points()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.check_exercise_deadline_extensions"><code class="docutils literal notranslate"><span class="pre">check_exercise_deadline_extensions()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.compared_submission_param"><code class="docutils literal notranslate"><span class="pre">compared_submission_param()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.exercise_accessible"><code class="docutils literal notranslate"><span class="pre">exercise_accessible()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.exercise_text_stats"><code class="docutils literal notranslate"><span class="pre">exercise_text_stats()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.format_points"><code class="docutils literal notranslate"><span class="pre">format_points()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.get_format_info"><code class="docutils literal notranslate"><span class="pre">get_format_info()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.get_format_info_list"><code class="docutils literal notranslate"><span class="pre">get_format_info_list()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.get_grading_errors"><code class="docutils literal notranslate"><span class="pre">get_grading_errors()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.get_regrade_info"><code class="docutils literal notranslate"><span class="pre">get_regrade_info()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.get_regrade_info_list"><code class="docutils literal notranslate"><span class="pre">get_regrade_info_list()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.get_zip_info"><code class="docutils literal notranslate"><span class="pre">get_zip_info()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.get_zip_info_list"><code class="docutils literal notranslate"><span class="pre">get_zip_info_list()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.is_ajax"><code class="docutils literal notranslate"><span class="pre">is_ajax()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.latest_submissions"><code class="docutils literal notranslate"><span class="pre">latest_submissions()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.module_accessible"><code class="docutils literal notranslate"><span class="pre">module_accessible()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.percent"><code class="docutils literal notranslate"><span class="pre">percent()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.points_badge"><code class="docutils literal notranslate"><span class="pre">points_badge()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.points_progress"><code class="docutils literal notranslate"><span class="pre">points_progress()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.submission_status"><code class="docutils literal notranslate"><span class="pre">submission_status()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.user_last"><code class="docutils literal notranslate"><span class="pre">user_last()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.user_results"><code class="docutils literal notranslate"><span class="pre">user_results()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.templatetags.exercise.user_toc"><code class="docutils literal notranslate"><span class="pre">user_toc()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.templatetags">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">exercise.templatetags package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/exercise.templatetags.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="exercise-templatetags-package">
+<h1>exercise.templatetags package<a class="headerlink" href="#exercise-templatetags-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-exercise.templatetags.exercise">
+<span id="exercise-templatetags-exercise-module"></span><h2>exercise.templatetags.exercise module<a class="headerlink" href="#module-exercise.templatetags.exercise" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.adddeviationsbutton">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">adddeviationsbutton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="course.html#course.models.CourseModule" title="course.models.CourseModule"><span class="pre">CourseModule</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.html#exercise.exercise_models.LearningObject" title="exercise.exercise_models.LearningObject"><span class="pre">LearningObject</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submitters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">User</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="userprofile.html#userprofile.models.UserProfile" title="userprofile.models.UserProfile"><span class="pre">UserProfile</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">User</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="userprofile.html#userprofile.models.UserProfile" title="userprofile.models.UserProfile"><span class="pre">UserProfile</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#adddeviationsbutton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.adddeviationsbutton" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.category_points">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">category_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">student</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#category_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.category_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.check_exercise_deadline_extensions">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">check_exercise_deadline_extensions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">children</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_module_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#check_exercise_deadline_extensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.check_exercise_deadline_extensions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.compared_submission_param">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">compared_submission_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compared_submission</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#compared_submission_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.compared_submission_param" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.exercise_accessible">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">exercise_accessible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#exercise_accessible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.exercise_accessible" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.exercise_text_stats">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">exercise_text_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.html#exercise.exercise_models.BaseExercise" title="exercise.exercise_models.BaseExercise"><span class="pre">BaseExercise</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#exercise_text_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.exercise_text_stats" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.format_points">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">format_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_revealed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_container</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#format_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.format_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.get_format_info">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">get_format_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#get_format_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.get_format_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.get_format_info_list">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">get_format_info_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">formats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#get_format_info_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.get_format_info_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.get_grading_errors">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">get_grading_errors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#get_grading_errors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.get_grading_errors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.get_regrade_info">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">get_regrade_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#get_regrade_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.get_regrade_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.get_regrade_info_list">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">get_regrade_info_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#get_regrade_info_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.get_regrade_info_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.get_zip_info">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">get_zip_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#get_zip_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.get_zip_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.get_zip_info_list">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">get_zip_info_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">types</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#get_zip_info_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.get_zip_info_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.is_ajax">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">is_ajax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Context</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#is_ajax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.is_ajax" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.latest_submissions">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">latest_submissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#latest_submissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.latest_submissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.module_accessible">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">module_accessible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#module_accessible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.module_accessible" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.percent">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">percent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">decimal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#percent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.percent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.points_badge">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">points_badge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.cache.html#exercise.cache.points.ModulePoints" title="exercise.cache.points.ModulePoints"><span class="pre">ModulePoints</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.cache.html#exercise.cache.points.LearningObjectPoints" title="exercise.cache.points.LearningObjectPoints"><span class="pre">LearningObjectPoints</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.cache.html#exercise.cache.points.ExercisePoints" title="exercise.cache.points.ExercisePoints"><span class="pre">ExercisePoints</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.cache.html#exercise.cache.points.SubmissionEntry" title="exercise.cache.points.SubmissionEntry"><span class="pre">SubmissionEntry</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#points_badge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.points_badge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.points_progress">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">points_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.cache.html#exercise.cache.points.CachedPointsData" title="exercise.cache.points.CachedPointsData"><span class="pre">CachedPointsData</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.cache.html#exercise.cache.points.ModulePoints" title="exercise.cache.points.ModulePoints"><span class="pre">ModulePoints</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="exercise.cache.html#exercise.cache.points.CategoryPoints" title="exercise.cache.points.CategoryPoints"><span class="pre">CategoryPoints</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">points_goal_enabled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#points_progress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.points_progress" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.submission_status">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">submission_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#submission_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.submission_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.user_last">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">user_last</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#user_last"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.user_last" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.user_results">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">user_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">student</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">User</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#user_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.user_results" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="exercise.templatetags.exercise.user_toc">
+<span class="sig-prename descclassname"><span class="pre">exercise.templatetags.exercise.</span></span><span class="sig-name descname"><span class="pre">user_toc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">student</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/templatetags/exercise.html#user_toc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.templatetags.exercise.user_toc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-exercise.templatetags">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-exercise.templatetags" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,729 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edit_course.course_forms &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edit_course.course_forms</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edit_course.course_forms</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.payload</span><span class="w"> </span><span class="kn">import</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">Permissions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">get</span> <span class="k">as</span> <span class="n">aplus_get</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django_colortag.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColorTagForm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">api_reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectCategory</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">UserTag</span><span class="p">,</span> <span class="n">SubmissionTag</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.sis</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_sis_configuration</span><span class="p">,</span> <span class="n">StudentInfoSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseChapter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.validators</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_url_key_validator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">UsersSearchSelectField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.widgets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DateTimeLocalInput</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">notification.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedNotifications</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;aplus.course&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FieldsetModelForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.FieldsetModelForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FieldsetModelForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="FieldsetModelForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.FieldsetModelForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="FieldsetModelForm.get_fieldsets">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.FieldsetModelForm.get_fieldsets">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fieldsets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="s2">&quot;legend&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Meta</span><span class="o">.</span><span class="n">legend</span><span class="p">,</span> <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Meta</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span> <span class="p">},</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="FieldsetModelForm.get_fields">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.FieldsetModelForm.get_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">names</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LearningObjectCategoryForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.LearningObjectCategoryForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearningObjectCategoryForm</span><span class="p">(</span><span class="n">FieldsetModelForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LearningObjectCategoryForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.LearningObjectCategoryForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span>
+        <span class="n">legend</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;CATEGORY_capitalized&#39;</span><span class="p">)</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;points_to_pass&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;confirm_the_level&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;accept_unofficial_submits&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseModuleForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseModuleForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseModuleForm</span><span class="p">(</span><span class="n">FieldsetModelForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CourseModuleForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseModuleForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseModule</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;status&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;order&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;introduction&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;points_to_pass&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;opening_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;reading_opening_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;closing_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;late_submissions_allowed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;late_submission_deadline&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;late_submission_penalty&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;model_answer&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;opening_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;reading_opening_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;closing_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;late_submission_deadline&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.exercise_forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">RevealRuleForm</span> <span class="c1"># pylint: disable=import-outside-toplevel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_solution_form</span> <span class="o">=</span> <span class="n">RevealRuleForm</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">),</span>
+            <span class="n">instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">active_model_solution_reveal_rule</span><span class="p">,</span>
+            <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;model_solution&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;model_answer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">CourseChapter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">course_module__course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CourseModuleForm.get_fieldsets">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseModuleForm.get_fieldsets">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fieldsets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;HIERARCHY&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span><span class="s1">&#39;order&#39;</span><span class="p">,</span><span class="s1">&#39;url&#39;</span><span class="p">)</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;CONTENT&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;introduction&#39;</span><span class="p">,</span><span class="s1">&#39;points_to_pass&#39;</span><span class="p">,</span> <span class="s1">&#39;model_answer&#39;</span><span class="p">)</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;REVEAL_MODEL_SOLUTIONS&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_solution_form</span> <span class="p">},</span>
+            <span class="p">{</span> <span class="s1">&#39;legend&#39;</span><span class="p">:</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SCHEDULE&#39;</span><span class="p">),</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">get_fields</span><span class="p">(</span><span class="s1">&#39;reading_opening_time&#39;</span><span class="p">,</span><span class="s1">&#39;opening_time&#39;</span><span class="p">,</span><span class="s1">&#39;closing_time&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;late_submissions_allowed&#39;</span><span class="p">,</span><span class="s1">&#39;late_submission_deadline&#39;</span><span class="p">,</span> <span class="s1">&#39;late_submission_penalty&#39;</span><span class="p">)</span> <span class="p">},</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CourseModuleForm.is_valid">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseModuleForm.is_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_solution_form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseModuleForm.save">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseModuleForm.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_solution_form</span><span class="o">.</span><span class="n">has_changed</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">model_solution_reveal_rule</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_solution_form</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseInstanceForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseInstanceForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseInstanceForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">UsersSearchSelectField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TEACHERS&#39;</span><span class="p">),</span>
+        <span class="n">queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="n">initial_queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">(),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">assistants</span> <span class="o">=</span> <span class="n">UsersSearchSelectField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ASSISTANTS&#39;</span><span class="p">),</span>
+        <span class="n">queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+        <span class="n">initial_queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">(),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Not required because a course does not have to have any assistants.</span>
+
+<div class="viewcode-block" id="CourseInstanceForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseInstanceForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;group_work_allowed&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;instance_name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;starting_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;ending_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lifesupport_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;archive_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;enrollment_starting_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;enrollment_ending_time&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;enrollment_audience&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;view_content_to&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;head_urls&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;teachers&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;assistants&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;technical_error_emails&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sis_enroll&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;points_goal_enabled&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;starting_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;ending_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;lifesupport_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;archive_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;enrollment_starting_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+            <span class="s1">&#39;enrollment_ending_time&#39;</span><span class="p">:</span> <span class="n">DateTimeLocalInput</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;teachers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;teachers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial_queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;teachers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">search_api_url</span> <span class="o">=</span> <span class="n">api_reverse</span><span class="p">(</span><span class="s2">&quot;user-list&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;assistants&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">assistants</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;assistants&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial_queryset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">assistants</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;assistants&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">search_api_url</span> <span class="o">=</span> <span class="n">api_reverse</span><span class="p">(</span><span class="s2">&quot;user-list&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;readonly&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_URL_IDENTIFIER_LOCKED_WHILE_COURSE_VISIBLE&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;lifesupport_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_REMOVES_MODEL_ANSWER_VISIBILITY_STUDENTS&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;archive_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">help_text</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_REMOVES_SUBMISSION_POSSIBILITY_STUDENTS&#39;</span><span class="p">)</span>
+
+        <span class="c1"># If course is not connected to SIS system, disable the enroll checkbox</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sis_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;sis_enroll&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="CourseInstanceForm.clean_url">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseInstanceForm.clean_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">:</span>
+            <span class="c1"># URL must not be changed for visible course instances.</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">url</span>
+        <span class="c1"># ModelForm runs form validation before the model validation.</span>
+        <span class="c1"># The URL validator is copied here from the model definition because</span>
+        <span class="c1"># the cleaned data returned here is used in the rendering of the form</span>
+        <span class="c1"># POST target page. Even though the model validation would stop invalid</span>
+        <span class="c1"># data from being saved to the database, the next page rendering could</span>
+        <span class="c1"># crash due to invalid data if this method returned an invalid value.</span>
+        <span class="c1"># Raising a ValidationError here prevents the course instance from</span>
+        <span class="c1"># having invalid values.</span>
+        <span class="n">generate_url_key_validator</span><span class="p">()(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">])</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">RESERVED_URLS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_URL_ALREADY_TAKEN&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">url</span> <span class="ow">and</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_URL_ALREADY_TAKEN&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">url</span></div>
+
+
+<div class="viewcode-block" id="CourseInstanceForm.save">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseInstanceForm.save">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">set_assistants</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;assistants&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">set_teachers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;teachers&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">userprofile</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">all_students</span><span class="p">:</span>
+                <span class="n">CachedNotifications</span><span class="o">.</span><span class="n">invalidate</span><span class="p">(</span><span class="n">userprofile</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseIndexForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseIndexForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseIndexForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CourseIndexForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseIndexForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;index_mode&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;footer&#39;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseContentForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseContentForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseContentForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CourseContentForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CourseContentForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;module_numbering&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;content_numbering&#39;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CloneInstanceForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CloneInstanceForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CloneInstanceForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_NEW_URL_IDENTIFIER_COURSE_INSTANCE&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_NEW_URL_IDENTIFIER_COURSE_INSTANCE_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+        <span class="n">validators</span><span class="o">=</span><span class="p">[</span><span class="n">generate_url_key_validator</span><span class="p">()],</span>
+    <span class="p">)</span>
+    <span class="n">instance_name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_INSTANCE_NAME&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_INSTANCE_NAME_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">teachers</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TEACHERS&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TEACHERS_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">initial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">assistants</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ASSISTANTS&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ASSISTANTS_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">initial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">menuitems</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_ITEMS&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_ITEMS_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">initial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">usertags</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_STUDENT_TAGS&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_STUDENT_TAGS_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">initial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">submissiontags</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION_TAGS&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUBMISSION_TAGS_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">initial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">GITMANAGER_URL</span><span class="p">:</span>
+        <span class="n">key_year</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_YEAR&#39;</span><span class="p">),</span>
+            <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_YEAR_HELPTEXT&#39;</span><span class="p">),</span>
+            <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">year</span><span class="p">)</span> <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span>
+            <span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">key_month</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SEMESTER_OR_MONTH&#39;</span><span class="p">),</span>
+            <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SEMESTER_OR_MONTH_HELPTEXT&#39;</span><span class="p">),</span>
+            <span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Select</span><span class="p">(</span><span class="n">choices</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">(</span><span class="s1">&#39;Autumn&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_AUTUMN&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;Spring&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SPRING&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;Summer&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SUMMER&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;January&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_JANUARY&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;February&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_FEBRUARY&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;March&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MARCH&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;April&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_APRIL&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;May&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MAY&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;June&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_JUNE&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;July&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_JULY&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;August&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_AUGUST&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;September&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SEPTEMBER&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;October&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_OCTOBER&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;November&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_NOVEMBER&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;December&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_DECEMBER&#39;</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;Test&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_TEST&#39;</span><span class="p">)),</span>
+            <span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">update_automatically</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_UPDATE_AUTOMATICALLY&#39;</span><span class="p">),</span>
+            <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_UPDATE_AUTOMATICALLY_HELPTEXT&#39;</span><span class="p">),</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">initial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">email_on_error</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EMAIL_ON_ERROR&#39;</span><span class="p">),</span>
+            <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EMAIL_ON_ERROR_HELPTEXT&#39;</span><span class="p">),</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">initial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">git_origin</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_ORIGIN&#39;</span><span class="p">),</span>
+            <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_ORIGIN_HELPTEXT&#39;</span><span class="p">),</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">git_branch</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_BRANCH&#39;</span><span class="p">),</span>
+            <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_BRANCH_HELPTEXT&#39;</span><span class="p">),</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CloneInstanceForm.set_sis_selector">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CloneInstanceForm.set_sis_selector">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_sis_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sis</span><span class="p">:</span> <span class="n">StudentInfoSystem</span> <span class="o">=</span> <span class="n">get_sis_configuration</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sis</span><span class="p">:</span>
+            <span class="c1"># Student Info System not configured</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">instances</span> <span class="o">=</span> <span class="n">sis</span><span class="o">.</span><span class="n">get_instances</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+
+            <span class="c1"># If there are no SIS instances by this course code, don&#39;t show menu or checkbox</span>
+            <span class="k">if</span> <span class="n">instances</span><span class="p">:</span>
+                <span class="n">options</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="s1">&#39;---------&#39;</span><span class="p">)]</span> <span class="o">+</span> <span class="n">instances</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;sis&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ChoiceField</span><span class="p">(</span>
+                        <span class="n">choices</span><span class="o">=</span><span class="n">options</span><span class="p">,</span>
+                        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SIS_INSTANCE&#39;</span><span class="p">),</span>
+                        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SIS_INSTANCE_HELPTEXT&#39;</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;sis_enroll&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+                    <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SIS_ENROLL&#39;</span><span class="p">),</span>
+                    <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SIS_ENROLL_HELPTEXT&#39;</span><span class="p">),</span>
+                    <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">initial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error getting instances from SIS.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CloneInstanceForm.set_initial_git_origin">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CloneInstanceForm.set_initial_git_origin">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_initial_git_origin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permissions</span><span class="p">()</span>
+        <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">READ</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">gitmanager_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">GITMANAGER_URL</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;api/gitmanager/id/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">aplus_get</span><span class="p">(</span><span class="n">gitmanager_url</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;git_origin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;git_origin&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;instance_name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">instance_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_sis_selector</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_initial_git_origin</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CloneInstanceForm.clean_url">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.CloneInstanceForm.clean_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_URL_ALREADY_TAKEN&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">url</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UserTagForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.UserTagForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserTagForm</span><span class="p">(</span><span class="n">ColorTagForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="UserTagForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.UserTagForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">ColorTagForm</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">UserTag</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;slug&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;visible_to_students&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_NAME&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SLUG&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_DESCRIPTION&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_COLOR&#39;</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="UserTagForm.get_base_object">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.UserTagForm.get_base_object">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_base_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_instance</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Meta</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">course_instance</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionTagForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.SubmissionTagForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionTagForm</span><span class="p">(</span><span class="n">ColorTagForm</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SubmissionTagForm.Meta">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.SubmissionTagForm.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">ColorTagForm</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">SubmissionTag</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;slug&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_NAME&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SLUG&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_DESCRIPTION&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_COLOR&#39;</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="SubmissionTagForm.get_base_object">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.SubmissionTagForm.get_base_object">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_base_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course_instance</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Meta</span><span class="o">.</span><span class="n">model</span><span class="p">()</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">course_instance</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SelectUsersForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.SelectUsersForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SelectUsersForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">UsersSearchSelectField</span><span class="p">(</span><span class="n">queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">(),</span>
+        <span class="n">initial_queryset</span><span class="o">=</span><span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">none</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">course_instance</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">search_api_url</span> <span class="o">=</span> <span class="n">api_reverse</span><span class="p">(</span>
+            <span class="s2">&quot;course-students-list&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="n">course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">queryset</span> <span class="o">=</span> <span class="n">course_instance</span><span class="o">.</span><span class="n">get_student_profiles</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="GitmanagerForm">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.GitmanagerForm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GitmanagerForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">SlugField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_KEY&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_KEY_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">update_automatically</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_UPDATE_AUTOMATICALLY&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_UPDATE_AUTOMATICALLY_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">email_on_error</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EMAIL_ON_ERROR&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_EMAIL_ON_ERROR_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">git_origin</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_ORIGIN&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_ORIGIN_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">git_branch</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_BRANCH&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_GIT_BRANCH_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">update_hook</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">URLField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_UPDATE_HOOK&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_UPDATE_HOOK_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">remote_id</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ID&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ID_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># forms.CharField because forms.URLField validation fails for docker container addresses</span>
+    <span class="n">aplus_json_url</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_APLUS_CONFIGURATION_JSON&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_APLUS_CONFIGURATION_JSON_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># forms.CharField because forms.URLField validation fails for docker container addresses</span>
+    <span class="n">hook</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_HOOK&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_HOOK_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">webhook_secret</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_WEBHOOK_SECRET&#39;</span><span class="p">),</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_WEBHOOK_SECRET_HELPTEXT&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="GitmanagerForm.set_initial_values">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.course_forms.GitmanagerForm.set_initial_values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_initial_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;remote_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;aplus_json_url&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">configure_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;update_automatically&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;email_on_error&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permissions</span><span class="p">()</span>
+        <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">READ</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="c1"># Write access is needed to retrieve the webhook secret</span>
+        <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">WRITE</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">gitmanager_url</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">GITMANAGER_URL</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;api/gitmanager/id/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">aplus_get</span><span class="p">(</span><span class="n">gitmanager_url</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;key&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;update_automatically&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;update_automatically&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;email_on_error&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;email_on_error&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;git_origin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;git_origin&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;git_branch&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;git_branch&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;update_hook&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;update_hook&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;webhook_secret&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;webhook_secret&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s1">&#39;hook&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">initial</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">GITMANAGER_URL</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;gitmanager/</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">/hook&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_initial_values</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

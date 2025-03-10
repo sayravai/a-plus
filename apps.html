@@ -1,0 +1,1413 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>apps package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">apps package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-apps.admin">apps.admin module</a><ul>
+<li><a class="reference internal" href="#apps.admin.BasePluginAdmin"><code class="docutils literal notranslate"><span class="pre">BasePluginAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.BasePluginAdmin.media"><code class="docutils literal notranslate"><span class="pre">BasePluginAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.BasePluginAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">BasePluginAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.admin.BaseTabAdmin"><code class="docutils literal notranslate"><span class="pre">BaseTabAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.BaseTabAdmin.media"><code class="docutils literal notranslate"><span class="pre">BaseTabAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.BaseTabAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">BaseTabAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.admin.ExternalEmbeddedTabAdmin"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTabAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.ExternalEmbeddedTabAdmin.media"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTabAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.ExternalEmbeddedTabAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTabAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.admin.ExternalIFramePluginAdmin"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePluginAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.ExternalIFramePluginAdmin.media"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePluginAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.ExternalIFramePluginAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePluginAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.admin.ExternalIFrameTabAdmin"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTabAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.ExternalIFrameTabAdmin.media"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTabAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.ExternalIFrameTabAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTabAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.admin.HTMLPluginAdmin"><code class="docutils literal notranslate"><span class="pre">HTMLPluginAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.HTMLPluginAdmin.course_instance_id"><code class="docutils literal notranslate"><span class="pre">HTMLPluginAdmin.course_instance_id()</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.HTMLPluginAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">HTMLPluginAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.HTMLPluginAdmin.list_display_links"><code class="docutils literal notranslate"><span class="pre">HTMLPluginAdmin.list_display_links</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.HTMLPluginAdmin.media"><code class="docutils literal notranslate"><span class="pre">HTMLPluginAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.HTMLPluginAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">HTMLPluginAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.admin.HTMLTabAdmin"><code class="docutils literal notranslate"><span class="pre">HTMLTabAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.HTMLTabAdmin.media"><code class="docutils literal notranslate"><span class="pre">HTMLTabAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.HTMLTabAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">HTMLTabAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.admin.RSSPluginAdmin"><code class="docutils literal notranslate"><span class="pre">RSSPluginAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.admin.RSSPluginAdmin.media"><code class="docutils literal notranslate"><span class="pre">RSSPluginAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#apps.admin.RSSPluginAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">RSSPluginAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-apps.app_renderers">apps.app_renderers module</a><ul>
+<li><a class="reference internal" href="#apps.app_renderers.ExternalIFramePluginRenderer"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePluginRenderer</span></code></a><ul>
+<li><a class="reference internal" href="#apps.app_renderers.ExternalIFramePluginRenderer.render"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePluginRenderer.render()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.app_renderers.ExternalIFrameTabRenderer"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTabRenderer</span></code></a><ul>
+<li><a class="reference internal" href="#apps.app_renderers.ExternalIFrameTabRenderer.render"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTabRenderer.render()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.app_renderers.TabRenderer"><code class="docutils literal notranslate"><span class="pre">TabRenderer</span></code></a><ul>
+<li><a class="reference internal" href="#apps.app_renderers.TabRenderer.render"><code class="docutils literal notranslate"><span class="pre">TabRenderer.render()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.app_renderers.build_plugin_renderers"><code class="docutils literal notranslate"><span class="pre">build_plugin_renderers()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-apps.models">apps.models module</a><ul>
+<li><a class="reference internal" href="#apps.models.AbstractApp"><code class="docutils literal notranslate"><span class="pre">AbstractApp</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.AbstractApp.Meta"><code class="docutils literal notranslate"><span class="pre">AbstractApp.Meta</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.AbstractApp.Meta.abstract"><code class="docutils literal notranslate"><span class="pre">AbstractApp.Meta.abstract</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.Meta.verbose_name"><code class="docutils literal notranslate"><span class="pre">AbstractApp.Meta.verbose_name</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.Meta.verbose_name_plural"><code class="docutils literal notranslate"><span class="pre">AbstractApp.Meta.verbose_name_plural</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.container"><code class="docutils literal notranslate"><span class="pre">AbstractApp.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.container_pk"><code class="docutils literal notranslate"><span class="pre">AbstractApp.container_pk</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.container_type"><code class="docutils literal notranslate"><span class="pre">AbstractApp.container_type</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.container_type_id"><code class="docutils literal notranslate"><span class="pre">AbstractApp.container_type_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.modelwithinheritance_ptr"><code class="docutils literal notranslate"><span class="pre">AbstractApp.modelwithinheritance_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.AbstractApp.modelwithinheritance_ptr_id"><code class="docutils literal notranslate"><span class="pre">AbstractApp.modelwithinheritance_ptr_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.BasePlugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.BasePlugin.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">BasePlugin.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">BasePlugin.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.container"><code class="docutils literal notranslate"><span class="pre">BasePlugin.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.container_pk"><code class="docutils literal notranslate"><span class="pre">BasePlugin.container_pk</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.container_type"><code class="docutils literal notranslate"><span class="pre">BasePlugin.container_type</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.container_type_id"><code class="docutils literal notranslate"><span class="pre">BasePlugin.container_type_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.externaliframeplugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin.externaliframeplugin</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.htmlplugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin.htmlplugin</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.modelwithinheritance_ptr"><code class="docutils literal notranslate"><span class="pre">BasePlugin.modelwithinheritance_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.modelwithinheritance_ptr_id"><code class="docutils literal notranslate"><span class="pre">BasePlugin.modelwithinheritance_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.render"><code class="docutils literal notranslate"><span class="pre">BasePlugin.render()</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.rssplugin"><code class="docutils literal notranslate"><span class="pre">BasePlugin.rssplugin</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.title"><code class="docutils literal notranslate"><span class="pre">BasePlugin.title</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BasePlugin.views"><code class="docutils literal notranslate"><span class="pre">BasePlugin.views</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.BaseTab"><code class="docutils literal notranslate"><span class="pre">BaseTab</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.BaseTab.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">BaseTab.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">BaseTab.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.container"><code class="docutils literal notranslate"><span class="pre">BaseTab.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.container_pk"><code class="docutils literal notranslate"><span class="pre">BaseTab.container_pk</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.container_type"><code class="docutils literal notranslate"><span class="pre">BaseTab.container_type</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.container_type_id"><code class="docutils literal notranslate"><span class="pre">BaseTab.container_type_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.externalembeddedtab"><code class="docutils literal notranslate"><span class="pre">BaseTab.externalembeddedtab</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.externaliframetab"><code class="docutils literal notranslate"><span class="pre">BaseTab.externaliframetab</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.get_container"><code class="docutils literal notranslate"><span class="pre">BaseTab.get_container()</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.get_label"><code class="docutils literal notranslate"><span class="pre">BaseTab.get_label()</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.get_renderer_class"><code class="docutils literal notranslate"><span class="pre">BaseTab.get_renderer_class()</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.htmltab"><code class="docutils literal notranslate"><span class="pre">BaseTab.htmltab</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.label"><code class="docutils literal notranslate"><span class="pre">BaseTab.label</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.modelwithinheritance_ptr"><code class="docutils literal notranslate"><span class="pre">BaseTab.modelwithinheritance_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.modelwithinheritance_ptr_id"><code class="docutils literal notranslate"><span class="pre">BaseTab.modelwithinheritance_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.opening_method"><code class="docutils literal notranslate"><span class="pre">BaseTab.opening_method</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.order"><code class="docutils literal notranslate"><span class="pre">BaseTab.order</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.render"><code class="docutils literal notranslate"><span class="pre">BaseTab.render()</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.BaseTab.title"><code class="docutils literal notranslate"><span class="pre">BaseTab.title</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.basetab_ptr"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.basetab_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.basetab_ptr_id"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.basetab_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.container"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.content_url"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.content_url</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.element_id"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.element_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalEmbeddedTab.get_renderer_class"><code class="docutils literal notranslate"><span class="pre">ExternalEmbeddedTab.get_renderer_class()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.baseplugin_ptr"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.baseplugin_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.baseplugin_ptr_id"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.baseplugin_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.container"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.get_renderer_class"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.get_renderer_class()</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.height"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.height</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.service_url"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.service_url</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFramePlugin.width"><code class="docutils literal notranslate"><span class="pre">ExternalIFramePlugin.width</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.basetab_ptr"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.basetab_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.basetab_ptr_id"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.basetab_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.container"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.content_url"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.content_url</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.get_renderer_class"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.get_renderer_class()</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.height"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.height</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.ExternalIFrameTab.width"><code class="docutils literal notranslate"><span class="pre">ExternalIFrameTab.width</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin.baseplugin_ptr"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin.baseplugin_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin.baseplugin_ptr_id"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin.baseplugin_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin.container"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin.content"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin.content</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLPlugin.render"><code class="docutils literal notranslate"><span class="pre">HTMLPlugin.render()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.HTMLTab"><code class="docutils literal notranslate"><span class="pre">HTMLTab</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.HTMLTab.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">HTMLTab.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLTab.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">HTMLTab.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLTab.basetab_ptr"><code class="docutils literal notranslate"><span class="pre">HTMLTab.basetab_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLTab.basetab_ptr_id"><code class="docutils literal notranslate"><span class="pre">HTMLTab.basetab_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLTab.container"><code class="docutils literal notranslate"><span class="pre">HTMLTab.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLTab.content"><code class="docutils literal notranslate"><span class="pre">HTMLTab.content</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.HTMLTab.render"><code class="docutils literal notranslate"><span class="pre">HTMLTab.render()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apps.models.RSSPlugin"><code class="docutils literal notranslate"><span class="pre">RSSPlugin</span></code></a><ul>
+<li><a class="reference internal" href="#apps.models.RSSPlugin.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">RSSPlugin.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.RSSPlugin.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">RSSPlugin.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.RSSPlugin.baseplugin_ptr"><code class="docutils literal notranslate"><span class="pre">RSSPlugin.baseplugin_ptr</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.RSSPlugin.baseplugin_ptr_id"><code class="docutils literal notranslate"><span class="pre">RSSPlugin.baseplugin_ptr_id</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.RSSPlugin.container"><code class="docutils literal notranslate"><span class="pre">RSSPlugin.container</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.RSSPlugin.feed_url"><code class="docutils literal notranslate"><span class="pre">RSSPlugin.feed_url</span></code></a></li>
+<li><a class="reference internal" href="#apps.models.RSSPlugin.render"><code class="docutils literal notranslate"><span class="pre">RSSPlugin.render()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-apps.tests">apps.tests module</a><ul>
+<li><a class="reference internal" href="#apps.tests.AppsTest"><code class="docutils literal notranslate"><span class="pre">AppsTest</span></code></a><ul>
+<li><a class="reference internal" href="#apps.tests.AppsTest.setUpTestData"><code class="docutils literal notranslate"><span class="pre">AppsTest.setUpTestData()</span></code></a></li>
+<li><a class="reference internal" href="#apps.tests.AppsTest.test_html_plugin"><code class="docutils literal notranslate"><span class="pre">AppsTest.test_html_plugin()</span></code></a></li>
+<li><a class="reference internal" href="#apps.tests.AppsTest.test_iframe_plugin"><code class="docutils literal notranslate"><span class="pre">AppsTest.test_iframe_plugin()</span></code></a></li>
+<li><a class="reference internal" href="#apps.tests.AppsTest.test_plugin_builder_selections"><code class="docutils literal notranslate"><span class="pre">AppsTest.test_plugin_builder_selections()</span></code></a></li>
+<li><a class="reference internal" href="#apps.tests.AppsTest.test_rss_plugin"><code class="docutils literal notranslate"><span class="pre">AppsTest.test_rss_plugin()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-apps.urls">apps.urls module</a></li>
+<li><a class="reference internal" href="#module-apps.views">apps.views module</a><ul>
+<li><a class="reference internal" href="#apps.views.TabView"><code class="docutils literal notranslate"><span class="pre">TabView</span></code></a><ul>
+<li><a class="reference internal" href="#apps.views.TabView.get"><code class="docutils literal notranslate"><span class="pre">TabView.get()</span></code></a></li>
+<li><a class="reference internal" href="#apps.views.TabView.get_resource_objects"><code class="docutils literal notranslate"><span class="pre">TabView.get_resource_objects()</span></code></a></li>
+<li><a class="reference internal" href="#apps.views.TabView.tab_kw"><code class="docutils literal notranslate"><span class="pre">TabView.tab_kw</span></code></a></li>
+<li><a class="reference internal" href="#apps.views.TabView.template_name"><code class="docutils literal notranslate"><span class="pre">TabView.template_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-apps">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">apps package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/apps.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="apps-package">
+<h1>apps package<a class="headerlink" href="#apps-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.migrations.html">apps.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="apps.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apps.migrations.html#module-apps.migrations.0001_initial">apps.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apps.migrations.html#apps.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apps.migrations.html#module-apps.migrations.0002_auto_20150527_1004">apps.migrations.0002_auto_20150527_1004 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apps.migrations.html#apps.migrations.0002_auto_20150527_1004.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0002_auto_20150527_1004.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0002_auto_20150527_1004.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apps.migrations.html#module-apps.migrations.0003_auto_20210701_1730">apps.migrations.0003_auto_20210701_1730 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apps.migrations.html#apps.migrations.0003_auto_20210701_1730.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0003_auto_20210701_1730.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0003_auto_20210701_1730.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apps.migrations.html#module-apps.migrations.0004_auto_20210812_1536">apps.migrations.0004_auto_20210812_1536 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apps.migrations.html#apps.migrations.0004_auto_20210812_1536.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0004_auto_20210812_1536.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="apps.migrations.html#apps.migrations.0004_auto_20210812_1536.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apps.migrations.html#module-apps.migrations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="apps.templatetags.html">apps.templatetags package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="apps.templatetags.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="apps.templatetags.html#module-apps.templatetags.apps">apps.templatetags.apps module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="apps.templatetags.html#apps.templatetags.apps.plugin_renderers"><code class="docutils literal notranslate"><span class="pre">plugin_renderers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="apps.templatetags.html#module-apps.templatetags">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-apps.admin">
+<span id="apps-admin-module"></span><h2>apps.admin module<a class="headerlink" href="#module-apps.admin" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.BasePluginAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">BasePluginAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#BasePluginAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.BasePluginAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.BasePluginAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.BasePluginAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.BasePluginAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',)</span></em><a class="headerlink" href="#apps.admin.BasePluginAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.BaseTabAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">BaseTabAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#BaseTabAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.BaseTabAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.BaseTabAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.BaseTabAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.BaseTabAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('label',</span> <span class="pre">'title')</span></em><a class="headerlink" href="#apps.admin.BaseTabAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.ExternalEmbeddedTabAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">ExternalEmbeddedTabAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#ExternalEmbeddedTabAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.ExternalEmbeddedTabAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.ExternalEmbeddedTabAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.ExternalEmbeddedTabAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.ExternalEmbeddedTabAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('label',</span> <span class="pre">'title',</span> <span class="pre">'content_url')</span></em><a class="headerlink" href="#apps.admin.ExternalEmbeddedTabAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.ExternalIFramePluginAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">ExternalIFramePluginAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#ExternalIFramePluginAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.ExternalIFramePluginAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.ExternalIFramePluginAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.ExternalIFramePluginAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.ExternalIFramePluginAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',</span> <span class="pre">'service_url')</span></em><a class="headerlink" href="#apps.admin.ExternalIFramePluginAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.ExternalIFrameTabAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">ExternalIFrameTabAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#ExternalIFrameTabAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.ExternalIFrameTabAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.ExternalIFrameTabAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.ExternalIFrameTabAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.ExternalIFrameTabAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('label',</span> <span class="pre">'title',</span> <span class="pre">'content_url')</span></em><a class="headerlink" href="#apps.admin.ExternalIFrameTabAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.HTMLPluginAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">HTMLPluginAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#HTMLPluginAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.HTMLPluginAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.admin.HTMLPluginAdmin.course_instance_id">
+<span class="sig-name descname"><span class="pre">course_instance_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#HTMLPluginAdmin.course_instance_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.HTMLPluginAdmin.course_instance_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.HTMLPluginAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',</span> <span class="pre">'course_instance_id',</span> <span class="pre">'container_type',</span> <span class="pre">'views')</span></em><a class="headerlink" href="#apps.admin.HTMLPluginAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.HTMLPluginAdmin.list_display_links">
+<span class="sig-name descname"><span class="pre">list_display_links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',)</span></em><a class="headerlink" href="#apps.admin.HTMLPluginAdmin.list_display_links" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.HTMLPluginAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.HTMLPluginAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.HTMLPluginAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',)</span></em><a class="headerlink" href="#apps.admin.HTMLPluginAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.HTMLTabAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">HTMLTabAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#HTMLTabAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.HTMLTabAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.HTMLTabAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.HTMLTabAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.HTMLTabAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('label',</span> <span class="pre">'title')</span></em><a class="headerlink" href="#apps.admin.HTMLTabAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.admin.RSSPluginAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.admin.</span></span><span class="sig-name descname"><span class="pre">RSSPluginAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/admin.html#RSSPluginAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.admin.RSSPluginAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="apps.admin.RSSPluginAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#apps.admin.RSSPluginAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.admin.RSSPluginAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',</span> <span class="pre">'feed_url')</span></em><a class="headerlink" href="#apps.admin.RSSPluginAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-apps.app_renderers">
+<span id="apps-app-renderers-module"></span><h2>apps.app_renderers module<a class="headerlink" href="#module-apps.app_renderers" title="Link to this heading"></a></h2>
+<p>App renderers are objects that wrap an instance of an AbstractApp and the
+the context where the app will be rendered into a single object. App renderers
+can then passed to templates where their render method should be called to
+render the html of the app.</p>
+<p>App renderers are most useful with BasePlugin apps since they can be rendered
+in many different views with different contexts. A helper function
+build_plugin_renderers is provided for consistent and simple renderer building
+in views.</p>
+<p>Plugin view is a term that is used as an abstraction of the apps architecture
+of A+. It consists of a name and definition of the context in that view. For
+example, a in the course_instance view, plugins have the UserProfile of the
+user logged in and the CourseInstance being viewed available for the plugin
+renderer to use while rendering the plugin for the course_instance view. If the
+plugin would for example just render a greeting for the user, it could use the
+user’s name in the greeting as it is available through the UserProfile object.</p>
+<p>The available plugin views are
+- submission
+- exercise
+- course_instance</p>
+<p>The definition of the context of each plugin view can read from the code. The
+code that calls the build_plugin_renderers is responsible of giving the
+data required by the plugin view.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.app_renderers.ExternalIFramePluginRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.app_renderers.</span></span><span class="sig-name descname"><span class="pre">ExternalIFramePluginRenderer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/app_renderers.html#ExternalIFramePluginRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.app_renderers.ExternalIFramePluginRenderer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.app_renderers.ExternalIFramePluginRenderer.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/app_renderers.html#ExternalIFramePluginRenderer.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.app_renderers.ExternalIFramePluginRenderer.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.app_renderers.ExternalIFrameTabRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.app_renderers.</span></span><span class="sig-name descname"><span class="pre">ExternalIFrameTabRenderer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/app_renderers.html#ExternalIFrameTabRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.app_renderers.ExternalIFrameTabRenderer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.app_renderers.ExternalIFrameTabRenderer.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/app_renderers.html#ExternalIFrameTabRenderer.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.app_renderers.ExternalIFrameTabRenderer.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.app_renderers.TabRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.app_renderers.</span></span><span class="sig-name descname"><span class="pre">TabRenderer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tab</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/app_renderers.html#TabRenderer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.app_renderers.TabRenderer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.app_renderers.TabRenderer.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/app_renderers.html#TabRenderer.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.app_renderers.TabRenderer.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="apps.app_renderers.build_plugin_renderers">
+<span class="sig-prename descclassname"><span class="pre">apps.app_renderers.</span></span><span class="sig-name descname"><span class="pre">build_plugin_renderers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plugins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_profile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submission</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/app_renderers.html#build_plugin_renderers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.app_renderers.build_plugin_renderers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-apps.models">
+<span id="apps-models-module"></span><h2>apps.models module<a class="headerlink" href="#module-apps.models" title="Link to this heading"></a></h2>
+<p>Plugins and tabs make it possible to customize the behavior and appearance of pages in this
+system. Plugins are rendered as small “boxes” on the side of a page, where tabs have their own
+pages which can be accessed through a tab-like user interface.</p>
+<p>Any model can be related to a Plugin or Tab using a django.contrib.contenttypes.GenericRelation
+field and naming AbstractApp fields container_pk &amp; container_type for the link.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.AbstractApp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">AbstractApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#AbstractApp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.AbstractApp" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="inheritance.html#inheritance.models.ModelWithInheritance" title="inheritance.models.ModelWithInheritance"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelWithInheritance</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/apps/models.html#AbstractApp.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.AbstractApp.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.Meta.abstract">
+<span class="sig-name descname"><span class="pre">abstract</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#apps.models.AbstractApp.Meta.abstract" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.Meta.verbose_name">
+<span class="sig-name descname"><span class="pre">verbose_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MODEL_NAME_ABSTRACT_APP'</span></em><a class="headerlink" href="#apps.models.AbstractApp.Meta.verbose_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.Meta.verbose_name_plural">
+<span class="sig-name descname"><span class="pre">verbose_name_plural</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MODEL_NAME_ABSTRACT_APP_PLURAL'</span></em><a class="headerlink" href="#apps.models.AbstractApp.Meta.verbose_name_plural" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.AbstractApp.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.container_pk">
+<span class="sig-name descname"><span class="pre">container_pk</span></span><a class="headerlink" href="#apps.models.AbstractApp.container_pk" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.container_type">
+<span class="sig-name descname"><span class="pre">container_type</span></span><a class="headerlink" href="#apps.models.AbstractApp.container_type" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.container_type_id">
+<span class="sig-name descname"><span class="pre">container_type_id</span></span><a class="headerlink" href="#apps.models.AbstractApp.container_type_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.modelwithinheritance_ptr">
+<span class="sig-name descname"><span class="pre">modelwithinheritance_ptr</span></span><a class="headerlink" href="#apps.models.AbstractApp.modelwithinheritance_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.AbstractApp.modelwithinheritance_ptr_id">
+<span class="sig-name descname"><span class="pre">modelwithinheritance_ptr_id</span></span><a class="headerlink" href="#apps.models.AbstractApp.modelwithinheritance_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.BasePlugin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">BasePlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelwithinheritance_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">views</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#BasePlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.BasePlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.AbstractApp" title="apps.models.AbstractApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractApp</span></code></a></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.BasePlugin.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.BasePlugin.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.BasePlugin.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.container_pk">
+<span class="sig-name descname"><span class="pre">container_pk</span></span><a class="headerlink" href="#apps.models.BasePlugin.container_pk" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.container_type">
+<span class="sig-name descname"><span class="pre">container_type</span></span><a class="headerlink" href="#apps.models.BasePlugin.container_type" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.container_type_id">
+<span class="sig-name descname"><span class="pre">container_type_id</span></span><a class="headerlink" href="#apps.models.BasePlugin.container_type_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.externaliframeplugin">
+<span class="sig-name descname"><span class="pre">externaliframeplugin</span></span><a class="headerlink" href="#apps.models.BasePlugin.externaliframeplugin" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the reverse side of a one-to-one
+relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Place.restaurant</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.htmlplugin">
+<span class="sig-name descname"><span class="pre">htmlplugin</span></span><a class="headerlink" href="#apps.models.BasePlugin.htmlplugin" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the reverse side of a one-to-one
+relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Place.restaurant</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.modelwithinheritance_ptr">
+<span class="sig-name descname"><span class="pre">modelwithinheritance_ptr</span></span><a class="headerlink" href="#apps.models.BasePlugin.modelwithinheritance_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.modelwithinheritance_ptr_id">
+<span class="sig-name descname"><span class="pre">modelwithinheritance_ptr_id</span></span><a class="headerlink" href="#apps.models.BasePlugin.modelwithinheritance_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#BasePlugin.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.BasePlugin.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.rssplugin">
+<span class="sig-name descname"><span class="pre">rssplugin</span></span><a class="headerlink" href="#apps.models.BasePlugin.rssplugin" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the reverse side of a one-to-one
+relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Place.restaurant</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#apps.models.BasePlugin.title" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BasePlugin.views">
+<span class="sig-name descname"><span class="pre">views</span></span><a class="headerlink" href="#apps.models.BasePlugin.views" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.BaseTab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">BaseTab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelwithinheritance_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opening_method</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#BaseTab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.BaseTab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.AbstractApp" title="apps.models.AbstractApp"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractApp</span></code></a></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.BaseTab.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.BaseTab.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.BaseTab.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.BaseTab.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.BaseTab.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.container_pk">
+<span class="sig-name descname"><span class="pre">container_pk</span></span><a class="headerlink" href="#apps.models.BaseTab.container_pk" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.container_type">
+<span class="sig-name descname"><span class="pre">container_type</span></span><a class="headerlink" href="#apps.models.BaseTab.container_type" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.container_type_id">
+<span class="sig-name descname"><span class="pre">container_type_id</span></span><a class="headerlink" href="#apps.models.BaseTab.container_type_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.externalembeddedtab">
+<span class="sig-name descname"><span class="pre">externalembeddedtab</span></span><a class="headerlink" href="#apps.models.BaseTab.externalembeddedtab" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the reverse side of a one-to-one
+relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Place.restaurant</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.externaliframetab">
+<span class="sig-name descname"><span class="pre">externaliframetab</span></span><a class="headerlink" href="#apps.models.BaseTab.externaliframetab" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the reverse side of a one-to-one
+relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Place.restaurant</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.BaseTab.get_container">
+<span class="sig-name descname"><span class="pre">get_container</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#BaseTab.get_container"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.BaseTab.get_container" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.BaseTab.get_label">
+<span class="sig-name descname"><span class="pre">get_label</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#BaseTab.get_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.BaseTab.get_label" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.BaseTab.get_renderer_class">
+<span class="sig-name descname"><span class="pre">get_renderer_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#BaseTab.get_renderer_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.BaseTab.get_renderer_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.htmltab">
+<span class="sig-name descname"><span class="pre">htmltab</span></span><a class="headerlink" href="#apps.models.BaseTab.htmltab" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the reverse side of a one-to-one
+relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Place.restaurant</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.label">
+<span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#apps.models.BaseTab.label" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.modelwithinheritance_ptr">
+<span class="sig-name descname"><span class="pre">modelwithinheritance_ptr</span></span><a class="headerlink" href="#apps.models.BaseTab.modelwithinheritance_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.modelwithinheritance_ptr_id">
+<span class="sig-name descname"><span class="pre">modelwithinheritance_ptr_id</span></span><a class="headerlink" href="#apps.models.BaseTab.modelwithinheritance_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.opening_method">
+<span class="sig-name descname"><span class="pre">opening_method</span></span><a class="headerlink" href="#apps.models.BaseTab.opening_method" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.order">
+<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#apps.models.BaseTab.order" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.BaseTab.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#BaseTab.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.BaseTab.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.BaseTab.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#apps.models.BaseTab.title" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">ExternalEmbeddedTab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelwithinheritance_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opening_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basetab_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#ExternalEmbeddedTab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.ExternalEmbeddedTab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab" title="apps.models.BaseTab"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTab</span></code></a></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab.DoesNotExist" title="apps.models.BaseTab.DoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab.MultipleObjectsReturned" title="apps.models.BaseTab.MultipleObjectsReturned"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.basetab_ptr">
+<span class="sig-name descname"><span class="pre">basetab_ptr</span></span><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.basetab_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.basetab_ptr_id">
+<span class="sig-name descname"><span class="pre">basetab_ptr_id</span></span><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.basetab_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.content_url">
+<span class="sig-name descname"><span class="pre">content_url</span></span><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.content_url" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.element_id">
+<span class="sig-name descname"><span class="pre">element_id</span></span><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.element_id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.ExternalEmbeddedTab.get_renderer_class">
+<span class="sig-name descname"><span class="pre">get_renderer_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#ExternalEmbeddedTab.get_renderer_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.ExternalEmbeddedTab.get_renderer_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">ExternalIFramePlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#ExternalIFramePlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.ExternalIFramePlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin" title="apps.models.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></a></p>
+<p>An ExternalIFramePlugin gets its content from an external url resource
+through an iframe which has the content_url as its src, possibly with
+additional url parameters.</p>
+<p>ExternalIFramePlugin uses ExternalIFramePluginRenderer for rendering. Refer
+to its documentation for more information about the available url
+parameters and its view behaviour.</p>
+<p>Iframes’ width and height are fixed in the html document flow and thus they
+should be given explicitly and they should be at least the size of the
+expected content html but at maximum the size available for the plugin in
+each view which varies among the views. The size of the rendered iframe
+will thus be the given width and height but at maximum the width and height
+available in the view.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin.DoesNotExist" title="apps.models.BasePlugin.DoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin.MultipleObjectsReturned" title="apps.models.BasePlugin.MultipleObjectsReturned"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.baseplugin_ptr">
+<span class="sig-name descname"><span class="pre">baseplugin_ptr</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.baseplugin_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.baseplugin_ptr_id">
+<span class="sig-name descname"><span class="pre">baseplugin_ptr_id</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.baseplugin_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.get_renderer_class">
+<span class="sig-name descname"><span class="pre">get_renderer_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#ExternalIFramePlugin.get_renderer_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.ExternalIFramePlugin.get_renderer_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.height" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.service_url">
+<span class="sig-name descname"><span class="pre">service_url</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.service_url" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFramePlugin.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#apps.models.ExternalIFramePlugin.width" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">ExternalIFrameTab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#ExternalIFrameTab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.ExternalIFrameTab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab" title="apps.models.BaseTab"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTab</span></code></a></p>
+<p>An ExternalIFrameTab gets its content from an external url resource through
+an iframe which has the content_url as its src, possibly with additional
+url parameters.</p>
+<p>ExternalIFrameTab uses ExternalIFrameTabRenderer for rendering. Refer to
+its documentation for more information about the available url parameters.</p>
+<p>Iframes’ width and height are fixed in the html document flow and thus they
+should be given explicitly and they should be the size of the expected
+content html.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab.DoesNotExist" title="apps.models.BaseTab.DoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab.MultipleObjectsReturned" title="apps.models.BaseTab.MultipleObjectsReturned"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.basetab_ptr">
+<span class="sig-name descname"><span class="pre">basetab_ptr</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.basetab_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.basetab_ptr_id">
+<span class="sig-name descname"><span class="pre">basetab_ptr_id</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.basetab_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.content_url">
+<span class="sig-name descname"><span class="pre">content_url</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.content_url" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.get_renderer_class">
+<span class="sig-name descname"><span class="pre">get_renderer_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#ExternalIFrameTab.get_renderer_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.ExternalIFrameTab.get_renderer_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.height" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.ExternalIFrameTab.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#apps.models.ExternalIFrameTab.width" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">HTMLPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelwithinheritance_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">views</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseplugin_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#HTMLPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.HTMLPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin" title="apps.models.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></a></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.HTMLPlugin.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin.DoesNotExist" title="apps.models.BasePlugin.DoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.HTMLPlugin.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin.MultipleObjectsReturned" title="apps.models.BasePlugin.MultipleObjectsReturned"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin.baseplugin_ptr">
+<span class="sig-name descname"><span class="pre">baseplugin_ptr</span></span><a class="headerlink" href="#apps.models.HTMLPlugin.baseplugin_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin.baseplugin_ptr_id">
+<span class="sig-name descname"><span class="pre">baseplugin_ptr_id</span></span><a class="headerlink" href="#apps.models.HTMLPlugin.baseplugin_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.HTMLPlugin.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin.content">
+<span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#apps.models.HTMLPlugin.content" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.HTMLPlugin.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#HTMLPlugin.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.HTMLPlugin.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.HTMLTab">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">HTMLTab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelwithinheritance_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opening_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basetab_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#HTMLTab"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.HTMLTab" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab" title="apps.models.BaseTab"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTab</span></code></a></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.HTMLTab.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.HTMLTab.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab.DoesNotExist" title="apps.models.BaseTab.DoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.HTMLTab.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.HTMLTab.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BaseTab.MultipleObjectsReturned" title="apps.models.BaseTab.MultipleObjectsReturned"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLTab.basetab_ptr">
+<span class="sig-name descname"><span class="pre">basetab_ptr</span></span><a class="headerlink" href="#apps.models.HTMLTab.basetab_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLTab.basetab_ptr_id">
+<span class="sig-name descname"><span class="pre">basetab_ptr_id</span></span><a class="headerlink" href="#apps.models.HTMLTab.basetab_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLTab.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.HTMLTab.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.HTMLTab.content">
+<span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#apps.models.HTMLTab.content" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.HTMLTab.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#HTMLTab.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.HTMLTab.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.models.</span></span><span class="sig-name descname"><span class="pre">RSSPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelwithinheritance_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container_pk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">views</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseplugin_ptr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#RSSPlugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.RSSPlugin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin" title="apps.models.BasePlugin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BasePlugin</span></code></a></p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apps.models.RSSPlugin.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin.DoesNotExist" title="apps.models.BasePlugin.DoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apps.models.RSSPlugin.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#apps.models.BasePlugin.MultipleObjectsReturned" title="apps.models.BasePlugin.MultipleObjectsReturned"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin.baseplugin_ptr">
+<span class="sig-name descname"><span class="pre">baseplugin_ptr</span></span><a class="headerlink" href="#apps.models.RSSPlugin.baseplugin_ptr" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin.baseplugin_ptr_id">
+<span class="sig-name descname"><span class="pre">baseplugin_ptr_id</span></span><a class="headerlink" href="#apps.models.RSSPlugin.baseplugin_ptr_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin.container">
+<span class="sig-name descname"><span class="pre">container</span></span><a class="headerlink" href="#apps.models.RSSPlugin.container" title="Link to this definition"></a></dt>
+<dd><p>Provide a generic many-to-one relation through the <code class="docutils literal notranslate"><span class="pre">content_type</span></code> and
+<code class="docutils literal notranslate"><span class="pre">object_id</span></code> fields.</p>
+<p>This class also doubles as an accessor to the related object (similar to
+ForwardManyToOneDescriptor) by adding itself as a model attribute.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin.feed_url">
+<span class="sig-name descname"><span class="pre">feed_url</span></span><a class="headerlink" href="#apps.models.RSSPlugin.feed_url" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.models.RSSPlugin.render">
+<span class="sig-name descname"><span class="pre">render</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/models.html#RSSPlugin.render"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.models.RSSPlugin.render" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-apps.tests">
+<span id="apps-tests-module"></span><h2>apps.tests module<a class="headerlink" href="#module-apps.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.tests.AppsTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.tests.</span></span><span class="sig-name descname"><span class="pre">AppsTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/tests.html#AppsTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.tests.AppsTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.tests.AppsTest.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/tests.html#AppsTest.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.tests.AppsTest.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.tests.AppsTest.test_html_plugin">
+<span class="sig-name descname"><span class="pre">test_html_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/tests.html#AppsTest.test_html_plugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.tests.AppsTest.test_html_plugin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.tests.AppsTest.test_iframe_plugin">
+<span class="sig-name descname"><span class="pre">test_iframe_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/tests.html#AppsTest.test_iframe_plugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.tests.AppsTest.test_iframe_plugin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.tests.AppsTest.test_plugin_builder_selections">
+<span class="sig-name descname"><span class="pre">test_plugin_builder_selections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/tests.html#AppsTest.test_plugin_builder_selections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.tests.AppsTest.test_plugin_builder_selections" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.tests.AppsTest.test_rss_plugin">
+<span class="sig-name descname"><span class="pre">test_rss_plugin</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/tests.html#AppsTest.test_rss_plugin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.tests.AppsTest.test_rss_plugin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-apps.urls">
+<span id="apps-urls-module"></span><h2>apps.urls module<a class="headerlink" href="#module-apps.urls" title="Link to this heading"></a></h2>
+</section>
+<section id="module-apps.views">
+<span id="apps-views-module"></span><h2>apps.views module<a class="headerlink" href="#module-apps.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="apps.views.TabView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apps.views.</span></span><span class="sig-name descname"><span class="pre">TabView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/views.html#TabView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.views.TabView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="course.html#course.viewbase.CourseInstanceBaseView" title="course.viewbase.CourseInstanceBaseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseInstanceBaseView</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.views.TabView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/views.html#TabView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.views.TabView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apps.views.TabView.get_resource_objects">
+<span class="sig-name descname"><span class="pre">get_resource_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/apps/views.html#TabView.get_resource_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apps.views.TabView.get_resource_objects" title="Link to this definition"></a></dt>
+<dd><p>Get the resource objects sufficient to determine the existance.
+Should raise Http404 if the request does not reach a resource.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.views.TabView.tab_kw">
+<span class="sig-name descname"><span class="pre">tab_kw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'tab_id'</span></em><a class="headerlink" href="#apps.views.TabView.tab_kw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="apps.views.TabView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'plugins/view_tab.html'</span></em><a class="headerlink" href="#apps.views.TabView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-apps">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-apps" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,765 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.cache package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">lib.cache package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-lib.cache.backends">lib.cache.backends module</a><ul>
+<li><a class="reference internal" href="#lib.cache.backends.LocMemCache"><code class="docutils literal notranslate"><span class="pre">LocMemCache</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.backends.LocMemCache.add"><code class="docutils literal notranslate"><span class="pre">LocMemCache.add()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.cache.cached">lib.cache.cached module</a><ul>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase"><code class="docutils literal notranslate"><span class="pre">CacheBase</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.as_proxy"><code class="docutils literal notranslate"><span class="pre">CacheBase.as_proxy()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.get"><code class="docutils literal notranslate"><span class="pre">CacheBase.get()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.get_child_proxies"><code class="docutils literal notranslate"><span class="pre">CacheBase.get_child_proxies()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.is_valid"><code class="docutils literal notranslate"><span class="pre">CacheBase.is_valid()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.populate_children"><code class="docutils literal notranslate"><span class="pre">CacheBase.populate_children()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.post_build"><code class="docutils literal notranslate"><span class="pre">CacheBase.post_build()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.post_get"><code class="docutils literal notranslate"><span class="pre">CacheBase.post_get()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheBase.proxy"><code class="docutils literal notranslate"><span class="pre">CacheBase.proxy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta"><code class="docutils literal notranslate"><span class="pre">CacheMeta</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta.DBCLS"><code class="docutils literal notranslate"><span class="pre">CacheMeta.DBCLS</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta.INVALIDATORS"><code class="docutils literal notranslate"><span class="pre">CacheMeta.INVALIDATORS</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta.KEY_PREFIX"><code class="docutils literal notranslate"><span class="pre">CacheMeta.KEY_PREFIX</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta.NUM_PARAMS"><code class="docutils literal notranslate"><span class="pre">CacheMeta.NUM_PARAMS</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta.invalidate"><code class="docutils literal notranslate"><span class="pre">CacheMeta.invalidate()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta.invalidate_many"><code class="docutils literal notranslate"><span class="pre">CacheMeta.invalidate_many()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.CacheMeta.parameter_ids"><code class="docutils literal notranslate"><span class="pre">CacheMeta.parameter_ids()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.cached.DBDataManager"><code class="docutils literal notranslate"><span class="pre">DBDataManager</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.cached.DBDataManager.add"><code class="docutils literal notranslate"><span class="pre">DBDataManager.add()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.DBDataManager.fetch"><code class="docutils literal notranslate"><span class="pre">DBDataManager.fetch()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.cached.NoCache"><code class="docutils literal notranslate"><span class="pre">NoCache</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.Pickler"><code class="docutils literal notranslate"><span class="pre">Pickler</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.cached.Pickler.getvalue"><code class="docutils literal notranslate"><span class="pre">Pickler.getvalue()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.Pickler.persistent_id"><code class="docutils literal notranslate"><span class="pre">Pickler.persistent_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager"><code class="docutils literal notranslate"><span class="pre">ProxyManager</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.db_managers"><code class="docutils literal notranslate"><span class="pre">ProxyManager.db_managers</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.fetch"><code class="docutils literal notranslate"><span class="pre">ProxyManager.fetch()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.fetched_data"><code class="docutils literal notranslate"><span class="pre">ProxyManager.fetched_data</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.gen_start"><code class="docutils literal notranslate"><span class="pre">ProxyManager.gen_start</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.get_or_create_proxy"><code class="docutils literal notranslate"><span class="pre">ProxyManager.get_or_create_proxy()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.new_keys"><code class="docutils literal notranslate"><span class="pre">ProxyManager.new_keys</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.new_proxies"><code class="docutils literal notranslate"><span class="pre">ProxyManager.new_proxies</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.nstates"><code class="docutils literal notranslate"><span class="pre">ProxyManager.nstates</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.proxies"><code class="docutils literal notranslate"><span class="pre">ProxyManager.proxies</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.resolve"><code class="docutils literal notranslate"><span class="pre">ProxyManager.resolve()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.save"><code class="docutils literal notranslate"><span class="pre">ProxyManager.save()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.ProxyManager.update"><code class="docutils literal notranslate"><span class="pre">ProxyManager.update()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.cached.Unpickler"><code class="docutils literal notranslate"><span class="pre">Unpickler</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.cached.Unpickler.persistent_load"><code class="docutils literal notranslate"><span class="pre">Unpickler.persistent_load()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.Unpickler.precreated"><code class="docutils literal notranslate"><span class="pre">Unpickler.precreated</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.cached.Varies"><code class="docutils literal notranslate"><span class="pre">Varies</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.get_cache_fields"><code class="docutils literal notranslate"><span class="pre">get_cache_fields()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached.resolve_proxies"><code class="docutils literal notranslate"><span class="pre">resolve_proxies()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.cache.cached_old">lib.cache.cached_old module</a><ul>
+<li><a class="reference internal" href="#lib.cache.cached_old.CachedAbstract"><code class="docutils literal notranslate"><span class="pre">CachedAbstract</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.cached_old.CachedAbstract.KEY_PREFIX"><code class="docutils literal notranslate"><span class="pre">CachedAbstract.KEY_PREFIX</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached_old.CachedAbstract.data"><code class="docutils literal notranslate"><span class="pre">CachedAbstract.data</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.cached_old.CachedAbstract.invalidate"><code class="docutils literal notranslate"><span class="pre">CachedAbstract.invalidate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.cache.tests">lib.cache.tests module</a><ul>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest"><code class="docutils literal notranslate"><span class="pre">CachedTest</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest.setUp"><code class="docutils literal notranslate"><span class="pre">CachedTest.setUp()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest.test_cache_stores_value"><code class="docutils literal notranslate"><span class="pre">CachedTest.test_cache_stores_value()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest.test_gen_invalidated"><code class="docutils literal notranslate"><span class="pre">CachedTest.test_gen_invalidated()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest.test_gen_value"><code class="docutils literal notranslate"><span class="pre">CachedTest.test_gen_value()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest.test_invalidate"><code class="docutils literal notranslate"><span class="pre">CachedTest.test_invalidate()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest.test_latest_data"><code class="docutils literal notranslate"><span class="pre">CachedTest.test_latest_data()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.CachedTest.test_out_of_order_update"><code class="docutils literal notranslate"><span class="pre">CachedTest.test_out_of_order_update()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.tests.MockCache"><code class="docutils literal notranslate"><span class="pre">MockCache</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.tests.MockCache.INVALIDATORS"><code class="docutils literal notranslate"><span class="pre">MockCache.INVALIDATORS</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.MockCache.KEY_PREFIX"><code class="docutils literal notranslate"><span class="pre">MockCache.KEY_PREFIX</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.MockCache.NUM_PARAMS"><code class="docutils literal notranslate"><span class="pre">MockCache.NUM_PARAMS</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.tests.Rollback"><code class="docutils literal notranslate"><span class="pre">Rollback</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TestCached"><code class="docutils literal notranslate"><span class="pre">TestCached</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest"><code class="docutils literal notranslate"><span class="pre">TransactionTest</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_changed_during_transaction"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_changed_during_transaction()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_commit"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_commit()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_invalidating_transaction"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_invalidating_transaction()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_nested_transaction"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_nested_transaction()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_no_transaction"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_no_transaction()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_overridden_invalidate_transaction"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_overridden_invalidate_transaction()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_rollback"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_rollback()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.TransactionTest.test_within_transaction"><code class="docutils literal notranslate"><span class="pre">TransactionTest.test_within_transaction()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#lib.cache.tests.cache_patcher"><code class="docutils literal notranslate"><span class="pre">cache_patcher()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.mock_add"><code class="docutils literal notranslate"><span class="pre">mock_add()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.mock_delete"><code class="docutils literal notranslate"><span class="pre">mock_delete()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.mock_get"><code class="docutils literal notranslate"><span class="pre">mock_get()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.mock_get_many"><code class="docutils literal notranslate"><span class="pre">mock_get_many()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.mock_set"><code class="docutils literal notranslate"><span class="pre">mock_set()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.tests.mock_set_many"><code class="docutils literal notranslate"><span class="pre">mock_set_many()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.cache.transact">lib.cache.transact module</a><ul>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager</span></code></a><ul>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager.commiting"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager.commiting</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager.get"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager.get()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager.get_many"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager.get_many()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager.init"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager.init()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager.memos"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager.memos</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager.set"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager.set()</span></code></a></li>
+<li><a class="reference internal" href="#lib.cache.transact.CacheTransactionManager.set_many"><code class="docutils literal notranslate"><span class="pre">CacheTransactionManager.set_many()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-lib.cache">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">lib.cache package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/lib.cache.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="lib-cache-package">
+<h1>lib.cache package<a class="headerlink" href="#lib-cache-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-lib.cache.backends">
+<span id="lib-cache-backends-module"></span><h2>lib.cache.backends module<a class="headerlink" href="#module-lib.cache.backends" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.backends.LocMemCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.backends.</span></span><span class="sig-name descname"><span class="pre">LocMemCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/backends.html#LocMemCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.backends.LocMemCache" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LocMemCache</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.backends.LocMemCache.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/backends.html#LocMemCache.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.backends.LocMemCache.add" title="Link to this definition"></a></dt>
+<dd><p>Set a value in the cache if the key does not already exist. If
+timeout is given, use that timeout for the key; otherwise use the
+default cache timeout.</p>
+<p>Return True if the value was stored, False otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.cache.cached">
+<span id="lib-cache-cached-module"></span><h2>lib.cache.cached module<a class="headerlink" href="#module-lib.cache.cached" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">CacheBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.as_proxy">
+<span class="sig-name descname"><span class="pre">as_proxy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.as_proxy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.as_proxy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.get">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">all_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefetch_children</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.get_child_proxies">
+<span class="sig-name descname"><span class="pre">get_child_proxies</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.get_child_proxies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.get_child_proxies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.is_valid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.populate_children">
+<span class="sig-name descname"><span class="pre">populate_children</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.populate_children"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.populate_children" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.post_build">
+<span class="sig-name descname"><span class="pre">post_build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precreated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lib.cache.cached.ProxyManager" title="lib.cache.cached.ProxyManager"><span class="pre">ProxyManager</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.post_build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.post_build" title="Link to this definition"></a></dt>
+<dd><p>Called after the whole object has been built (each object in the inheritance
+tree has been loaded from the cache or generated).</p>
+<p>This is just a useful hook, and does not have to be implemented.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.post_get">
+<span class="sig-name descname"><span class="pre">post_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precreated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lib.cache.cached.ProxyManager" title="lib.cache.cached.ProxyManager"><span class="pre">ProxyManager</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.post_get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.post_get" title="Link to this definition"></a></dt>
+<dd><p>Called after the object was loaded from cache. This is called for each
+separately cached object in the inheritance tree.</p>
+<p>This is just a useful hook, and does not have to be implemented.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheBase.proxy">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">proxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifiers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">T</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheBase.proxy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheBase.proxy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">CacheMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheMeta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></p>
+<p>A metaclass for CacheBase to set the _cached_fields attribute automatically for each subclass</p>
+<p>Class variables:
+- KEY_PREFIX: prefix used for the cache key
+- NUM_PARAMS: number of cache parameters (i.e. the parameters given to CacheBase.get())
+- INVALIDATORS: A list of (Model, List[ModelSignal], ParamAttrsOrGenerator). Used to
+determine which database models invalidate the cache. See basetypes.py and points.py for examples on use.
+- PARENTS: Can be used to override the parent items in cache. In essence, this can be used to
+manually determine which parent classes should be fetched separately and which should be included in the
+this class’ cache. (Classes in PARENTS will be fetched separately)
+- PROTO_BASES: Base classes that are to be handled as protocols: their fields are not included in the
+cache.
+- DBCLS: DBDataManager subclass to be used for fetching data from the database.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta.DBCLS">
+<span class="sig-name descname"><span class="pre">DBCLS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.DBDataManager" title="lib.cache.cached.DBDataManager"><span class="pre">DBDataManager</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lib.cache.cached.CacheMeta.DBCLS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta.INVALIDATORS">
+<span class="sig-name descname"><span class="pre">INVALIDATORS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">Model</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ModelSignal</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Model</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Model</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Iterator</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.cached.CacheMeta.INVALIDATORS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta.KEY_PREFIX">
+<span class="sig-name descname"><span class="pre">KEY_PREFIX</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#lib.cache.cached.CacheMeta.KEY_PREFIX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta.NUM_PARAMS">
+<span class="sig-name descname"><span class="pre">NUM_PARAMS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#lib.cache.cached.CacheMeta.NUM_PARAMS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta.invalidate">
+<span class="sig-name descname"><span class="pre">invalidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheMeta.invalidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheMeta.invalidate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta.invalidate_many">
+<span class="sig-name descname"><span class="pre">invalidate_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">models_iterable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Collection</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheMeta.invalidate_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheMeta.invalidate_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.CacheMeta.parameter_ids">
+<span class="sig-name descname"><span class="pre">parameter_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">models</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#CacheMeta.parameter_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.CacheMeta.parameter_ids" title="Link to this definition"></a></dt>
+<dd><p>Turn the cache parameters used to generate the data into ids that can be used
+to identify the original objects</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.DBDataManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">DBDataManager</span></span><a class="reference internal" href="_modules/lib/cache/cached.html#DBDataManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.DBDataManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.DBDataManager.add">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#DBDataManager.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.DBDataManager.add" title="Link to this definition"></a></dt>
+<dd><p>Add cache object to be fetched data for</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.DBDataManager.fetch">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#DBDataManager.fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.DBDataManager.fetch" title="Link to this definition"></a></dt>
+<dd><p>Fetch data from the database for the added cache entries</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.NoCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">NoCache</span></span><a class="reference internal" href="_modules/lib/cache/cached.html#NoCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.NoCache" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">CacheT</span></code>]</p>
+<p>Do not add the field to the cache</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.Pickler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">Pickler</span></span><a class="reference internal" href="_modules/lib/cache/cached.html#Pickler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.Pickler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Pickler</span></code></p>
+<p>Custom pickler that returns persistent ids for cache objects</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.Pickler.getvalue">
+<span class="sig-name descname"><span class="pre">getvalue</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#Pickler.getvalue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.Pickler.getvalue" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.Pickler.persistent_id">
+<span class="sig-name descname"><span class="pre">persistent_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#Pickler.persistent_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.Pickler.persistent_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">ProxyManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached.html#ProxyManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.ProxyManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Handles creating and building cache objects while trying to minimize
+the number of cache operations.</p>
+<p>proxies contains a list of proxies managed by this manager.
+fetched_data holds on to the data fetched from the cache.
+new_keys contains cache keys that were added to the manager since the
+last cache get.
+nstates contains new items to be saved to the cache on .save().</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.db_managers">
+<span class="sig-name descname"><span class="pre">db_managers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.DBDataManager" title="lib.cache.cached.DBDataManager"><span class="pre">DBDataManager</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#lib.cache.cached.DBDataManager" title="lib.cache.cached.DBDataManager"><span class="pre">DBDataManager</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.cached.ProxyManager.db_managers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.fetch">
+<span class="sig-name descname"><span class="pre">fetch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#ProxyManager.fetch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.ProxyManager.fetch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.fetched_data">
+<span class="sig-name descname"><span class="pre">fetched_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.cached.ProxyManager.fetched_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.gen_start">
+<span class="sig-name descname"><span class="pre">gen_start</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#lib.cache.cached.ProxyManager.gen_start" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.get_or_create_proxy">
+<span class="sig-name descname"><span class="pre">get_or_create_proxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">CacheBaseT</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifiers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">CacheBaseT</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#ProxyManager.get_or_create_proxy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.ProxyManager.get_or_create_proxy" title="Link to this definition"></a></dt>
+<dd><p>Return proxy object corresponding to cls and params from precreated or create a new proxy object if
+not found otherwise.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.new_keys">
+<span class="sig-name descname"><span class="pre">new_keys</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Set</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.cached.ProxyManager.new_keys" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.new_proxies">
+<span class="sig-name descname"><span class="pre">new_proxies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.cached.ProxyManager.new_proxies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.nstates">
+<span class="sig-name descname"><span class="pre">nstates</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.cached.ProxyManager.nstates" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.proxies">
+<span class="sig-name descname"><span class="pre">proxies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.cached.ProxyManager.proxies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.resolve">
+<span class="sig-name descname"><span class="pre">resolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#ProxyManager.resolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.ProxyManager.resolve" title="Link to this definition"></a></dt>
+<dd><p>Resolve given proxies. Depth is how many layers (child proxies) down should be resolved. Negative depth
+means to resolve the whole proxy tree.</p>
+<p>NOTE: Doesn’t resolve the children of already resolved proxies no matter the depth value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#ProxyManager.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.ProxyManager.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.ProxyManager.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#ProxyManager.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.ProxyManager.update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.Unpickler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">Unpickler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precreated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached.html#Unpickler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.Unpickler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Unpickler</span></code></p>
+<p>Custom unpickler that resolves persistent ids for cache objects created by the above pickler
+using the given proxy manager. Cache objects with the same params and modifiers will be set to
+the same instance</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached.Unpickler.persistent_load">
+<span class="sig-name descname"><span class="pre">persistent_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#Unpickler.persistent_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.Unpickler.persistent_load" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached.Unpickler.precreated">
+<span class="sig-name descname"><span class="pre">precreated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#lib.cache.cached.ProxyManager" title="lib.cache.cached.ProxyManager"><span class="pre">ProxyManager</span></a></em><a class="headerlink" href="#lib.cache.cached.Unpickler.precreated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached.Varies">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">Varies</span></span><a class="reference internal" href="_modules/lib/cache/cached.html#Varies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.Varies" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">CacheT</span></code>]</p>
+<p>Add the field to the cache separately for each object in the inheritance tree</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.cached.get_cache_fields">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">get_cache_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#get_cache_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.get_cache_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.cached.resolve_proxies">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.cached.</span></span><span class="sig-name descname"><span class="pre">resolve_proxies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proxies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><span class="pre">CacheBase</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/cached.html#resolve_proxies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached.resolve_proxies" title="Link to this definition"></a></dt>
+<dd><p>Resolve proxies and save any newly generated ones</p>
+</dd></dl>
+
+</section>
+<section id="module-lib.cache.cached_old">
+<span id="lib-cache-cached-old-module"></span><h2>lib.cache.cached_old module<a class="headerlink" href="#module-lib.cache.cached_old" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.cached_old.CachedAbstract">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.cached_old.</span></span><span class="sig-name descname"><span class="pre">CachedAbstract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifiers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached_old.html#CachedAbstract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached_old.CachedAbstract" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">DataType</span></code>]</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached_old.CachedAbstract.KEY_PREFIX">
+<span class="sig-name descname"><span class="pre">KEY_PREFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'abstract'</span></em><a class="headerlink" href="#lib.cache.cached_old.CachedAbstract.KEY_PREFIX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.cached_old.CachedAbstract.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">DataType</span></em><a class="headerlink" href="#lib.cache.cached_old.CachedAbstract.data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.cached_old.CachedAbstract.invalidate">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">invalidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifiers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/cached_old.html#CachedAbstract.invalidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.cached_old.CachedAbstract.invalidate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.cache.tests">
+<span id="lib-cache-tests-module"></span><h2>lib.cache.tests module<a class="headerlink" href="#module-lib.cache.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">CachedTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleTestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest.setUp">
+<span class="sig-name descname"><span class="pre">setUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest.setUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest.setUp" title="Link to this definition"></a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest.test_cache_stores_value">
+<span class="sig-name descname"><span class="pre">test_cache_stores_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest.test_cache_stores_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest.test_cache_stores_value" title="Link to this definition"></a></dt>
+<dd><p>Cache should store the generated value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest.test_gen_invalidated">
+<span class="sig-name descname"><span class="pre">test_gen_invalidated</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest.test_gen_invalidated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest.test_gen_invalidated" title="Link to this definition"></a></dt>
+<dd><p>Cache should return the value generated, also after cache is invalidated</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest.test_gen_value">
+<span class="sig-name descname"><span class="pre">test_gen_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest.test_gen_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest.test_gen_value" title="Link to this definition"></a></dt>
+<dd><p>Cache should return the generated value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest.test_invalidate">
+<span class="sig-name descname"><span class="pre">test_invalidate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest.test_invalidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest.test_invalidate" title="Link to this definition"></a></dt>
+<dd><p>If cache is invalidated during a data generation, then the data should not be cached.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest.test_latest_data">
+<span class="sig-name descname"><span class="pre">test_latest_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest.test_latest_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest.test_latest_data" title="Link to this definition"></a></dt>
+<dd><p>Cached should store the data, which generation was started at the latest point in time.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.CachedTest.test_out_of_order_update">
+<span class="sig-name descname"><span class="pre">test_out_of_order_update</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#CachedTest.test_out_of_order_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.CachedTest.test_out_of_order_update" title="Link to this definition"></a></dt>
+<dd><p>Cached should store the data, which generation was started at the latest point in time.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.tests.MockCache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">MockCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#MockCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.MockCache" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lib.cache.cached.CacheBase" title="lib.cache.cached.CacheBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">CacheBase</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.tests.MockCache.INVALIDATORS">
+<span class="sig-name descname"><span class="pre">INVALIDATORS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#lib.cache.tests.MockCache.INVALIDATORS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.tests.MockCache.KEY_PREFIX">
+<span class="sig-name descname"><span class="pre">KEY_PREFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cachetest'</span></em><a class="headerlink" href="#lib.cache.tests.MockCache.KEY_PREFIX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.tests.MockCache.NUM_PARAMS">
+<span class="sig-name descname"><span class="pre">NUM_PARAMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#lib.cache.tests.MockCache.NUM_PARAMS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="lib.cache.tests.Rollback">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">Rollback</span></span><a class="reference internal" href="_modules/lib/cache/tests.html#Rollback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.Rollback" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.tests.TestCached">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">TestCached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TestCached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TestCached" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#lib.cache.cached_old.CachedAbstract" title="lib.cache.cached_old.CachedAbstract"><code class="xref py py-class docutils literal notranslate"><span class="pre">CachedAbstract</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">TransactionTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TransactionTestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_changed_during_transaction">
+<span class="sig-name descname"><span class="pre">test_changed_during_transaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_changed_during_transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_changed_during_transaction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_commit">
+<span class="sig-name descname"><span class="pre">test_commit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_commit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_commit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_invalidating_transaction">
+<span class="sig-name descname"><span class="pre">test_invalidating_transaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_invalidating_transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_invalidating_transaction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_nested_transaction">
+<span class="sig-name descname"><span class="pre">test_nested_transaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_nested_transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_nested_transaction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_no_transaction">
+<span class="sig-name descname"><span class="pre">test_no_transaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_no_transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_no_transaction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_overridden_invalidate_transaction">
+<span class="sig-name descname"><span class="pre">test_overridden_invalidate_transaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_overridden_invalidate_transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_overridden_invalidate_transaction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_rollback">
+<span class="sig-name descname"><span class="pre">test_rollback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_rollback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_rollback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.tests.TransactionTest.test_within_transaction">
+<span class="sig-name descname"><span class="pre">test_within_transaction</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#TransactionTest.test_within_transaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.TransactionTest.test_within_transaction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.tests.cache_patcher">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">cache_patcher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#cache_patcher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.cache_patcher" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.tests.mock_add">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">mock_add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#mock_add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.mock_add" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.tests.mock_delete">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">mock_delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#mock_delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.mock_delete" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.tests.mock_get">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">mock_get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#mock_get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.mock_get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.tests.mock_get_many">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">mock_get_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#mock_get_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.mock_get_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.tests.mock_set">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">mock_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#mock_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.mock_set" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="lib.cache.tests.mock_set_many">
+<span class="sig-prename descclassname"><span class="pre">lib.cache.tests.</span></span><span class="sig-name descname"><span class="pre">mock_set_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/tests.html#mock_set_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.tests.mock_set_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-lib.cache.transact">
+<span id="lib-cache-transact-module"></span><h2>lib.cache.transact module<a class="headerlink" href="#module-lib.cache.transact" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lib.cache.transact.</span></span><span class="sig-name descname"><span class="pre">CacheTransactionManager</span></span><a class="reference internal" href="_modules/lib/cache/transact.html#CacheTransactionManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.request_globals.RequestGlobal" title="lib.request_globals.RequestGlobal"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestGlobal</span></code></a></p>
+<p>Handles cache interaction during database transactions. Cache operations
+are not committed to the cache if the transaction/savepoint is rolled back.</p>
+<p>Idea is that any invalidations/modifications made during a transaction only
+affect other requests if the transaction is committed. The invalidations
+and modifications do affect other actions taken during the transaction
+itself.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager.commiting">
+<span class="sig-name descname"><span class="pre">commiting</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager.commiting" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/transact.html#CacheTransactionManager.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager.get_many">
+<span class="sig-name descname"><span class="pre">get_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/lib/cache/transact.html#CacheTransactionManager.get_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager.get_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/lib/cache/transact.html#CacheTransactionManager.init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager.init" title="Link to this definition"></a></dt>
+<dd><p>Called once when the object is first created</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager.memos">
+<span class="sig-name descname"><span class="pre">memos</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager.memos" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager.set">
+<span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/transact.html#CacheTransactionManager.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager.set" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="lib.cache.transact.CacheTransactionManager.set_many">
+<span class="sig-name descname"><span class="pre">set_many</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/lib/cache/transact.html#CacheTransactionManager.set_many"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#lib.cache.transact.CacheTransactionManager.set_many" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-lib.cache">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-lib.cache" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

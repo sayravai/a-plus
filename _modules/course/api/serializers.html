@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.api.serializers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.api.serializers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.api.serializers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">serializers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework.reverse</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedHyperlinkedIdentityField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.api.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AplusModelSerializer</span><span class="p">,</span> <span class="n">AlwaysListSerializer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.api.serializers</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserBriefSerializer</span><span class="p">,</span> <span class="n">UserMinimalListField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">news.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">News</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseInstance</span><span class="p">,</span>
+    <span class="n">UserTag</span><span class="p">,</span>
+    <span class="n">StudentGroup</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..cache.students</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedStudent</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;CourseBriefSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseListField&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;StudentBriefSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseUsertagBriefSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseStudentGroupBriefSerializer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CourseNewsBriefSerializer&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="CourseBriefSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseBriefSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BriefSerializer for course models</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># course model has url var, so we need to redifen the type here</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">NestedHyperlinkedIdentityField</span><span class="p">(</span>
+        <span class="n">view_name</span><span class="o">=</span><span class="s1">&#39;api:course-detail&#39;</span><span class="p">,</span>
+        <span class="n">lookup_map</span><span class="o">=</span><span class="s1">&#39;course.api.views.CourseViewSet&#39;</span>
+    <span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;course.code&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="s1">&#39;course.name&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CourseBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;html_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;code&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;instance_name&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseListField">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseListField">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseListField</span><span class="p">(</span><span class="n">AlwaysListSerializer</span><span class="p">,</span> <span class="n">CourseBriefSerializer</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="StudentBriefSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.StudentBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StudentBriefSerializer</span><span class="p">(</span><span class="n">UserBriefSerializer</span><span class="p">):</span>
+    <span class="n">tag_slugs</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+    <span class="n">summary_html</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">serializers</span><span class="o">.</span><span class="n">SerializerMethodField</span><span class="p">()</span>
+
+<div class="viewcode-block" id="StudentBriefSerializer.get_tag_slugs">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.StudentBriefSerializer.get_tag_slugs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tag_slugs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="n">cached</span> <span class="o">=</span> <span class="n">CachedStudent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cached</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;tag_slugs&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="StudentBriefSerializer.get_summary_html">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.StudentBriefSerializer.get_summary_html">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_summary_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StudentBriefSerializer.get_points">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.StudentBriefSerializer.get_points">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_link_lookup</span><span class="p">(</span><span class="s1">&#39;api:course-points-detail&#39;</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StudentBriefSerializer.get_data">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.StudentBriefSerializer.get_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_link_lookup</span><span class="p">(</span><span class="s1">&#39;api:course-submissiondata-detail&#39;</span><span class="p">,</span> <span class="n">profile</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_link_lookup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;course_id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;view&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s1">&#39;user_id&#39;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">request</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="StudentBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.StudentBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">UserBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="n">UserBriefSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="o">.</span><span class="n">fields</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="s1">&#39;tag_slugs&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;summary_html&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;points&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseUsertagBriefSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseUsertagBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseUsertagBriefSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BriefSerialzer for course UserTag objects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CourseUsertagBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseUsertagBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">UserTag</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;slug&#39;</span><span class="p">,)</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;api:course-usertags-detail&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;lookup_map&#39;</span><span class="p">:</span> <span class="s1">&#39;course.api.views.CourseUsertagsViewSet&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseStudentGroupBriefSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseStudentGroupBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseStudentGroupBriefSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+    <span class="n">members</span> <span class="o">=</span> <span class="n">UserMinimalListField</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CourseStudentGroupBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseStudentGroupBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">StudentGroup</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;members&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;timestamp&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;api:course-mygroups-detail&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CourseNewsBriefSerializer">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseNewsBriefSerializer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseNewsBriefSerializer</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CourseNewsBriefSerializer.Meta">
+<a class="viewcode-back" href="../../../course.api.html#course.api.serializers.CourseNewsBriefSerializer.Meta">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">(</span><span class="n">AplusModelSerializer</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">News</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;title&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;audience&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;publish&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;body&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;pin&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;view_name&#39;</span><span class="p">:</span> <span class="s1">&#39;api:course-news-detail&#39;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

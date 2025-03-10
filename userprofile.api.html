@@ -1,0 +1,396 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>userprofile.api package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">userprofile.api package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-userprofile.api.full_serializers">userprofile.api.full_serializers module</a><ul>
+<li><a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer"><code class="docutils literal notranslate"><span class="pre">UserSerializer</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">UserSerializer.Meta</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer.Meta.fields"><code class="docutils literal notranslate"><span class="pre">UserSerializer.Meta.fields</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer.get_assistant_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_assistant_courses()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer.get_enrolled_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_enrolled_courses()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer.get_staff_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_staff_courses()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer.get_teacher_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_teacher_courses()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.api.serializers">userprofile.api.serializers module</a><ul>
+<li><a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer"><code class="docutils literal notranslate"><span class="pre">UserBriefSerializer</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">UserBriefSerializer.Meta</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer.Meta.extra_kwargs"><code class="docutils literal notranslate"><span class="pre">UserBriefSerializer.Meta.extra_kwargs</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer.Meta.fields"><code class="docutils literal notranslate"><span class="pre">UserBriefSerializer.Meta.fields</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer.Meta.model"><code class="docutils literal notranslate"><span class="pre">UserBriefSerializer.Meta.model</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.api.serializers.UserListField"><code class="docutils literal notranslate"><span class="pre">UserListField</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.api.tests">userprofile.api.tests module</a><ul>
+<li><a class="reference internal" href="#userprofile.api.tests.UserProfileAPITest"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.api.tests.UserProfileAPITest.test_field_values_filter"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest.test_field_values_filter()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.tests.UserProfileAPITest.test_get_userdetail"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest.test_get_userdetail()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.tests.UserProfileAPITest.test_get_userlist"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest.test_get_userlist()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.api.views">userprofile.api.views module</a><ul>
+<li><a class="reference internal" href="#userprofile.api.views.MeDetail"><code class="docutils literal notranslate"><span class="pre">MeDetail</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.api.views.MeDetail.get"><code class="docutils literal notranslate"><span class="pre">MeDetail.get()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet"><code class="docutils literal notranslate"><span class="pre">UserViewSet</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.basename"><code class="docutils literal notranslate"><span class="pre">UserViewSet.basename</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.description"><code class="docutils literal notranslate"><span class="pre">UserViewSet.description</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.detail"><code class="docutils literal notranslate"><span class="pre">UserViewSet.detail</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.field_values_map"><code class="docutils literal notranslate"><span class="pre">UserViewSet.field_values_map</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.filter_backends"><code class="docutils literal notranslate"><span class="pre">UserViewSet.filter_backends</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.listserializer_class"><code class="docutils literal notranslate"><span class="pre">UserViewSet.listserializer_class</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.lookup_field"><code class="docutils literal notranslate"><span class="pre">UserViewSet.lookup_field</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.lookup_url_kwarg"><code class="docutils literal notranslate"><span class="pre">UserViewSet.lookup_url_kwarg</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.lookup_value_regex"><code class="docutils literal notranslate"><span class="pre">UserViewSet.lookup_value_regex</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.name"><code class="docutils literal notranslate"><span class="pre">UserViewSet.name</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.permission_classes"><code class="docutils literal notranslate"><span class="pre">UserViewSet.permission_classes</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.queryset"><code class="docutils literal notranslate"><span class="pre">UserViewSet.queryset</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.search_fields"><code class="docutils literal notranslate"><span class="pre">UserViewSet.search_fields</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.serializer_class"><code class="docutils literal notranslate"><span class="pre">UserViewSet.serializer_class</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.api.views.UserViewSet.suffix"><code class="docutils literal notranslate"><span class="pre">UserViewSet.suffix</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">userprofile.api package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/userprofile.api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="userprofile-api-package">
+<h1>userprofile.api package<a class="headerlink" href="#userprofile-api-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-userprofile.api.full_serializers">
+<span id="userprofile-api-full-serializers-module"></span><h2>userprofile.api.full_serializers module<a class="headerlink" href="#module-userprofile.api.full_serializers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.full_serializers.UserSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.api.full_serializers.</span></span><span class="sig-name descname"><span class="pre">UserSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/full_serializers.html#UserSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.full_serializers.UserSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer" title="userprofile.api.serializers.UserBriefSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserBriefSerializer</span></code></a></p>
+<p>Add the details of a user.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.full_serializers.UserSerializer.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/userprofile/api/full_serializers.html#UserSerializer.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.full_serializers.UserSerializer.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer.Meta" title="userprofile.api.serializers.UserBriefSerializer.Meta"><code class="xref py py-class docutils literal notranslate"><span class="pre">Meta</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.full_serializers.UserSerializer.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'url',</span> <span class="pre">'username',</span> <span class="pre">'student_id',</span> <span class="pre">'email',</span> <span class="pre">'full_name',</span> <span class="pre">'is_external',</span> <span class="pre">'enrolled_courses',</span> <span class="pre">'staff_courses',</span> <span class="pre">'teacher_courses',</span> <span class="pre">'assistant_courses',</span> <span class="pre">'first_name',</span> <span class="pre">'last_name')</span></em><a class="headerlink" href="#userprofile.api.full_serializers.UserSerializer.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.full_serializers.UserSerializer.get_assistant_courses">
+<span class="sig-name descname"><span class="pre">get_assistant_courses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/full_serializers.html#UserSerializer.get_assistant_courses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.full_serializers.UserSerializer.get_assistant_courses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.full_serializers.UserSerializer.get_enrolled_courses">
+<span class="sig-name descname"><span class="pre">get_enrolled_courses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/full_serializers.html#UserSerializer.get_enrolled_courses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.full_serializers.UserSerializer.get_enrolled_courses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.full_serializers.UserSerializer.get_staff_courses">
+<span class="sig-name descname"><span class="pre">get_staff_courses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/full_serializers.html#UserSerializer.get_staff_courses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.full_serializers.UserSerializer.get_staff_courses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.full_serializers.UserSerializer.get_teacher_courses">
+<span class="sig-name descname"><span class="pre">get_teacher_courses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/full_serializers.html#UserSerializer.get_teacher_courses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.full_serializers.UserSerializer.get_teacher_courses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-userprofile.api.serializers">
+<span id="userprofile-api-serializers-module"></span><h2>userprofile.api.serializers module<a class="headerlink" href="#module-userprofile.api.serializers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.serializers.UserBriefSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.api.serializers.</span></span><span class="sig-name descname"><span class="pre">UserBriefSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/serializers.html#UserBriefSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.serializers.UserBriefSerializer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.api.html#lib.api.serializers.AplusModelSerializer" title="lib.api.serializers.AplusModelSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">AplusModelSerializer</span></code></a></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.serializers.UserBriefSerializer.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/userprofile/api/serializers.html#UserBriefSerializer.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.serializers.UserBriefSerializer.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.api.html#lib.api.serializers.AplusModelSerializer.Meta" title="lib.api.serializers.AplusModelSerializer.Meta"><code class="xref py py-class docutils literal notranslate"><span class="pre">Meta</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.serializers.UserBriefSerializer.Meta.extra_kwargs">
+<span class="sig-name descname"><span class="pre">extra_kwargs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'url':</span> <span class="pre">{'lookup_map':</span> <span class="pre">'userprofile.api.views.UserViewSet',</span> <span class="pre">'view_name':</span> <span class="pre">'api:user-detail'}}</span></em><a class="headerlink" href="#userprofile.api.serializers.UserBriefSerializer.Meta.extra_kwargs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.serializers.UserBriefSerializer.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'url',</span> <span class="pre">'username',</span> <span class="pre">'student_id',</span> <span class="pre">'email',</span> <span class="pre">'full_name',</span> <span class="pre">'is_external')</span></em><a class="headerlink" href="#userprofile.api.serializers.UserBriefSerializer.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.serializers.UserBriefSerializer.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#userprofile.api.serializers.UserBriefSerializer.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="userprofile.html#userprofile.models.UserProfile" title="userprofile.models.UserProfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfile</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.serializers.UserListField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.api.serializers.</span></span><span class="sig-name descname"><span class="pre">UserListField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/serializers.html#UserListField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.serializers.UserListField" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.api.html#lib.api.serializers.AlwaysListSerializer" title="lib.api.serializers.AlwaysListSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">AlwaysListSerializer</span></code></a>, <a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer" title="userprofile.api.serializers.UserBriefSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserBriefSerializer</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-userprofile.api.tests">
+<span id="userprofile-api-tests-module"></span><h2>userprofile.api.tests module<a class="headerlink" href="#module-userprofile.api.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.tests.UserProfileAPITest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.api.tests.</span></span><span class="sig-name descname"><span class="pre">UserProfileAPITest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/tests.html#UserProfileAPITest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.tests.UserProfileAPITest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="userprofile.html#userprofile.tests.UserProfileTestCase" title="userprofile.tests.UserProfileTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileTestCase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.tests.UserProfileAPITest.test_field_values_filter">
+<span class="sig-name descname"><span class="pre">test_field_values_filter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/tests.html#UserProfileAPITest.test_field_values_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.tests.UserProfileAPITest.test_field_values_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.tests.UserProfileAPITest.test_get_userdetail">
+<span class="sig-name descname"><span class="pre">test_get_userdetail</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/tests.html#UserProfileAPITest.test_get_userdetail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.tests.UserProfileAPITest.test_get_userdetail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.tests.UserProfileAPITest.test_get_userlist">
+<span class="sig-name descname"><span class="pre">test_get_userlist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/tests.html#UserProfileAPITest.test_get_userlist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.tests.UserProfileAPITest.test_get_userlist" title="Link to this definition"></a></dt>
+<dd><p>Test if list of users are given correctly via REST.
+This does not need any authentication.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-userprofile.api.views">
+<span id="userprofile-api-views-module"></span><h2>userprofile.api.views module<a class="headerlink" href="#module-userprofile.api.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.views.MeDetail">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.api.views.</span></span><span class="sig-name descname"><span class="pre">MeDetail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/views.html#MeDetail"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.views.MeDetail" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">APIView</span></code></p>
+<p>The <cite>me</cite> endpoint returns information about the current user.</p>
+<section id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><cite>GET /me/</cite>:</dt><dd><p>returns the details of the current user.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.api.views.MeDetail.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/views.html#MeDetail.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.views.MeDetail.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.api.views.</span></span><span class="sig-name descname"><span class="pre">UserViewSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/api/views.html#UserViewSet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.api.views.UserViewSet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.api.html#lib.api.mixins.ListSerializerMixin" title="lib.api.mixins.ListSerializerMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListSerializerMixin</span></code></a>, <a class="reference internal" href="lib.api.html#lib.api.mixins.MeUserMixin" title="lib.api.mixins.MeUserMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MeUserMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ReadOnlyModelViewSet</span></code></p>
+<p>The <cite>users</cite> endpoint returns information about all users.</p>
+<section id="id1">
+<h3>Operations<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<dl class="simple">
+<dt><cite>GET /users/</cite>:</dt><dd><p>returns a list of all users.</p>
+</dd>
+<dt><cite>GET /users/&lt;user_id&gt;/</cite>:</dt><dd><p>returns the details of a specific user.</p>
+</dd>
+<dt><cite>GET /users/me/</cite>:</dt><dd><p>returns the details of the current user.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.basename">
+<span class="sig-name descname"><span class="pre">basename</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.basename" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.detail">
+<span class="sig-name descname"><span class="pre">detail</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.detail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.field_values_map">
+<span class="sig-name descname"><span class="pre">field_values_map</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">'user__email',</span> <span class="pre">'id':</span> <span class="pre">'user_id',</span> <span class="pre">'student_id':</span> <span class="pre">'student_id'}</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.field_values_map" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.filter_backends">
+<span class="sig-name descname"><span class="pre">filter_backends</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'userprofile.permissions.IsTeacherOrAdminOrSelf'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'rest_framework.filters.SearchFilter'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'lib.api.filters.FieldValuesFilter'&gt;)</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.filter_backends" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.listserializer_class">
+<span class="sig-name descname"><span class="pre">listserializer_class</span></span><a class="headerlink" href="#userprofile.api.views.UserViewSet.listserializer_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#userprofile.api.serializers.UserBriefSerializer" title="userprofile.api.serializers.UserBriefSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserBriefSerializer</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.lookup_field">
+<span class="sig-name descname"><span class="pre">lookup_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.lookup_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.lookup_url_kwarg">
+<span class="sig-name descname"><span class="pre">lookup_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_id'</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.lookup_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.lookup_value_regex">
+<span class="sig-name descname"><span class="pre">lookup_value_regex</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'([0-9]+|me)'</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.lookup_value_regex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'rest_framework.permissions.IsAuthenticated'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'userprofile.permissions.GraderUserCanOnlyRead'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'userprofile.permissions.IsTeacherOrAdminOrSelf'&gt;]</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.permission_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.queryset">
+<span class="sig-name descname"><span class="pre">queryset</span></span><a class="headerlink" href="#userprofile.api.views.UserViewSet.queryset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['user__first_name',</span> <span class="pre">'user__last_name',</span> <span class="pre">'student_id',</span> <span class="pre">'user__email']</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.serializer_class">
+<span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#userprofile.api.views.UserViewSet.serializer_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#userprofile.api.full_serializers.UserSerializer" title="userprofile.api.full_serializers.UserSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserSerializer</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.api.views.UserViewSet.suffix">
+<span class="sig-name descname"><span class="pre">suffix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#userprofile.api.views.UserViewSet.suffix" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+<section id="module-userprofile.api">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-userprofile.api" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

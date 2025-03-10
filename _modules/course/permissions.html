@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.permissions &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.permissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.permissions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.payload</span><span class="w"> </span><span class="kn">import</span> <span class="n">Payload</span><span class="p">,</span> <span class="n">Permission</span> <span class="k">as</span> <span class="n">AccessPermission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpRequest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings_text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ACCESS</span><span class="p">,</span>
+    <span class="n">Permission</span><span class="p">,</span>
+    <span class="n">MessageMixin</span><span class="p">,</span>
+    <span class="n">ObjectVisibleBasePermission</span><span class="p">,</span>
+    <span class="n">FilterBackend</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedPoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span><span class="p">,</span> <span class="n">LearningObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraderUser</span><span class="p">,</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Course</span><span class="p">,</span>
+    <span class="n">CourseModule</span><span class="p">,</span>
+    <span class="n">CourseInstance</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="JWTObjectPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTObjectPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTObjectPermission</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+    <span class="n">obj_key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">obj_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+    <span class="n">access_key</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">access_type</span><span class="p">:</span> <span class="n">AccessPermission</span>
+    <span class="n">id_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;id&quot;</span>
+
+<div class="viewcode-block" id="JWTObjectPermission.get_obj">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTObjectPermission.get_obj">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="JWTObjectPermission.has_object_in_permissions">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTObjectPermission.has_object_in_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_in_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span> <span class="c1"># pylint: disable=unused-argument</span>
+        <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">has</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_type</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id_key</span><span class="p">:</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="JWTObjectPermission.has_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTObjectPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_obj</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="JWTObjectPermission.has_object_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTObjectPermission.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;auth&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">auth</span><span class="p">,</span> <span class="n">Payload</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_type</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_object_in_permissions</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="JWTCoursePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTCoursePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTCoursePermission</span><span class="p">(</span><span class="n">JWTObjectPermission</span><span class="p">):</span>
+    <span class="n">obj_key</span> <span class="o">=</span> <span class="s2">&quot;course&quot;</span>
+    <span class="n">obj_type</span> <span class="o">=</span> <span class="n">Course</span>
+    <span class="n">access_key</span> <span class="o">=</span> <span class="s2">&quot;courses&quot;</span></div>
+
+
+<div class="viewcode-block" id="JWTCourseWritePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTCourseWritePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTCourseWritePermission</span><span class="p">(</span><span class="n">JWTCoursePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_COURSE_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">WRITE</span></div>
+
+
+<div class="viewcode-block" id="JWTCourseReadPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTCourseReadPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTCourseReadPermission</span><span class="p">(</span><span class="n">JWTCoursePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_COURSE_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">READ</span></div>
+
+
+<div class="viewcode-block" id="JWTInstancePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTInstancePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTInstancePermission</span><span class="p">(</span><span class="n">JWTObjectPermission</span><span class="p">):</span>
+    <span class="n">obj_key</span> <span class="o">=</span> <span class="s2">&quot;instance&quot;</span>
+    <span class="n">obj_type</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+    <span class="n">access_key</span> <span class="o">=</span> <span class="s2">&quot;instances&quot;</span></div>
+
+
+<div class="viewcode-block" id="JWTInstanceWritePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTInstanceWritePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTInstanceWritePermission</span><span class="p">(</span><span class="n">JWTInstancePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_INSTANCE_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">WRITE</span></div>
+
+
+<div class="viewcode-block" id="JWTInstanceReadPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTInstanceReadPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTInstanceReadPermission</span><span class="p">(</span><span class="n">JWTInstancePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_INSTANCE_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">READ</span></div>
+
+
+<div class="viewcode-block" id="JWTExercisePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTExercisePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTExercisePermission</span><span class="p">(</span><span class="n">JWTObjectPermission</span><span class="p">):</span>
+    <span class="n">obj_key</span> <span class="o">=</span> <span class="s2">&quot;exercise&quot;</span>
+    <span class="n">obj_type</span> <span class="o">=</span> <span class="n">BaseExercise</span>
+    <span class="n">access_key</span> <span class="o">=</span> <span class="s2">&quot;exercises&quot;</span></div>
+
+
+<div class="viewcode-block" id="JWTExerciseWritePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTExerciseWritePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTExerciseWritePermission</span><span class="p">(</span><span class="n">JWTExercisePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_EXERCISE_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">WRITE</span></div>
+
+
+<div class="viewcode-block" id="JWTExerciseReadPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTExerciseReadPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTExerciseReadPermission</span><span class="p">(</span><span class="n">JWTExercisePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_EXERCISE_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">READ</span></div>
+
+
+<div class="viewcode-block" id="JWTSubmissionPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTSubmissionPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTSubmissionPermission</span><span class="p">(</span><span class="n">JWTObjectPermission</span><span class="p">):</span>
+    <span class="n">obj_key</span> <span class="o">=</span> <span class="s2">&quot;submission&quot;</span>
+    <span class="n">obj_type</span> <span class="o">=</span> <span class="n">Submission</span>
+    <span class="n">access_key</span> <span class="o">=</span> <span class="s2">&quot;submissions&quot;</span></div>
+
+
+<div class="viewcode-block" id="JWTSubmissionReadPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTSubmissionReadPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTSubmissionReadPermission</span><span class="p">(</span><span class="n">JWTSubmissionPermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_SUBMISSION_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">READ</span></div>
+
+
+<div class="viewcode-block" id="JWTSubmissionWritePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTSubmissionWritePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTSubmissionWritePermission</span><span class="p">(</span><span class="n">JWTSubmissionPermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_SUBMISSION_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">WRITE</span></div>
+
+
+<div class="viewcode-block" id="JWTSubmissionCreatePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.JWTSubmissionCreatePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">JWTSubmissionCreatePermission</span><span class="p">(</span><span class="n">JWTObjectPermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;NO_JWT_SUBMISSION_PERMISSION&quot;</span><span class="p">)</span>
+    <span class="n">obj_key</span> <span class="o">=</span> <span class="s2">&quot;exercise&quot;</span>
+    <span class="n">obj_type</span> <span class="o">=</span> <span class="n">BaseExercise</span>
+    <span class="n">access_key</span> <span class="o">=</span> <span class="s2">&quot;submissions&quot;</span>
+    <span class="n">access_type</span> <span class="o">=</span> <span class="n">AccessPermission</span><span class="o">.</span><span class="n">CREATE</span>
+    <span class="n">id_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;exercise_id&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="CourseVisiblePermissionBase">
+<a class="viewcode-back" href="../../course.html#course.permissions.CourseVisiblePermissionBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseVisiblePermissionBase</span><span class="p">(</span><span class="n">ObjectVisibleBasePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_VISIBILITY_PERMISSION_DENIED_MSG&#39;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+    <span class="n">obj_var</span> <span class="o">=</span> <span class="s1">&#39;instance&#39;</span>
+
+<div class="viewcode-block" id="CourseVisiblePermissionBase.is_object_visible">
+<a class="viewcode-back" href="../../course.html#course.permissions.CourseVisiblePermissionBase.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">course</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find out if CourseInstance is visible to user</span>
+<span class="sd">        We expect that AccessModePermission is checked first</span>
+
+<span class="sd">         - Always visible to course staff</span>
+<span class="sd">         - Always hidden if not open (visible_to_students)</span>
+<span class="sd">         - Always visible if public</span>
+<span class="sd">         - If not public:</span>
+<span class="sd">           - Require authentication</span>
+<span class="sd">           - If view_access == enrolled -&gt; visible if student of the course</span>
+<span class="sd">           - If enrollment audience external, user should be external</span>
+<span class="sd">           - If enrollment audience internal, user should be internal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># NOTE: course is actually course instance</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Course is always visible to staff members</span>
+        <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Course is not visible if it&#39;s hidden</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">course</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_VISIBILITY_ERROR_NOT_VISIBLE&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">show_for</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">view_content_to</span>
+        <span class="n">VA</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">VIEW_ACCESS</span>
+
+        <span class="c1"># FIXME: we probably should test if access_mode is ANONYMOUS (public), but that</span>
+        <span class="c1"># would break api permissiosn (requires get_access_mode)</span>
+        <span class="k">if</span> <span class="n">show_for</span> <span class="o">!=</span> <span class="n">VA</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_VISIBILITY_ERROR_NOT_PUBLIC&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Allow enrolled students. This is important when students that</span>
+            <span class="c1"># do not belong to the enrollment audience are manually enrolled</span>
+            <span class="c1"># in the course.</span>
+            <span class="c1"># Avoid querying the database again if we can read</span>
+            <span class="c1"># CourseInstanceBaseMixin.is_student.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">is_student</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">is_student</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">is_student</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_student</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="c1"># Handle enroll views separately</span>
+            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">get_access_mode</span><span class="p">()</span> <span class="o">==</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLL</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrollment_audience_check</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">show_for</span> <span class="o">==</span> <span class="n">VA</span><span class="o">.</span><span class="n">ENROLLED</span><span class="p">:</span>
+                <span class="c1"># Already checked above that the user has not enrolled.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ACCESS_ERROR_ONLY_ENROLLED_STUDENTS&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">show_for</span> <span class="o">==</span> <span class="n">VA</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrollment_audience_check</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="CourseVisiblePermissionBase.enrollment_audience_check">
+<a class="viewcode-back" href="../../course.html#course.permissions.CourseVisiblePermissionBase.enrollment_audience_check">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enrollment_audience_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">course</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+        <span class="n">audience</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">enrollment_audience</span>
+        <span class="n">external</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">is_external</span>
+        <span class="n">EA</span> <span class="o">=</span> <span class="n">course</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span>
+        <span class="n">institution_name</span> <span class="o">=</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;BRAND_INSTITUTION_NAME&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">audience</span> <span class="o">==</span> <span class="n">EA</span><span class="o">.</span><span class="n">INTERNAL_USERS</span> <span class="ow">and</span> <span class="n">external</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span>
+                <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_ENROLLMENT_AUDIENCE_ERROR_ONLY_INTERNAL -- </span><span class="si">{institution}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">institution</span><span class="o">=</span><span class="n">institution_name</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">audience</span> <span class="o">==</span> <span class="n">EA</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">external</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span>
+                <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_ENROLLMENT_AUDIENCE_ERROR_ONLY_EXTERNAL -- </span><span class="si">{institution}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">institution</span><span class="o">=</span><span class="n">institution_name</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="n">CourseVisiblePermission</span> <span class="o">=</span> <span class="n">CourseVisiblePermissionBase</span> <span class="o">|</span> <span class="n">JWTCourseReadPermission</span>
+
+
+<div class="viewcode-block" id="EnrollInfoVisiblePermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.EnrollInfoVisiblePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnrollInfoVisiblePermission</span><span class="p">(</span><span class="n">ObjectVisibleBasePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_VISIBILITY_PERMISSION_DENIED_MSG&#39;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">CourseInstance</span>
+    <span class="n">obj_var</span> <span class="o">=</span> <span class="s1">&#39;instance&#39;</span>
+
+<div class="viewcode-block" id="EnrollInfoVisiblePermission.is_object_visible">
+<a class="viewcode-back" href="../../course.html#course.permissions.EnrollInfoVisiblePermission.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">course_instance</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+        <span class="c1"># Course is always visible to staff members</span>
+        <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Course is not visible if it&#39;s hidden</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">course_instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_VISIBILITY_ERROR_NOT_VISIBLE&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Only public courses may be browsed without logging in.</span>
+        <span class="k">if</span> <span class="n">course_instance</span><span class="o">.</span><span class="n">view_content_to</span> <span class="o">!=</span> <span class="n">course_instance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">PUBLIC</span> \
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_VISIBILITY_ERROR_NOT_PUBLIC&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CourseModulePermissionBase">
+<a class="viewcode-back" href="../../course.html#course.permissions.CourseModulePermissionBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseModulePermissionBase</span><span class="p">(</span><span class="n">MessageMixin</span><span class="p">,</span> <span class="n">Permission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODULE_PERMISSION_MSG_NOT_VISIBLE&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CourseModulePermissionBase.has_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.CourseModulePermissionBase.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">:</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">module</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="c1"># pylint: disable-next=arguments-renamed</span>
+<div class="viewcode-block" id="CourseModulePermissionBase.has_object_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.CourseModulePermissionBase.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">view</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">CourseModule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Enrollment questionnaires are not affected by the module opening time.</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="s1">&#39;exercise&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">view</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">status</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT</span><span class="p">,</span>
+                <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT_EXTERNAL</span><span class="p">,</span>
+                <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">module</span><span class="o">.</span><span class="n">is_after_open</span><span class="p">():</span>
+            <span class="c1"># FIXME: use format from django settings</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODULE_PERMISSION_ERROR_NOT_OPEN_YET -- </span><span class="si">{date}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="nb">format</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span><span class="p">},</span>
+                <span class="n">delim</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">requirements</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">points</span> <span class="o">=</span> <span class="n">CachedPoints</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">module</span><span class="o">.</span><span class="n">are_requirements_passed</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="n">CourseModulePermission</span> <span class="o">=</span> <span class="n">CourseModulePermissionBase</span> <span class="o">|</span> <span class="n">JWTInstanceReadPermission</span>
+
+
+<div class="viewcode-block" id="OnlyCourseTeacherPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyCourseTeacherPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OnlyCourseTeacherPermission</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_PERMISSION_MSG_ONLY_TEACHER&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OnlyCourseTeacherPermission.has_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyCourseTeacherPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OnlyCourseTeacherPermission.has_object_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyCourseTeacherPermission.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">is_teacher</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OnlyCourseStaffPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyCourseStaffPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OnlyCourseStaffPermission</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_PERMISSION_MSG_ONLY_COURSE_STAFF&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OnlyCourseStaffPermission.has_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyCourseStaffPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">view</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OnlyCourseStaffPermission.has_object_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyCourseStaffPermission.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="IsCourseAdminOrUserObjIsSelf">
+<a class="viewcode-back" href="../../course.html#course.permissions.IsCourseAdminOrUserObjIsSelf">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IsCourseAdminOrUserObjIsSelf</span><span class="p">(</span><span class="n">OnlyCourseStaffPermission</span><span class="p">,</span> <span class="n">FilterBackend</span><span class="p">):</span>
+
+<div class="viewcode-block" id="IsCourseAdminOrUserObjIsSelf.has_object_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.IsCourseAdminOrUserObjIsSelf.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">UserProfile</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">return</span> <span class="n">user</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">obj</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IsCourseAdminOrUserObjIsSelf.filter_queryset">
+<a class="viewcode-back" href="../../course.html#course.permissions.IsCourseAdminOrUserObjIsSelf.filter_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">issubclass</span><span class="p">(</span><span class="n">queryset</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">UserProfile</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span> <span class="ow">and</span>
+            <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span>
+        <span class="p">):</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryset</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OnlyEnrolledStudentOrCourseStaffPermission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyEnrolledStudentOrCourseStaffPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OnlyEnrolledStudentOrCourseStaffPermission</span><span class="p">(</span><span class="n">Permission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_PERMISSION_MSG_ONLY_ENROLLED_STUDENTS_OR_COURSE_STAFF&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OnlyEnrolledStudentOrCourseStaffPermission.has_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyEnrolledStudentOrCourseStaffPermission.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_object_permission</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OnlyEnrolledStudentOrCourseStaffPermission.has_object_permission">
+<a class="viewcode-back" href="../../course.html#course.permissions.OnlyEnrolledStudentOrCourseStaffPermission.has_object_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_object_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">view</span><span class="o">.</span><span class="n">is_student</span> <span class="ow">or</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span> <span class="ow">or</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

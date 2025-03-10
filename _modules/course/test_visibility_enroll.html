@@ -1,0 +1,904 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.test_visibility_enroll &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.test_visibility_enroll</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.test_visibility_enroll</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Course</span><span class="p">,</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> \
+    <span class="n">LearningObjectCategory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span><span class="p">,</span> <span class="n">CourseChapter</span><span class="p">,</span> <span class="n">LearningObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span>
+
+<div class="viewcode-block" id="CourseVisibilityTest">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseVisibilityTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for course visibility and access control.</span>
+<span class="sd">    There are also some tests about enrollment.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CourseVisibilityTest.setUpTestData">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.setUpTestData">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpTestData</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">)</span> <span class="c1"># not enrolled in the course</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testUser&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="s1">&#39;123456&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">organization</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LOCAL_ORGANIZATION</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">)</span> <span class="c1"># enrolled in the course</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;student&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="s1">&#39;654321&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">organization</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">LOCAL_ORGANIZATION</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test course&quot;</span><span class="p">,</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;Course-Url&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">two_days_from_now</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">yesterday</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># course instances with different view_access_to settings</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">public_course_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Public&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;public&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">all_regist_course_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;All registered users&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;allregistered&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ALL_REGISTERED</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">enroll_audience_course_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Enrollment audience&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">two_days_from_now</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;enrollmentaudience&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">enrolled_course_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Enrolled&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">two_days_from_now</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;enrolled&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instances</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">public_course_instance</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">all_regist_course_instance</span><span class="p">,</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">enroll_audience_course_instance</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="p">]</span>
+
+        <span class="c1"># enrollment</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">course_instances</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="p">)</span>
+
+        <span class="c1"># module/exercise round for each course instance</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_modules</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">course_instances</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test module&quot;</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test-module&quot;</span><span class="p">,</span>
+                <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">course_instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span>
+                <span class="n">opening_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+                <span class="n">closing_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># category</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">categories</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">course_instances</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">categories</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test category&quot;</span><span class="p">,</span>
+                <span class="n">course_instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span>
+                <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># learning objects</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">learning_objects</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">course_instances</span><span class="p">:</span>
+            <span class="n">lobjects</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">chapter</span> <span class="o">=</span> <span class="n">CourseChapter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test chapter&quot;</span><span class="p">,</span>
+                <span class="n">course_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="n">category</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">categories</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="n">url</span><span class="o">=</span><span class="s1">&#39;chapter1&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">lobjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chapter</span><span class="p">)</span>
+            <span class="n">lobjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Embedded exercise&quot;</span><span class="p">,</span>
+                <span class="n">parent</span><span class="o">=</span><span class="n">chapter</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNLISTED</span><span class="p">,</span>
+                <span class="n">course_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="n">category</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">categories</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="n">url</span><span class="o">=</span><span class="s1">&#39;embedexercise&#39;</span><span class="p">,</span>
+                <span class="n">max_submissions</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">max_points</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">))</span>
+            <span class="n">lobjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Normal exercise&quot;</span><span class="p">,</span>
+                <span class="n">course_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="n">category</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">categories</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="n">url</span><span class="o">=</span><span class="s1">&#39;normalexercise&#39;</span><span class="p">,</span>
+                <span class="n">max_submissions</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">max_points</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">))</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">lobjects</span>
+
+        <span class="c1"># submissions</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">submissions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">_course_instance_id</span><span class="p">,</span> <span class="n">exercises</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">learning_objects</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">is_submittable</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">submissions</span><span class="p">[</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">exercise</span><span class="o">=</span><span class="n">exercise</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="n">submissions</span><span class="p">[</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">submission</span><span class="p">)</span>
+
+        <span class="c1"># disable all logging</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_redirect_to_enroll">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_redirect_to_enroll">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_redirect_to_enroll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># unenrolled logged-in user should be redirected to the enroll page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># enrolled students should open the course front page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_course_home">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_course_home">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_course_home</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enroll_audience_course_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the course home page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the course front page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course instance: all registered/logged-in users may see the course</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_regist_course_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the course home page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the course front page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># public course instance</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_course_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># anonymous user should see the course front page</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the course home page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the course front page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course content visible to the enrollment audience, but user is</span>
+        <span class="c1"># not in the enrollment audience</span>
+        <span class="n">ext_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Enrollment audience external&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;extaudience&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">ext_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span> <span class="c1"># Forbidden</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ext_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="c1"># allowed to see the enrollment page</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">ext_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span> <span class="c1"># may not enroll</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course content visible to registered users (logged-in users), but user is</span>
+        <span class="c1"># not in the enrollment audience</span>
+        <span class="n">ext_regist_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span> <span class="c1"># pylint: disable=unused-variable</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Enrollment audience external - view registered users&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;extaudience-registusers&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ALL_REGISTERED</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">ext_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span> <span class="c1"># Forbidden</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ext_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span> <span class="c1"># allowed to see the enrollment page</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">ext_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span> <span class="c1"># may not enroll</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_course_module">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_course_module">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_course_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should be redirected to enrollment page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the course module page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course instance: access to enrollment audience (logged-in internal users)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enroll_audience_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the module page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the course module page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course instance: access to registered users (any logged-in users)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">all_regist_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the module page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the course module page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course instance: access to anyone (anonymous)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">public_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="c1"># anonymous user can open the module page</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the module page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the course module page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course content visible to the enrollment audience, but user is</span>
+        <span class="c1"># not in the enrollment audience</span>
+        <span class="n">ext_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Enrollment audience external&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;extaudience&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ext_module</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test module&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test-module&quot;</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="n">ext_instance</span><span class="p">,</span>
+            <span class="n">opening_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">closing_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">ext_module</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span> <span class="c1"># Forbidden</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_chapter_enrolled_only">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_chapter_enrolled_only">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_chapter_enrolled_only</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should be redirected to enrollment page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># chapter exercise</span>
+        <span class="n">chapter_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># pylint: disable=unused-variable</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;/Course-Url/enrolled/test-module/chapter1/embedexercise/plain/&#39;</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should be redirected to enrollment page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># normal exercise (not inside chapter)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;exercise_path&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;module_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;instance_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;course_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;/Course-Url/enrolled/test-module/normalexercise/&#39;</span><span class="p">)</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should be redirected to enrollment page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_chapter_enroll_audience">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_chapter_enroll_audience">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_chapter_enroll_audience</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enroll_audience_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in internal user should see the chapter page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># chapter exercise</span>
+        <span class="c1"># pylint: disable-next=unused-variable</span>
+        <span class="n">chapter_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enroll_audience_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;/Course-Url/enrollmentaudience/test-module/chapter1/embedexercise/plain/&#39;</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in internal user should see the exercise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># normal exercise (not inside chapter)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enroll_audience_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;exercise_path&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;module_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;instance_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;course_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;/Course-Url/enrollmentaudience/test-module/normalexercise/&#39;</span><span class="p">)</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the exercise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the exercise page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># course content visible to the enrollment audience, but user is</span>
+        <span class="c1"># not in the enrollment audience</span>
+        <span class="n">ext_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Enrollment audience external&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;extaudience&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ext_module</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Test module&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test-module&quot;</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="n">ext_instance</span><span class="p">,</span>
+            <span class="n">opening_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">closing_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ext_category</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;External test category&quot;</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="n">ext_instance</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">ext_chapter</span> <span class="o">=</span> <span class="n">CourseChapter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;External test chapter&quot;</span><span class="p">,</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="n">ext_module</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="n">ext_category</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s1">&#39;extchapter1&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">ext_chapter</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in internal user should NOT see the chapter page</span>
+        <span class="c1"># (user is not external and the course is visible to external users only)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_chapter_all_registered">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_chapter_all_registered">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_chapter_all_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">all_regist_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in internal user should see the chapter page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># chapter exercise</span>
+        <span class="c1"># pylint: disable-next=unused-variable</span>
+        <span class="n">chapter_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">all_regist_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;/Course-Url/allregistered/test-module/chapter1/embedexercise/plain/&#39;</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in internal user should see the exercise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># normal exercise (not inside chapter)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">all_regist_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;exercise_path&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;module_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;instance_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;course_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;/Course-Url/allregistered/test-module/normalexercise/&#39;</span><span class="p">)</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the exercise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the exercise page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_chapter_public">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_chapter_public">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_chapter_public</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">public_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span>
+        <span class="c1"># anonymous user can open the chapter</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in internal user should see the chapter page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># chapter exercise</span>
+        <span class="n">chapter_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">public_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># pylint: disable=unused-variable</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;/Course-Url/public/test-module/chapter1/embedexercise/plain/&#39;</span>
+        <span class="c1"># anonymous user can open the chapter exercise</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in internal user should see the exercise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the chapter exercise normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+
+        <span class="c1"># normal exercise (not inside chapter)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">public_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;exercise_path&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;module_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;instance_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;course_slug&#39;</span><span class="p">:</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;/Course-Url/public/test-module/normalexercise/&#39;</span><span class="p">)</span>
+        <span class="c1"># anonymous user can open the exercise</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should see the exercise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled students should open the exercise page normally</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_submission">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_submission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_submission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># submission in the chapter exercise</span>
+        <span class="n">chapter_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">submission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">submissions</span><span class="p">[</span><span class="n">chapter_exercise</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">submission</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;/Course-Url/enrolled/test-module/chapter1/embedexercise/submissions/</span><span class="si">{0}</span><span class="s1">/&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">submission</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="c1"># should redirect to A+ login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="c1"># unenrolled logged-in user should be redirected to enrollment page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="c1"># enrolled non-submitter user should not see the submission</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testUser&#39;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">get_enrollment_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="c1"># the submitter should see her submission</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;student&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_enroll">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_enroll">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_enroll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">is_enrollable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span><span class="o">.</span><span class="n">is_enrollment_open</span><span class="p">())</span>
+
+        <span class="c1"># course instance is hidden from students</span>
+        <span class="n">new_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Hidden course instance&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;hiddencourse&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">,</span>
+            <span class="n">enrollment_audience</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">,</span>
+            <span class="n">visible_to_students</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">new_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">)</span>
+        <span class="c1"># anonymous user accesses a hidden course: redirect to login</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># enrollment closed</span>
+        <span class="n">new_instance</span><span class="o">.</span><span class="n">visible_to_students</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">new_instance</span><span class="o">.</span><span class="n">enrollment_starting_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span>
+        <span class="n">new_instance</span><span class="o">.</span><span class="n">enrollment_ending_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">new_instance</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">new_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">new_instance</span><span class="o">.</span><span class="n">is_enrollable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">new_instance</span><span class="o">.</span><span class="n">is_enrollment_open</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="c1"># can open the enrollment page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="c1"># can not enroll</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_enrollment_exercise">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_enrollment_exercise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_enrollment_exercise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span>
+        <span class="n">enroll_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT</span>
+        <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">enroll_url</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">)</span>
+        <span class="n">exercise_url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;exercise_path&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;module_slug&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;instance_slug&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;course_slug&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">})</span>
+
+        <span class="c1"># anonymous may not open the exercise nor enroll</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">enroll_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">enroll_url</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">exercise_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">exercise_url</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">exercise_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;/accounts/login/?next=&#39;</span> <span class="o">+</span> <span class="n">exercise_url</span><span class="p">)</span>
+        <span class="c1"># the course has only one enrollment (made in setUp())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># logged-in user may open the exercise and submit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">enroll_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRedirects</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">exercise_url</span><span class="p">)</span> <span class="c1"># redirects to the enrollment exercise</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">exercise_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="c1"># Since there is no exercise service running in the unit test environment,</span>
+        <span class="c1"># we can not make test submissions to the exercise.</span>
+        <span class="n">success_flag</span><span class="p">,</span> <span class="n">alerts</span><span class="p">,</span> <span class="n">_students</span> <span class="o">=</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">check_submission_allowed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">success_flag</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">SUBMIT_STATUS</span><span class="o">.</span><span class="n">ALLOWED</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;error_messages&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;warning_messages&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">alerts</span><span class="p">[</span><span class="s1">&#39;info_messages&#39;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">students</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.test_enrollment_exercise_external_users">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.test_enrollment_exercise_external_users">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_enrollment_exercise_external_users</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># only external users may enroll</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrolled_course_instance</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">enrollment_audience</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">enroll_exercise</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_objects</span><span class="p">[</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT_EXTERNAL</span>
+        <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">enroll_url</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;enroll&#39;</span><span class="p">)</span>
+        <span class="n">exercise_url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;exercise&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;exercise_path&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;module_slug&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;instance_slug&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="s1">&#39;course_slug&#39;</span><span class="p">:</span> <span class="n">enroll_exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="p">})</span>
+
+        <span class="c1"># internal user may not enroll</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">))</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">enroll_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">exercise_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">exercise_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">logout</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CourseVisibilityTest.tearDown">
+<a class="viewcode-back" href="../../course.html#course.test_visibility_enroll.CourseVisibilityTest.tearDown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># return previous logging settings</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">disable</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

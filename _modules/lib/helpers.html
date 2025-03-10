@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lib.helpers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lib.helpers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lib.helpers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cachetools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached</span><span class="p">,</span> <span class="n">TTLCache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_qs</span><span class="p">,</span> <span class="n">parse_qsl</span><span class="p">,</span> <span class="n">urlencode</span><span class="p">,</span> <span class="n">urlsplit</span><span class="p">,</span> <span class="n">urlunparse</span><span class="p">,</span> <span class="n">urlunsplit</span><span class="p">,</span> <span class="n">urlparse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.crypto</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_random_string</span> <span class="k">as</span> <span class="n">django_get_random_string</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.deprecation</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemovedInNextVersionWarning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_language</span>
+
+
+<div class="viewcode-block" id="is_ajax">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.is_ajax">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detect AJAX requests.</span>
+<span class="sd">    Request object method is_ajax() was removed in Django 4.0, this can be used instead.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x-requested-with&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;XMLHttpRequest&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="deprecated">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.deprecated">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">deprecated</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is a decorator which can be used to mark functions</span>
+<span class="sd">    as deprecated. It will result in a warning being emitted</span>
+<span class="sd">    when the function is used.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">new_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">RemovedInNextVersionWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_func</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="extract_form_errors">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.extract_form_errors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_form_errors</span><span class="p">(</span><span class="n">form</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts Django form errors to a list of error messages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">err</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">[</span><span class="n">field</span><span class="p">]:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">errors</span></div>
+
+
+
+<div class="viewcode-block" id="get_random_string">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.get_random_string">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_random_string</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function creates a random string with a given length.</span>
+<span class="sd">    The strings consist of upper and lower case letters and numbers.</span>
+
+<span class="sd">    @param length: the length of the randomized string, defaults to 32</span>
+<span class="sd">    @return: a random string containing lower and upper case letters and digits</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Use all letters and numbers in the identifier</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">choices</span><span class="p">:</span>
+        <span class="n">choices</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span>
+    <span class="k">return</span> <span class="n">django_get_random_string</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">allowed_chars</span><span class="o">=</span><span class="n">choices</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="query_dict_to_list_of_tuples">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.query_dict_to_list_of_tuples">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">query_dict_to_list_of_tuples</span><span class="p">(</span><span class="n">query_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This helper function creates a list of tuples with the values</span>
+<span class="sd">    from a QueryDict object. In a QueryDict the same key can have</span>
+<span class="sd">    several values, which is not possible with a typical dict nor a JSON</span>
+<span class="sd">    object. The resulting list will be similar to [(key1, value1), (key2, value2)].</span>
+
+<span class="sd">    @param query_dict: a QueryDict object</span>
+<span class="sd">    @return: a list of tuples with the same keys and values as in the given QueryDict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">list_of_tuples</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">query_dict</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">query_dict</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">list_of_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">list_of_tuples</span></div>
+
+
+
+<span class="c1"># Any is used here because Python&#39;s type hints can&#39;t ensure that the input</span>
+<span class="c1"># iterable&#39;s 1st and 2nd item match the keys and values of the output dict,</span>
+<span class="c1"># respectively.</span>
+<div class="viewcode-block" id="pairs_to_dict">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.pairs_to_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pairs_to_dict</span><span class="p">(</span><span class="n">pairs</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transforms the provided key-value-pairs into a dict. Each key may appear</span>
+<span class="sd">    multiple times, which is why the output dict&#39;s values are lists. This can</span>
+<span class="sd">    be used to turn the result of `query_dict_to_list_of_tuples` back into a</span>
+<span class="sd">    dict (not a QueryDict).</span>
+
+<span class="sd">    Example: `[[&quot;field_1&quot;, &quot;1&quot;], [&quot;field_2&quot;, &quot;a&quot;], [&quot;field_2&quot;, &quot;b&quot;]]` is</span>
+<span class="sd">    transformed into `{&quot;field_1&quot;: [&quot;1&quot;], &quot;field_2&quot;: [&quot;a&quot;, &quot;b&quot;]}`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="url_with_query_in_data">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.url_with_query_in_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">url_with_query_in_data</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}):</span> <span class="c1"># pylint: disable=dangerous-default-value</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take an url with (or without) query parameters and a dictionary of data.</span>
+<span class="sd">    Return url without query parameters and a dictionary with merged values from the query and the data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scheme</span><span class="p">,</span> <span class="n">netloc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">query</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)[:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">query</span><span class="p">))</span>
+    <span class="n">query</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">urlunsplit</span><span class="p">((</span><span class="n">scheme</span><span class="p">,</span> <span class="n">netloc</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)),</span> <span class="n">query</span></div>
+
+
+
+<div class="viewcode-block" id="update_url_params">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.update_url_params">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_url_params</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">delimiter</span> <span class="o">=</span> <span class="s2">&quot;&amp;&quot;</span> <span class="k">if</span> <span class="s2">&quot;?&quot;</span> <span class="ow">in</span> <span class="n">url</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span>
+    <span class="k">return</span> <span class="n">url</span> <span class="o">+</span> <span class="n">delimiter</span> <span class="o">+</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="remove_query_param_from_url">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.remove_query_param_from_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_query_param_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Take an url with (or without) query parameters. Return url without the selected query parameter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">keep_blank_values</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">query</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">urlunsplit</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">urlencode</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="kc">True</span><span class="p">)))</span></div>
+
+
+
+<div class="viewcode-block" id="build_aplus_url">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.build_aplus_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_aplus_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_url</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enforce that the given URL is a full absolute URL that always uses</span>
+<span class="sd">    the network location from the configured BASE_URL. In some installations, particularly</span>
+<span class="sd">    local docker environments, separate SERVICE_BASE_URL is used to distinguish the</span>
+<span class="sd">    docker internal network addresses from user-facing address (typically localhost).</span>
+<span class="sd">    Optional argument &#39;user_url&#39; tells which one the caller is interested in.</span>
+<span class="sd">    Takes URL as a parameter, returns (possibly) modified URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">baseurl</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">BASE_URL</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">user_url</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;SERVICE_BASE_URL&#39;</span><span class="p">):</span>
+        <span class="n">baseurl</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">SERVICE_BASE_URL</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">baseparsed</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">baseurl</span><span class="p">)</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">_replace</span><span class="p">(</span><span class="n">scheme</span><span class="o">=</span><span class="n">baseparsed</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">netloc</span><span class="o">=</span><span class="n">baseparsed</span><span class="o">.</span><span class="n">netloc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">urlunparse</span><span class="p">(</span><span class="n">parsed</span><span class="p">)</span></div>
+
+
+
+<span class="n">FILENAME_CHARS</span> <span class="o">=</span> <span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ._-0123456789&quot;</span>
+
+<div class="viewcode-block" id="safe_file_name">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.safe_file_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">safe_file_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="n">safename</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">FILENAME_CHARS</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">safename</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">safename</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">safename</span><span class="p">[:</span><span class="mi">80</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="resize_image">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.resize_image">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">resize_image</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">max_size</span><span class="p">):</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">(</span><span class="n">max_size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">LANCZOS</span><span class="p">)</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="roman_numeral">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.roman_numeral">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">roman_numeral</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1000</span><span class="p">,</span><span class="mi">900</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">400</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">90</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mi">40</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span>
+    <span class="n">letters</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;M&quot;</span><span class="p">,</span><span class="s2">&quot;CM&quot;</span><span class="p">,</span><span class="s2">&quot;D&quot;</span><span class="p">,</span><span class="s2">&quot;CD&quot;</span><span class="p">,</span><span class="s2">&quot;C&quot;</span><span class="p">,</span><span class="s2">&quot;XC&quot;</span><span class="p">,</span><span class="s2">&quot;L&quot;</span><span class="p">,</span><span class="s2">&quot;XL&quot;</span><span class="p">,</span><span class="s2">&quot;X&quot;</span><span class="p">,</span><span class="s2">&quot;IX&quot;</span><span class="p">,</span><span class="s2">&quot;V&quot;</span><span class="p">,</span><span class="s2">&quot;IV&quot;</span><span class="p">,</span><span class="s2">&quot;I&quot;</span><span class="p">];</span>
+    <span class="n">roman</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">numbers</span><span class="p">)):</span> <span class="c1"># pylint: disable=consider-using-enumerate</span>
+        <span class="k">while</span> <span class="n">number</span> <span class="o">&gt;=</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+            <span class="n">roman</span> <span class="o">+=</span> <span class="n">letters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">number</span> <span class="o">-=</span> <span class="n">numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">roman</span></div>
+
+
+
+<div class="viewcode-block" id="settings_text">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.settings_text">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">settings_text</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">get</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="n">get_language</span><span class="p">()</span> <span class="ow">or</span> <span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_CODE</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span> <span class="ow">or</span> <span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_url_ip_address_list">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.get_url_ip_address_list">[docs]</a>
+<span class="nd">@cached</span><span class="p">(</span><span class="n">TTLCache</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">30</span><span class="p">))</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_url_ip_address_list</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function takes a full URL as a parameter and returns the IP addresses</span>
+<span class="sd">    of the host as a string.</span>
+
+<span class="sd">    It will cache results for 30 seconds, so repeated calls return fast</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hostname</span> <span class="o">=</span> <span class="n">urlsplit</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">hostname</span>
+    <span class="k">assert</span> <span class="n">hostname</span><span class="p">,</span> <span class="s2">&quot;Invalid url: no hostname found&quot;</span>
+    <span class="n">ips</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">socket</span><span class="o">.</span><span class="n">getaddrinfo</span><span class="p">(</span><span class="n">hostname</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">IPPROTO_TCP</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ips</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="get_remote_addr">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.get_remote_addr">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_remote_addr</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">real_ip</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_X_REAL_IP&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">real_ip</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">real_ip</span>
+    <span class="n">forwarded_for</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_X_FORWARDED_FOR&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">forwarded_for</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">forwarded_for</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REMOTE_ADDR&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="show_debug_toolbar">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.show_debug_toolbar">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_debug_toolbar</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if the Django Debug Toolbar should be shown on a given page.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">settings</span><span class="o">.</span><span class="n">ENABLE_DJANGO_DEBUG_TOOLBAR</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REMOTE_ADDR&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INTERNAL_IPS</span></div>
+
+
+
+<div class="viewcode-block" id="format_points">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.format_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">format_points</span><span class="p">(</span><span class="n">points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">is_revealed</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">is_container</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Formats a number of points to be displayed in the UI. The formatting</span>
+<span class="sd">    depends on two parameters:</span>
+
+<span class="sd">    `is_revealed`: False if the points are for an exercise whose feedback is</span>
+<span class="sd">    hidden, or if the points are for a module/category that contains at least</span>
+<span class="sd">    one exercise whose feedback is hidden. Otherwise true.</span>
+
+<span class="sd">    `is_container`: False if the points are for an exercise or a submission.</span>
+<span class="sd">    Otherwise true.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">is_revealed</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_container</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">points</span><span class="si">}</span><span class="s1">+&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;?&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="Enum">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.Enum">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Enum</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents constant enumeration.</span>
+
+<span class="sd">    Usage:</span>
+<span class="sd">        OPTS = Enum(</span>
+<span class="sd">            (&#39;FOO&#39;, 1, &#39;help string for foo&#39;),</span>
+<span class="sd">            (&#39;BAR&#39;, 2, &#39;help string for bar&#39;),</span>
+<span class="sd">        )</span>
+
+<span class="sd">        if OPTS.FOO == test_var:</span>
+<span class="sd">            return OPTS[test_var]</span>
+
+<span class="sd">        ChoicesField(choices=OPTS.choices)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">choices</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">choices</span> <span class="o">=</span> <span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strings</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">choices</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strings</span><span class="p">,</span> <span class="s2">&quot;Multiple choices have same value&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strings</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">string</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">choices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_strings</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+
+<div class="viewcode-block" id="Enum.keys">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.Enum.keys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keys</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Enum.values">
+<a class="viewcode-back" href="../../lib.html#lib.helpers.Enum.values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strings</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strings</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strings</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&lt;</span><span class="si">%s</span><span class="s2">([&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,)]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">txt</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">),&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">txt</span><span class="p">))</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;])&gt;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

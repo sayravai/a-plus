@@ -1,0 +1,811 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>deviations.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">deviations.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for deviations.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Course</span><span class="p">,</span>
+    <span class="n">CourseInstance</span><span class="p">,</span>
+    <span class="n">CourseModule</span><span class="p">,</span>
+    <span class="n">LearningObjectCategory</span><span class="p">,</span>
+    <span class="n">UserTag</span><span class="p">,</span>
+    <span class="n">UserTagging</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseWithAttachment</span><span class="p">,</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeadlineRuleDeviation</span><span class="p">,</span> <span class="n">MaxSubmissionsRuleDeviation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_deviation_groups</span>
+
+
+<div class="viewcode-block" id="DeviationsTest">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeviationsTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="DeviationsTest.setUpTestData">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.setUpTestData">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpTestData</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;staff&quot;</span><span class="p">,</span> <span class="n">is_staff</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;staffPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">,</span> <span class="n">first_name</span><span class="o">=</span><span class="s2">&quot;First&quot;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s2">&quot;Last&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user_2</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser2&quot;</span><span class="p">,</span> <span class="n">first_name</span><span class="o">=</span><span class="s2">&quot;First2&quot;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s2">&quot;Last2&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testPassword2&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test course&quot;</span><span class="p">,</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;Course-Url&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Truncate the datetime to seconds to make testing deadline deviations more convenient</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">microsecond</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">two_days_from_now</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Fall 2011 day 1&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;T-00.1000_d1&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">user_2</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">add_teacher</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_module</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test module&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test-module&quot;</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">opening_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">closing_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_module_2</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test module 2&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test-module-2&quot;</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">opening_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">closing_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test category&quot;</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">exercise_with_attachment</span> <span class="o">=</span> <span class="n">ExerciseWithAttachment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test exercise 3&quot;</span><span class="p">,</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">max_submissions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">files_to_submit</span><span class="o">=</span><span class="s2">&quot;test1.txt|test2.txt|img.png&quot;</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s2">&quot;test_instructions&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test_exercise_1&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">exercise_with_attachment_2</span> <span class="o">=</span> <span class="n">ExerciseWithAttachment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test exercise 4&quot;</span><span class="p">,</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">max_submissions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">files_to_submit</span><span class="o">=</span><span class="s2">&quot;test1.txt|test2.txt|img.png&quot;</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="s2">&quot;test_instructions&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;test_exercise_2&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">module_2_exercise_1</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;module 2 test exercise 1&quot;</span><span class="p">,</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_module_2</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">max_submissions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;module_2_exercise_1&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">module_2_exercise_2</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;module 2 test exercise 2&quot;</span><span class="p">,</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_module_2</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">learning_object_category</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">max_submissions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;module_2_exercise_2&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user_tag</span> <span class="o">=</span> <span class="n">UserTag</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s1">&#39;tag_1&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user_tagging</span> <span class="o">=</span> <span class="n">UserTagging</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">tag</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">user_tag</span><span class="p">,</span>
+            <span class="n">user</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">granter</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_seconds</span><span class="o">=</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="c1"># One day</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e2</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">exercise_with_attachment_2</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">granter</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_seconds</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="c1"># Two days</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">deadline_rule_deviation_u2_e1</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">granter</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_seconds</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="c1"># Three days</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_deadline_rule_deviation_extra_time">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_deadline_rule_deviation_extra_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_deadline_rule_deviation_extra_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">get_extra_time</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_deadline_rule_deviation_new_deadline">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_deadline_rule_deviation_new_deadline">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_deadline_rule_deviation_new_deadline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">two_days_from_now</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">get_new_deadline</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_deadline_rule_deviation_new_deadline_with_normal_deadline">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_deadline_rule_deviation_new_deadline_with_normal_deadline">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_deadline_rule_deviation_new_deadline_with_normal_deadline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">get_new_deadline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">today</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_deadline_rule_deviation_normal_deadline">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_deadline_rule_deviation_normal_deadline">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_deadline_rule_deviation_normal_deadline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">get_normal_deadline</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_get_max_deviations">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_get_max_deviations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_get_max_deviations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test that the get_max_deviations method returns the correct deviation</span>
+        <span class="c1"># when one exercise is passed into the method.</span>
+
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_max_deviation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">deviation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_max_deviation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">deviation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_get_max_deviations_multiple">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_get_max_deviations_multiple">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_get_max_deviations_multiple</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test that the get_max_deviations method returns the correct deviation</span>
+        <span class="c1"># when multiple exercises are passed into the method.</span>
+
+        <span class="n">deviations</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_max_deviations</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment_2</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">deviations</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment_2</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">failureException</span><span class="p">(</span><span class="s1">&#39;Unexpected exercise returned&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">deviations</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_max_deviations</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment_2</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">deviation</span> <span class="ow">in</span> <span class="n">deviations</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">failureException</span><span class="p">(</span><span class="s1">&#39;Unexpected exercise returned&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_get_max_deviations_group">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_get_max_deviations_group">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_get_max_deviations_group</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Test that the get_max_deviations method returns the correct deviation</span>
+        <span class="c1"># when there is a group submission with both users. In this case,</span>
+        <span class="c1"># user 2&#39;s deviation should also be returned for user 1.</span>
+
+        <span class="n">submission</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">Submission</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_max_deviation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">deviation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_max_deviation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNotNone</span><span class="p">(</span><span class="n">deviation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_update_by_form">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_update_by_form">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_update_by_form</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">update_by_form</span><span class="p">({</span>
+            <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="s1">&#39;without_late_penalty&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">without_late_penalty</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">deviation</span><span class="o">.</span><span class="n">update_by_form</span><span class="p">({</span>
+            <span class="s1">&#39;new_date&#39;</span><span class="p">:</span> <span class="n">timezone</span><span class="o">.</span><span class="n">make_naive</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">two_days_from_now</span><span class="p">),</span>
+            <span class="s1">&#39;without_late_penalty&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">without_late_penalty</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">MaxSubmissionsRuleDeviation</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">deviation</span><span class="o">.</span><span class="n">update_by_form</span><span class="p">({</span>
+            <span class="s1">&#39;extra_submissions&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_submissions</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_is_groupable">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_is_groupable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_is_groupable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">deviation_1</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_seconds</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="n">without_late_penalty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">deviation_2</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment_2</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_seconds</span><span class="o">=</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="n">without_late_penalty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">deviation_1</span><span class="o">.</span><span class="n">is_groupable</span><span class="p">(</span><span class="n">deviation_2</span><span class="p">))</span>
+
+        <span class="n">deviation_2</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">120</span><span class="o">*</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">deviation_1</span><span class="o">.</span><span class="n">is_groupable</span><span class="p">(</span><span class="n">deviation_2</span><span class="p">))</span>
+
+        <span class="n">deviation_2</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+        <span class="n">deviation_2</span><span class="o">.</span><span class="n">without_late_penalty</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">deviation_1</span><span class="o">.</span><span class="n">is_groupable</span><span class="p">(</span><span class="n">deviation_2</span><span class="p">))</span>
+
+        <span class="n">deviation_1</span> <span class="o">=</span> <span class="n">MaxSubmissionsRuleDeviation</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_submissions</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">deviation_2</span> <span class="o">=</span> <span class="n">MaxSubmissionsRuleDeviation</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_with_attachment_2</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="n">extra_submissions</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">deviation_1</span><span class="o">.</span><span class="n">is_groupable</span><span class="p">(</span><span class="n">deviation_2</span><span class="p">))</span>
+
+        <span class="n">deviation_2</span><span class="o">.</span><span class="n">extra_submissions</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">deviation_1</span><span class="o">.</span><span class="n">is_groupable</span><span class="p">(</span><span class="n">deviation_2</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_get_deviation_groups">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_get_deviation_groups">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_get_deviation_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># The deviations of user 1 can&#39;t be grouped because of different extra seconds</span>
+        <span class="c1"># The deviations of user 2 can&#39;t be grouped because there is only one deviation</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_deviation_groups</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()))</span>
+        <span class="n">deviations</span><span class="p">,</span> <span class="n">can_group</span><span class="p">,</span> <span class="n">group_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">deviations</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">can_group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">group_id</span><span class="p">)</span>
+        <span class="n">deviations</span><span class="p">,</span> <span class="n">can_group</span><span class="p">,</span> <span class="n">group_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">deviations</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">can_group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">group_id</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e2</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u2_e1</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u2_e1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c1"># The deviations of user 1 can now be grouped</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_deviation_groups</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()))</span>
+        <span class="n">deviations</span><span class="p">,</span> <span class="n">can_group</span><span class="p">,</span> <span class="n">group_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">deviations</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">can_group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">group_id</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">extra_exercise</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;extra exercise&quot;</span><span class="p">,</span>
+            <span class="n">course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module</span><span class="p">,</span>
+            <span class="n">category</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_object_category</span><span class="p">,</span>
+            <span class="n">max_points</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">points_to_pass</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">max_submissions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># The deviations of user 1 can no longer be grouped because there is an exercise without a deviation</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_deviation_groups</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()))</span>
+        <span class="n">deviations</span><span class="p">,</span> <span class="n">can_group</span><span class="p">,</span> <span class="n">group_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">groups</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">deviations</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">can_group</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIsNone</span><span class="p">(</span><span class="n">group_id</span><span class="p">)</span>
+
+        <span class="c1"># Reset original values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e2</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u1_e2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u2_e1</span><span class="o">.</span><span class="n">extra_seconds</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deadline_rule_deviation_u2_e1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">extra_exercise</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_add_deadline_deviations">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_add_deadline_deviations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_add_deadline_deviations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;staff&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;staffPassword&quot;</span><span class="p">)</span>
+        <span class="n">add_deadline_deviations_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s2">&quot;deviations-add-dl&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Module and user tag provided</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">add_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module_2</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter_tag&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user_tag</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">add_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Exercise and submitters provided</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">add_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">120</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">add_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">120</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">120</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># All fields provided</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">add_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module_2</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter_tag&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user_tag</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">180</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">add_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">180</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">180</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">180</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">deviation</span> <span class="o">=</span> <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+            <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_2</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">deviation</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span> <span class="mi">180</span><span class="o">*</span><span class="mi">60</span><span class="p">)</span>
+        <span class="n">deviation</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="c1"># No extra deviations should have been created</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">exercise__course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module_2</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_override_deadline_deviations">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_override_deadline_deviations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_override_deadline_deviations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;staff&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;staffPassword&quot;</span><span class="p">)</span>
+        <span class="n">add_deadline_deviations_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s2">&quot;deviations-add-dl&quot;</span><span class="p">)</span>
+        <span class="n">override_deadline_deviations_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s2">&quot;deviations-override-dl&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create initial deviation</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">add_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">add_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create new deviations, one overlapping the initial deviation</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">add_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">override_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">30</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Override the overlapping deviation</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">override_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;override&#39;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">add_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create deviations overlapping both deviations, override 2nd one</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">add_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">120</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">override_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">override_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;override&#39;</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">add_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">120</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercise__course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module_2</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DeviationsTest.test_remove_deadline_deviations">
+<a class="viewcode-back" href="../../deviations.html#deviations.tests.DeviationsTest.test_remove_deadline_deviations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_remove_deadline_deviations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;staff&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;staffPassword&quot;</span><span class="p">)</span>
+        <span class="n">add_deadline_deviations_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s2">&quot;deviations-add-dl&quot;</span><span class="p">)</span>
+        <span class="n">remove_deadline_deviations_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s2">&quot;deviations-remove-dl&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create initial deviations</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">add_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;seconds&#39;</span><span class="p">:</span> <span class="mi">45</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">add_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">45</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">extra_seconds</span><span class="p">,</span>
+            <span class="mi">45</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Remove one deviation</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">remove_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">remove_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_1</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Remove the other deviation using module and user tag</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">remove_deadline_deviations_url</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">course_module_2</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+                <span class="s1">&#39;submitter_tag&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">user_tag</span><span class="o">.</span><span class="n">id</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">remove_deadline_deviations_url</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+            <span class="n">DeadlineRuleDeviation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module_2_exercise_2</span><span class="p">,</span>
+                <span class="n">submitter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span>
+            <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

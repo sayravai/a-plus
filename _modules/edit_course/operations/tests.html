@@ -1,0 +1,684 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edit_course.operations.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edit_course.operations.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edit_course.operations.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.configure</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure</span><span class="p">,</span> <span class="n">parse_bool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Course</span><span class="p">,</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">LearningObjectCategory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObject</span><span class="p">,</span> <span class="n">CourseChapter</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">,</span> <span class="n">LTIExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">external_services.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIService</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
+
+<span class="n">configs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;categories&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;cat1&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;category1&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;cat2&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;category2&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;module1&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;module2&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">module_configs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{}</span>
+<span class="p">]</span>
+
+<span class="n">exercise_configs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;LTIExercise&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;lti&quot;</span><span class="p">:</span> <span class="s2">&quot;lti&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;cat1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;test_title&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;BaseExercise&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;max_submissions&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;cat1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;test_title&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;CourseChapter&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;cat1&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;test_title&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">category_configs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;cat1&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;category1&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;cat2&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;category2&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;cat3&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;cat3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;accept_unofficial_submits&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="ConfigureTest">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigureTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="n">course</span><span class="p">:</span> <span class="n">Course</span>
+    <span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span>
+
+<div class="viewcode-block" id="ConfigureTest.setUp">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.setUp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">configs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test course&quot;</span><span class="p">,</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;Course-Url&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">today</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">today</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">two_days_from_now</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">three_days_from_now</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">two_days_from_now</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Fall 2011 day 1&quot;</span><span class="p">,</span>
+            <span class="n">enrollment_starting_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yesterday</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;T-00.1000_d1&quot;</span><span class="p">,</span>
+            <span class="n">view_content_to</span><span class="o">=</span><span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lti_service</span> <span class="o">=</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="s1">&#39;http://localhost:8080/lti-launch&#39;</span><span class="p">,</span> <span class="c1"># fake URL</span>
+            <span class="n">consumer_key</span><span class="o">=</span><span class="s1">&#39;apluskey&#39;</span><span class="p">,</span>
+            <span class="n">consumer_secret</span><span class="o">=</span><span class="s1">&#39;aplussecret&#39;</span><span class="p">,</span>
+            <span class="n">menu_label</span><span class="o">=</span><span class="s2">&quot;lti&quot;</span><span class="p">,</span>
+            <span class="n">access_settings</span><span class="o">=</span><span class="n">LTIService</span><span class="o">.</span><span class="n">LTI_ACCESS</span><span class="o">.</span><span class="n">ANON_API_NO</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_field_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;children&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lobject_field_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;service_url&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;children&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_category_by_key</span><span class="p">),</span>
+            <span class="s2">&quot;target_category&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;target_category&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_category_by_name</span><span class="p">),</span>
+            <span class="s2">&quot;lti&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;lti_service&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_lti_service</span><span class="p">),</span>
+            <span class="s2">&quot;target_url&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category_field_map</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.tearDown">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.tearDown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_modules</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.test_modules">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.test_modules">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_module</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_module_config</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_module&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_module</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_module_config</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_order_change&quot;</span><span class="p">),</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.test_exercises">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.test_exercises">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_exercises</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="s2">&quot;BaseExercise&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_BaseExercise&quot;</span><span class="p">),</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="s2">&quot;LTIExercise&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_LTIExercise&quot;</span><span class="p">),</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="s2">&quot;CourseChapter&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_CourseChapter&quot;</span><span class="p">),</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="s2">&quot;BaseExercise&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_nested_BaseExercise&quot;</span><span class="p">),</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="s2">&quot;CourseChapter&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_replace_BaseExercise&quot;</span><span class="p">),</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="p">[],</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.test_changing_type">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.test_changing_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_changing_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">exercise_types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">exercise_configs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="c1"># test every pair of exercise types</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">exercise_types</span><span class="p">,</span> <span class="n">exercise_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="n">b</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_TypeChange&quot;</span><span class="p">),</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_exercise</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_TypeChange&quot;</span><span class="p">),</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_exercise</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.test_field_defined_by_dict">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.test_field_defined_by_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_field_defined_by_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">exercise_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_config</span><span class="p">(</span><span class="s2">&quot;BaseExercise&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;test_BaseExercise&quot;</span><span class="p">)</span>
+
+        <span class="n">exercise_config</span><span class="p">[</span><span class="s2">&quot;exercise_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;test2&quot;</span><span class="p">:</span> <span class="s2">&quot;test2&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">exercise_config</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="n">exercise_config</span><span class="p">[</span><span class="s2">&quot;exercise_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;test2&quot;</span><span class="p">:</span> <span class="s2">&quot;test2&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;test3&quot;</span><span class="p">:</span> <span class="s2">&quot;test3&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">exercise_config</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="n">exercise_config</span><span class="p">[</span><span class="s2">&quot;exercise_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">exercise_config</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="n">exercise_config</span><span class="p">[</span><span class="s2">&quot;exercise_info&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;test5&quot;</span><span class="p">:</span> <span class="s2">&quot;test5&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insert_exercise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">exercise_config</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.test_categories">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.test_categories">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_categories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_category</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;cat3&quot;</span><span class="p">,</span> <span class="n">category_configs</span><span class="p">[</span><span class="s2">&quot;cat3&quot;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_category</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;cat2&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_category</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;cat1&quot;</span><span class="p">,</span> <span class="n">category_configs</span><span class="p">[</span><span class="s2">&quot;cat2&quot;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">configure_and_test</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.configure_and_test">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.configure_and_test">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure_and_test</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">configure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">success</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="ow">not</span> <span class="n">errors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_instance_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigureTest.check_categories_config">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.check_categories_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_categories_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">categories</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">LearningObjectCategory</span><span class="p">],</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="c1"># Hidden categories are old, so skip them</span>
+        <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">category</span>
+            <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span>
+            <span class="k">if</span> <span class="n">category</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span>
+        <span class="p">]</span>
+        <span class="n">category_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">category</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">}</span>
+        <span class="n">name_to_category_config</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="n">config_category_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">name_to_category_config</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">category_names</span><span class="p">,</span> <span class="n">config_category_names</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_fields</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category_field_map</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">name_to_category_config</span><span class="p">[</span><span class="n">category</span><span class="o">.</span><span class="n">name</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigureTest.check_lobject_config">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.check_lobject_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_lobject_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lobject</span><span class="p">:</span> <span class="n">LearningObject</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="c1"># order should be set by check_instance_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;order&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_fields</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lobject_field_map</span><span class="p">,</span> <span class="n">lobject</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="n">lobject_cls</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">LTIExercise</span> <span class="k">if</span> <span class="s2">&quot;lti&quot;</span> <span class="ow">in</span> <span class="n">config</span>
+            <span class="k">else</span> <span class="n">BaseExercise</span> <span class="k">if</span> <span class="s2">&quot;max_submissions&quot;</span> <span class="ow">in</span> <span class="n">config</span>
+            <span class="k">else</span> <span class="n">CourseChapter</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">lobject</span><span class="p">),</span> <span class="n">lobject_cls</span><span class="p">)</span>
+
+        <span class="n">lobjects</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="p">[])}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">lobjects</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">set</span><span class="p">(</span><span class="n">lobj</span><span class="o">.</span><span class="n">url</span> <span class="k">for</span> <span class="n">lobj</span> <span class="ow">in</span> <span class="n">lobject</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">all</span><span class="p">()))</span>
+
+        <span class="k">for</span> <span class="n">lobj</span> <span class="ow">in</span> <span class="n">lobject</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">lobjects</span><span class="p">[</span><span class="n">lobj</span><span class="o">.</span><span class="n">url</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_lobject_config</span><span class="p">(</span><span class="n">lobj</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.check_module_config">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.check_module_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="c1"># order should be set by check_instance_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;order&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_fields</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module_field_map</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+        <span class="n">children</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">learning_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="n">lobjects</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="p">[])}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">lobjects</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">set</span><span class="p">(</span><span class="n">lobject</span><span class="o">.</span><span class="n">url</span> <span class="k">for</span> <span class="n">lobject</span> <span class="ow">in</span> <span class="n">children</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">lobject</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">lobjects</span><span class="p">[</span><span class="n">lobject</span><span class="o">.</span><span class="n">url</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_lobject_config</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.check_instance_config">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.check_instance_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_instance_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">set_order</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="k">if</span> <span class="s2">&quot;order&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                    <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">o</span><span class="p">[</span><span class="s2">&quot;order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+
+                <span class="n">set_order</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">n</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;modules&quot;</span><span class="p">,</span> <span class="p">[])}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="nb">set</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">url</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">course_modules</span><span class="o">.</span><span class="n">all</span><span class="p">()))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_categories_config</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;categories&quot;</span><span class="p">])</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;modules&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="s2">&quot;order&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">o</span><span class="p">[</span><span class="s2">&quot;order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s2">&quot;numerate_ignoring_modules&quot;</span> <span class="ow">in</span> <span class="n">config</span> \
+                    <span class="ow">and</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;numerate_ignoring_modules&quot;</span><span class="p">])):</span>
+                <span class="n">nn</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">nn</span> <span class="o">=</span> <span class="n">set_order</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">course_modules</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">modules</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">url</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_module_config</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.check_fields">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.check_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">func</span> <span class="o">=</span> <span class="n">key</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">value</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;attr: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.get_module_config">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.get_module_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_module_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">module_configs</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">ret</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.get_exercise_config">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.get_exercise_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercise_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typ</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">exercise_configs</span><span class="p">[</span><span class="n">typ</span><span class="p">][</span><span class="n">index</span><span class="p">])</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">ret</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.insert_module">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.insert_module">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert_module</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">module_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;modules&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">module_config</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">module_config</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.remove_module">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.remove_module">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_module</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.insert_exercise">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.insert_exercise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert_exercise</span><span class="p">(</span> <span class="c1"># pylint: disable=too-many-arguments</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">lobject_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">module_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">][</span><span class="n">module_index</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">parent</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="k">if</span> <span class="n">replace</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lobject_config</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">lobject_config</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.remove_exercise">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.remove_exercise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">module_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove exercise from the &lt;config&gt;</span>
+
+<span class="sd">        :param indices: a list of child indices to access the correct chapter. If the</span>
+<span class="sd">          exercise to be removed is at the top-level of the module, leave empty. If</span>
+<span class="sd">          it is under a chapter that is at the top-level of the module, include the</span>
+<span class="sd">          index of the chapter in the module.</span>
+<span class="sd">        :param index: the index of the exercise to be removed. Can be a tuple to</span>
+<span class="sd">          indicate a range of indices, or None to remove the last exercise.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">][</span><span class="n">module_index</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">parent</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.set_category">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.set_category">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_category</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">category_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">category_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;categories&quot;</span><span class="p">][</span><span class="n">category_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">category_config</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.remove_category">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.remove_category">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_category</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+            <span class="n">category_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;categories&quot;</span><span class="p">][</span><span class="n">category_key</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.get_category_by_key">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.get_category_by_key">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_category_by_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category_key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;categories&quot;</span><span class="p">][</span><span class="n">category_key</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.get_category_by_name">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.get_category_by_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_category_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category_name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">category_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigureTest.get_lti_service">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.tests.ConfigureTest.get_lti_service">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_lti_service</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lti_key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">menu_label</span><span class="o">=</span><span class="n">lti_key</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

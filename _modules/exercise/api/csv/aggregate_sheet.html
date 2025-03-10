@@ -1,0 +1,204 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.api.csv.aggregate_sheet &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.api.csv.aggregate_sheet</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.api.csv.aggregate_sheet</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModuleContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span>
+
+
+<span class="c1"># pylint: disable-next=too-many-locals</span>
+<div class="viewcode-block" id="aggregate_sheet">
+<a class="viewcode-back" href="../../../../exercise.api.csv.html#exercise.api.csv.aggregate_sheet.aggregate_sheet">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">aggregate_sheet</span><span class="p">(</span>
+        <span class="n">profiles</span><span class="p">,</span>
+        <span class="n">taggings</span><span class="p">,</span>
+        <span class="n">exercises</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ModuleContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span><span class="p">]],</span>
+        <span class="n">aggregate</span><span class="p">,</span>
+        <span class="n">number</span><span class="p">,</span>
+        <span class="p">):</span>
+    <span class="n">DEFAULT_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="s1">&#39;UserID&#39;</span><span class="p">,</span> <span class="s1">&#39;StudentID&#39;</span><span class="p">,</span> <span class="s1">&#39;Email&#39;</span><span class="p">,</span> <span class="s1">&#39;Tags&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">OBJECT_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+      <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> Count&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> Total&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> Ratio&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="c1"># Count: number of submissions.</span>
+    <span class="c1"># Total: (best) points.</span>
+    <span class="c1"># Ratio: float between 0-1, the percentage of points / max_points.</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">number</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span> <span class="k">if</span> <span class="n">number</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># If the number parameter is not given, all modules in the course are included.</span>
+    <span class="c1"># If the number is given, the children below that level are included.</span>
+    <span class="c1"># Example: number = &quot;1&quot; (module 1), d = 2, the output includes chapters in the fields: 1.1, 1.2, 1.3, ...</span>
+    <span class="c1"># (The exercises are aggregated under their parent chapters.)</span>
+    <span class="n">exercise_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">exercise_max</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">exercise_fields</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">exercise_nums</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">:</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">number</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+        <span class="n">enum</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">number</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[:</span><span class="n">d</span><span class="p">])</span>
+        <span class="c1"># num needs to be checked here because in some cases, the exercises list</span>
+        <span class="c1"># is missing parents for some exercises. Especially when search</span>
+        <span class="c1"># entries are filtered with the filter_for_assistant parameter.</span>
+        <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="n">d</span> <span class="ow">or</span> <span class="p">(</span><span class="n">level</span> <span class="o">&gt;</span> <span class="n">d</span> <span class="ow">and</span> <span class="n">num</span> <span class="o">!=</span> <span class="n">enum</span><span class="p">):</span>
+            <span class="c1"># Object in the level to include. If this object has children,</span>
+            <span class="c1"># the variables are initialized here. The children come after</span>
+            <span class="c1"># the parent in the exercises list.</span>
+            <span class="c1"># The children enter the next if branch since their level is higher.</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">number</span> <span class="k">if</span> <span class="n">level</span> <span class="o">==</span> <span class="n">d</span> <span class="k">else</span> <span class="n">enum</span>
+            <span class="n">exercise_nums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+            <span class="n">exercise_max</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">OBJECT_FIELDS</span><span class="p">:</span>
+                <span class="n">exercise_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">LearningObjectContent</span><span class="p">):</span>
+                <span class="n">exercise_map</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">exercise_max</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">+=</span> <span class="n">e</span><span class="o">.</span><span class="n">max_points</span>
+        <span class="k">elif</span> <span class="n">level</span> <span class="o">&gt;</span> <span class="n">d</span><span class="p">:</span>
+            <span class="c1"># Child object of the previous parent.</span>
+            <span class="c1"># Parent comes before its children in the exercises list.</span>
+            <span class="n">exercise_map</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">num</span>
+            <span class="n">exercise_max</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">+=</span> <span class="n">e</span><span class="o">.</span><span class="n">max_points</span>
+
+    <span class="n">agg</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">aggregate</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;submitters__user_id&#39;</span><span class="p">]</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="n">exercise_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;exercise_id&#39;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">num</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">user_row</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">user_row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span>
+        <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span>
+        <span class="n">user_row</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+        <span class="n">agg</span><span class="p">[</span><span class="n">uid</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_row</span>
+
+    <span class="n">tags</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">taggings</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">:</span>
+            <span class="n">tags</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">tag_id</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tags</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">tag_id</span><span class="p">)]</span>
+
+    <span class="n">sheet</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">profiles</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">user_row</span> <span class="o">=</span> <span class="n">agg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">user_tags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mooc&#39;</span> <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">is_external</span> <span class="k">else</span> <span class="s1">&#39;aalto&#39;</span><span class="p">]</span>
+        <span class="n">user_tags</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
+            <span class="p">(</span><span class="s1">&#39;UserID&#39;</span><span class="p">,</span> <span class="n">uid</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;StudentID&#39;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">student_id</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;Email&#39;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;Tags&#39;</span><span class="p">,</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">user_tags</span><span class="p">)),</span>
+        <span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">num</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">exercise_nums</span><span class="p">):</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">user_row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">maxp</span> <span class="o">=</span> <span class="n">exercise_max</span><span class="p">[</span><span class="n">num</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">row</span><span class="p">[</span><span class="n">exercise_fields</span><span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span><span class="p">]]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="n">row</span><span class="p">[</span><span class="n">exercise_fields</span><span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">maxp</span> <span class="k">if</span> <span class="n">maxp</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span>
+                <span class="mi">1</span> <span class="k">if</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">)</span>
+        <span class="n">sheet</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sheet</span><span class="p">,</span> <span class="n">DEFAULT_FIELDS</span> <span class="o">+</span> <span class="n">exercise_fields</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

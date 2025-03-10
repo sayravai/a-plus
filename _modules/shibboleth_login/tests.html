@@ -1,0 +1,485 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>shibboleth_login.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">shibboleth_login.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for shibboleth_login.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">quote</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span><span class="p">,</span> <span class="n">modify_settings</span><span class="p">,</span> <span class="n">override_settings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">shibboleth_login.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">shib_join</span>
+
+
+<span class="n">DEF_SHIBD_META</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">:</span> <span class="s2">&quot;teekkarit@first.invalid&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;TESTSHIB_cn&#39;</span><span class="p">:</span> <span class="s2">&quot;Temppu Ojanen Teettari&quot;</span><span class="p">,</span> <span class="c1"># used as fallback</span>
+    <span class="s1">&#39;TESTSHIB_displayName&#39;</span><span class="p">:</span> <span class="s2">&quot;Teemudemus&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;TESTSHIB_givenName&#39;</span><span class="p">:</span> <span class="s2">&quot;Teemu&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;TESTSHIB_sn&#39;</span><span class="p">:</span> <span class="s2">&quot;Teekkari&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;TESTSHIB_mail&#39;</span><span class="p">:</span> <span class="s2">&quot;teemu.teekkari@first.invalid&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;TESTSHIB_preferredLanguage&#39;</span><span class="p">:</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;TESTSHIB_schacHomeOrganization&#39;</span><span class="p">:</span> <span class="s1">&#39;first.invalid&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;TESTSHIB_schacPersonalUniqueCode&#39;</span><span class="p">:</span> <span class="n">shib_join</span><span class="p">(</span>
+        <span class="s1">&#39;urn:mace:example.invalid:schac:personalUniqueCode:int:libraryID:first.invalid:999999&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;urn:mace:example.invalid:schac:personalUniqueCode:int:studentID:first.invalid:123453&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;urn:mace:example.invalid:schac:personalUniqueCode:int:studentID:second.invalid:abcdef&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">ENV_VARS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;PREFIX&#39;</span><span class="p">:</span> <span class="s1">&#39;TESTSHIB_&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">:</span> <span class="s1">&#39;first.invalid&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;URL_DECODE&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="ShibbolethTest">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest">[docs]</a>
+<span class="nd">@modify_settings</span><span class="p">(</span>
+    <span class="n">INSTALLED_APPS</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;append&#39;</span><span class="p">:</span> <span class="s1">&#39;shibboleth_login&#39;</span><span class="p">},</span>
+    <span class="n">AUTHENTICATION_BACKENDS</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;append&#39;</span><span class="p">:</span> <span class="s1">&#39;shibboleth_login.auth_backend.ShibbolethAuthBackend&#39;</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="nd">@override_settings</span><span class="p">(</span><span class="n">SHIBBOLETH_ENVIRONMENT_VARS</span><span class="o">=</span><span class="n">ENV_VARS</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShibbolethTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ShibbolethTest.setUpTestData">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.setUpTestData">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpTestData</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="s1">&#39;meikalm8@first.invalid&#39;</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="s1">&#39;matti@second.invalid&#39;</span><span class="p">,</span>
+            <span class="n">first_name</span><span class="o">=</span><span class="s1">&#39;Matti&#39;</span><span class="p">,</span>
+            <span class="n">last_name</span><span class="o">=</span><span class="s1">&#39;Sukunimi&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">set_unusable_password</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="s1">&#39;000&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">organization</span> <span class="o">=</span> <span class="s1">&#39;first.invalid&#39;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">login_url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;shibboleth-login&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_permission_is_denied_when_user_id_is_missing">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_missing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_permission_is_denied_when_user_id_is_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_permission_is_denied_when_user_id_does_not_contain_domain">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_does_not_contain_domain">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_permission_is_denied_when_user_id_does_not_contain_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;invalid-non-domain&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_permission_is_denied_when_user_id_is_way_too_long">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_id_is_way_too_long">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_permission_is_denied_when_user_id_is_way_too_long</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;invalid&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;@first.invalid&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_new_user_is_create_when_there_is_valid_data">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_when_there_is_valid_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_new_user_is_create_when_there_is_valid_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;teemu.teekkari@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Teemu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Teekkari&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="s1">&#39;123453&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_new_user_is_create_with_tuni_user_info">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_with_tuni_user_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_new_user_is_create_with_tuni_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate that shib login works with data obtained from Tampere universities</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">env_vars</span> <span class="o">=</span> <span class="n">ENV_VARS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_schacPersonalUniqueCode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;urn:schac:personalUniqueCode:int:studentID:uta.fi:A11111;&#39;</span>
+            <span class="s1">&#39;urn:schac:personalUniqueCode:int:studentID:tamk.fi:222222;&#39;</span>
+            <span class="s1">&#39;urn:schac:personalUniqueCode:int:studentID:tut.fi:333333;&#39;</span>
+            <span class="s1">&#39;urn:schac:personalUniqueCode:int:studentID:uta.fi:44444&#39;</span>
+        <span class="p">)</span>
+        <span class="n">tests</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s1">&#39;uta.fi&#39;</span><span class="p">,</span> <span class="s1">&#39;A11111&#39;</span><span class="p">),</span> <span class="c1"># first instance is selected</span>
+            <span class="p">(</span><span class="s1">&#39;tamk.fi&#39;</span><span class="p">,</span> <span class="s1">&#39;222222&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;tut.fi&#39;</span><span class="p">,</span> <span class="s1">&#39;333333&#39;</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">domain</span><span class="p">,</span> <span class="n">studentid</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">subTest</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span> <span class="n">studentid</span><span class="o">=</span><span class="n">studentid</span><span class="p">):</span>
+                <span class="n">env_vars</span><span class="p">[</span><span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain</span>
+                <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_schacHomeOrganization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">domain</span>
+                <span class="k">with</span> <span class="n">override_settings</span><span class="p">(</span><span class="n">SHIBBOLETH_ENVIRONMENT_VARS</span><span class="o">=</span><span class="n">env_vars</span><span class="p">):</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="n">studentid</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_new_user_is_create_even_with_lowercase_meta">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_new_user_is_create_even_with_lowercase_meta">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_new_user_is_create_even_with_lowercase_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;teemu.teekkari@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Teemu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Teekkari&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="s1">&#39;123453&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_email_is_create_when_when_email_is_missing">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_email_is_create_when_when_email_is_missing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_email_is_create_when_when_email_is_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_mail&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">{:d}</span><span class="s1">@localhost&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Teemu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Teekkari&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cn_is_used_for_first_and_last_name_when_givename_and_sn_are_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_givenName&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_sn&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Temppu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Ojanen Teettari&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_cn_is_used_for_first_name_when_givename_is_missing">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_cn_is_used_for_first_name_when_givename_is_missing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cn_is_used_for_first_name_when_givename_is_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_givenName&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Temppu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Teekkari&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_displayname_is_used_for_first_name_when_givename_and_cn_are_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_givenName&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_cn&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Teemudemus&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Teekkari&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_no_student_id_is_set_when_it_is_missing_from_shib">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_no_student_id_is_set_when_it_is_missing_from_shib">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_no_student_id_is_set_when_it_is_missing_from_shib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_schacPersonalUniqueCode&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;teekkarit@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;teemu.teekkari@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Teemu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Teekkari&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_second_domain_student_id_is_used_when_setting_is_changed">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_second_domain_student_id_is_used_when_setting_is_changed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_second_domain_student_id_is_used_when_setting_is_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+        <span class="n">env_vars</span> <span class="o">=</span> <span class="n">ENV_VARS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">env_vars</span><span class="p">[</span><span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;second.invalid&#39;</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_schacHomeOrganization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;second.invalid&#39;</span>
+        <span class="k">with</span> <span class="n">override_settings</span><span class="p">(</span><span class="n">SHIBBOLETH_ENVIRONMENT_VARS</span><span class="o">=</span><span class="n">env_vars</span><span class="p">):</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="s1">&#39;abcdef&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_last_name_is_not_updated_when_sn_is_missing">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_last_name_is_not_updated_when_sn_is_missing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_last_name_is_not_updated_when_sn_is_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_sn&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;teemu.teekkari@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Teemu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Sukunimi&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="s1">&#39;123453&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_values_are_not_updated_when_they_are_missing">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_values_are_not_updated_when_they_are_missing">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_values_are_not_updated_when_they_are_missing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_givenName&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_sn&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_schacPersonalUniqueCode&#39;</span><span class="p">]</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;teemu.teekkari@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Matti&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Sukunimi&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="s1">&#39;000&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_unicode_values_are_supported_for_names">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_unicode_values_are_supported_for_names">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_unicode_values_are_supported_for_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_givenName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Mänty&#39;</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_sn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Hölmöläinen&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="s1">&#39;teemu.teekkari@first.invalid&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Mänty&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Hölmöläinen&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_old_user_found_using_email">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_old_user_found_using_email">[docs]</a>
+    <span class="nd">@override_settings</span><span class="p">(</span><span class="n">SHIBBOLETH_LOGIN</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ALLOW_SEARCH_WITH_EMAIL&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_old_user_found_using_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">email</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_mail&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">email</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="n">email</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="s1">&#39;Teemu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span> <span class="s1">&#39;Teekkari&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">,</span> <span class="s1">&#39;123453&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethTest.test_permission_is_denied_when_user_is_inactive">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethTest.test_permission_is_denied_when_user_is_inactive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_permission_is_denied_when_user_is_inactive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="n">DEF_SHIBD_META</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;TESTSHIB_eppn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta</span><span class="p">):</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">quote</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">generic</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">login_url</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="ShibbolethSettingsTest">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethSettingsTest">[docs]</a>
+<span class="nd">@modify_settings</span><span class="p">(</span>
+    <span class="n">INSTALLED_APPS</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;append&#39;</span><span class="p">:</span> <span class="s1">&#39;shibboleth_login&#39;</span><span class="p">},</span>
+    <span class="n">AUTHENTICATION_BACKENDS</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;append&#39;</span><span class="p">:</span> <span class="s1">&#39;shibboleth_login.auth_backend.ShibbolethAuthBackend&#39;</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShibbolethSettingsTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ShibbolethSettingsTest.test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethSettingsTest.test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_SHIBBOLETH_VARIABLES_URL_ENCODED_is_migrated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="c1"># pylint: disable=use-dict-literal</span>
+            <span class="n">SHIBBOLETH_VARIABLES_URL_ENCODED</span> <span class="o">=</span> <span class="s1">&#39;test-value&#39;</span><span class="p">,</span>
+            <span class="n">SHIBBOLETH_ENVIRONMENT_VARS</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">:</span> <span class="n">ENV_VARS</span><span class="p">[</span><span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">],</span>
+                <span class="s1">&#39;PREFIX&#39;</span><span class="p">:</span> <span class="n">ENV_VARS</span><span class="p">[</span><span class="s1">&#39;PREFIX&#39;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="n">override_settings</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">shibboleth_login.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">env_settings</span> <span class="c1"># pylint: disable=import-outside-toplevel</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">URL_DECODE</span><span class="p">,</span> <span class="s1">&#39;test-value&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethSettingsTest.test_old_settings_are_parsed_correctly">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_are_parsed_correctly">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_old_settings_are_parsed_correctly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="c1"># pylint: disable=use-dict-literal</span>
+            <span class="n">SHIB_USER_ID_KEY</span> <span class="o">=</span> <span class="s1">&#39;RANDOM_EPPN&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_FIRST_NAME_KEY</span> <span class="o">=</span> <span class="s1">&#39;RANDOM_GIVENNAME&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_LAST_NAME_KEY</span> <span class="o">=</span> <span class="s1">&#39;RANDOM_SN&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_MAIL_KEY</span> <span class="o">=</span> <span class="s1">&#39;RANDOM_MAIL&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_STUDENT_ID_KEY</span> <span class="o">=</span> <span class="s1">&#39;RANDOM_SCHACPERSONALUNIQUECODE&#39;</span><span class="p">,</span>
+            <span class="n">SHIBBOLETH_ENVIRONMENT_VARS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">:</span> <span class="n">ENV_VARS</span><span class="p">[</span><span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">]},</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="n">override_settings</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">shibboleth_login.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">env_settings</span> <span class="c1"># pylint: disable=import-outside-toplevel</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">PREFIX</span><span class="p">,</span> <span class="s1">&#39;RANDOM_&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">USER_ID</span><span class="p">,</span> <span class="s1">&#39;EPPN&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="s1">&#39;GIVENNAME&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">LAST_NAME</span><span class="p">,</span> <span class="s1">&#39;SN&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">EMAIL</span><span class="p">,</span> <span class="s1">&#39;MAIL&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">STUDENT_IDS</span><span class="p">,</span> <span class="s1">&#39;SCHACPERSONALUNIQUECODE&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShibbolethSettingsTest.test_old_settings_with_http_prefix_are_parsed_correctly">
+<a class="viewcode-back" href="../../shibboleth_login.html#shibboleth_login.tests.ShibbolethSettingsTest.test_old_settings_with_http_prefix_are_parsed_correctly">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_old_settings_with_http_prefix_are_parsed_correctly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="c1"># pylint: disable=use-dict-literal</span>
+            <span class="n">SHIB_USER_ID_KEY</span> <span class="o">=</span> <span class="s1">&#39;HTTP_SHIB_EPPN&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_FIRST_NAME_KEY</span> <span class="o">=</span> <span class="s1">&#39;HTTP_SHIB_GIVENNAME&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_LAST_NAME_KEY</span> <span class="o">=</span> <span class="s1">&#39;HTTP_SHIB_SN&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_MAIL_KEY</span> <span class="o">=</span> <span class="s1">&#39;HTTP_SHIB_MAIL&#39;</span><span class="p">,</span>
+            <span class="n">SHIB_STUDENT_ID_KEY</span> <span class="o">=</span> <span class="s1">&#39;HTTP_SHIB_SCHACPERSONALUNIQUECODE&#39;</span><span class="p">,</span>
+            <span class="n">SHIBBOLETH_ENVIRONMENT_VARS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">:</span> <span class="n">ENV_VARS</span><span class="p">[</span><span class="s1">&#39;STUDENT_DOMAIN&#39;</span><span class="p">]},</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="n">override_settings</span><span class="p">(</span><span class="o">**</span><span class="n">settings</span><span class="p">):</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">shibboleth_login.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">env_settings</span> <span class="c1"># pylint: disable=import-outside-toplevel</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">PREFIX</span><span class="p">,</span> <span class="s1">&#39;HTTP_SHIB_&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">USER_ID</span><span class="p">,</span> <span class="s1">&#39;EPPN&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="s1">&#39;GIVENNAME&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">LAST_NAME</span><span class="p">,</span> <span class="s1">&#39;SN&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">EMAIL</span><span class="p">,</span> <span class="s1">&#39;MAIL&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">env_settings</span><span class="o">.</span><span class="n">STUDENT_IDS</span><span class="p">,</span> <span class="s1">&#39;SCHACPERSONALUNIQUECODE&#39;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

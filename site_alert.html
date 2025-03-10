@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>site_alert package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">site_alert package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-site_alert.admin">site_alert.admin module</a><ul>
+<li><a class="reference internal" href="#site_alert.admin.SiteAlertAdmin"><code class="docutils literal notranslate"><span class="pre">SiteAlertAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#site_alert.admin.SiteAlertAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">SiteAlertAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.admin.SiteAlertAdmin.media"><code class="docutils literal notranslate"><span class="pre">SiteAlertAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.admin.SiteAlertAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">SiteAlertAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-site_alert.apps">site_alert.apps module</a><ul>
+<li><a class="reference internal" href="#site_alert.apps.SiteAlertConfig"><code class="docutils literal notranslate"><span class="pre">SiteAlertConfig</span></code></a><ul>
+<li><a class="reference internal" href="#site_alert.apps.SiteAlertConfig.default_auto_field"><code class="docutils literal notranslate"><span class="pre">SiteAlertConfig.default_auto_field</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.apps.SiteAlertConfig.name"><code class="docutils literal notranslate"><span class="pre">SiteAlertConfig.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-site_alert.models">site_alert.models module</a><ul>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert"><code class="docutils literal notranslate"><span class="pre">SiteAlert</span></code></a><ul>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">SiteAlert.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">SiteAlert.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.STATUS"><code class="docutils literal notranslate"><span class="pre">SiteAlert.STATUS</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.alert"><code class="docutils literal notranslate"><span class="pre">SiteAlert.alert</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.get_status_display"><code class="docutils literal notranslate"><span class="pre">SiteAlert.get_status_display()</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.id"><code class="docutils literal notranslate"><span class="pre">SiteAlert.id</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.objects"><code class="docutils literal notranslate"><span class="pre">SiteAlert.objects</span></code></a></li>
+<li><a class="reference internal" href="#site_alert.models.SiteAlert.status"><code class="docutils literal notranslate"><span class="pre">SiteAlert.status</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-site_alert">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">site_alert package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/site_alert.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="site-alert-package">
+<h1>site_alert package<a class="headerlink" href="#site-alert-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="site_alert.migrations.html">site_alert.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="site_alert.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="site_alert.migrations.html#module-site_alert.migrations.0001_initial">site_alert.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="site_alert.migrations.html#site_alert.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="site_alert.migrations.html#site_alert.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="site_alert.migrations.html#site_alert.migrations.0001_initial.Migration.initial"><code class="docutils literal notranslate"><span class="pre">Migration.initial</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="site_alert.migrations.html#site_alert.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="site_alert.migrations.html#module-site_alert.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-site_alert.admin">
+<span id="site-alert-admin-module"></span><h2>site_alert.admin module<a class="headerlink" href="#module-site_alert.admin" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="site_alert.admin.SiteAlertAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">site_alert.admin.</span></span><span class="sig-name descname"><span class="pre">SiteAlertAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/site_alert/admin.html#SiteAlertAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#site_alert.admin.SiteAlertAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.admin.SiteAlertAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'alert',</span> <span class="pre">'status')</span></em><a class="headerlink" href="#site_alert.admin.SiteAlertAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="site_alert.admin.SiteAlertAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#site_alert.admin.SiteAlertAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.admin.SiteAlertAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('alert',</span> <span class="pre">'status')</span></em><a class="headerlink" href="#site_alert.admin.SiteAlertAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-site_alert.apps">
+<span id="site-alert-apps-module"></span><h2>site_alert.apps module<a class="headerlink" href="#module-site_alert.apps" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="site_alert.apps.SiteAlertConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">site_alert.apps.</span></span><span class="sig-name descname"><span class="pre">SiteAlertConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/site_alert/apps.html#SiteAlertConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#site_alert.apps.SiteAlertConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.apps.SiteAlertConfig.default_auto_field">
+<span class="sig-name descname"><span class="pre">default_auto_field</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'django.db.models.BigAutoField'</span></em><a class="headerlink" href="#site_alert.apps.SiteAlertConfig.default_auto_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.apps.SiteAlertConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'site_alert'</span></em><a class="headerlink" href="#site_alert.apps.SiteAlertConfig.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-site_alert.models">
+<span id="site-alert-models-module"></span><h2>site_alert.models module<a class="headerlink" href="#module-site_alert.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">site_alert.models.</span></span><span class="sig-name descname"><span class="pre">SiteAlert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/site_alert/models.html#SiteAlert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#site_alert.models.SiteAlert" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>SiteAlert models represents sitewide alerts. There can be a single or
+multiple alerts active simultaneously.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#site_alert.models.SiteAlert.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#site_alert.models.SiteAlert.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.STATUS">
+<span class="sig-name descname"><span class="pre">STATUS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;lib.helpers.Enum</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#site_alert.models.SiteAlert.STATUS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.alert">
+<span class="sig-name descname"><span class="pre">alert</span></span><a class="headerlink" href="#site_alert.models.SiteAlert.alert" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.get_status_display">
+<span class="sig-name descname"><span class="pre">get_status_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.IntegerField:</span> <span class="pre">status&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#site_alert.models.SiteAlert.get_status_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#site_alert.models.SiteAlert.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#site_alert.models.SiteAlert.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="site_alert.models.SiteAlert.status">
+<span class="sig-name descname"><span class="pre">status</span></span><a class="headerlink" href="#site_alert.models.SiteAlert.status" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-site_alert">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-site_alert" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.sis &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.sis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.sis</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.course&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StudentInfoSystem">
+<a class="viewcode-back" href="../../course.html#course.sis.StudentInfoSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StudentInfoSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for university-specific SIS system extensions, such as SISU at Aalto.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StudentInfoSystem.get_instances">
+<a class="viewcode-back" href="../../course.html#course.sis.StudentInfoSystem.get_instances">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_instances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">course</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span> <span class="c1"># pylint: disable=unused-argument</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get active course instances from SIS based on the course code.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        course</span>
+<span class="sd">            Course code for which instances are fetched</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List of tuples representing instances. The first part of the tuple is an</span>
+<span class="sd">        identifier by which specific instance data can be found in the API. The second part</span>
+<span class="sd">        is an instance description shown to the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="StudentInfoSystem.get_course_data">
+<a class="viewcode-back" href="../../course.html#course.sis.StudentInfoSystem.get_course_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_course_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span> <span class="c1"># pylint: disable=unused-argument redefined-builtin</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get course data (teachers, start/end times) from the SIS system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        id</span>
+<span class="sd">            SIS identifier of the course instance</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Dictionary of course data. Currently possible keys are &#39;starting_time&#39;,</span>
+<span class="sd">        &#39;ending_time&#39; and &#39;teachers&#39; (list of teacher usernames).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="StudentInfoSystem.get_participants">
+<a class="viewcode-back" href="../../course.html#course.sis.StudentInfoSystem.get_participants">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_participants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span> <span class="c1"># pylint: disable=unused-argument redefined-builtin</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get participating students from the SIS system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        id</span>
+<span class="sd">            SIS identifier of the course instance</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        List of student identifiers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="get_sis_configuration">
+<a class="viewcode-back" href="../../course.html#course.sis.get_sis_configuration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_sis_configuration</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">StudentInfoSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Loads the proper SIS plugin based on settings.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    StudentInfoSystem - inherited object that implements university-specific</span>
+<span class="sd">    functionality and APIs for SIS interactions.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;SIS_PLUGIN_MODULE&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;SIS_PLUGIN_CLASS&#39;</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s1">&#39;&quot;course.sis.get_sis_configuration()&quot; called but SIS settings are missing. &#39;</span>
+            <span class="s1">&#39;Check &quot;settings.SIS_PLUGIN_MODULE&quot; and &quot;settings.SIS_PLUGIN_CLASS&quot;.&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">SIS_PLUGIN_MODULE</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="s1">&#39;course&#39;</span><span class="p">)</span>
+
+    <span class="n">pluginclass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">settings</span><span class="o">.</span><span class="n">SIS_PLUGIN_CLASS</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pluginclass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;SIS plugin module &quot;</span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">SIS_PLUGIN_MODULE</span><span class="si">}</span><span class="s1">&quot; does not define &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;the class &quot;</span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">SIS_PLUGIN_CLASS</span><span class="si">}</span><span class="s1">&quot;. &#39;</span>
+            <span class="s1">&#39;Check &quot;settings.SIS_PLUGIN_MODULE&quot; and &quot;settings.SIS_PLUGIN_CLASS&quot;.&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">plugin</span> <span class="o">=</span> <span class="n">pluginclass</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">plugin</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

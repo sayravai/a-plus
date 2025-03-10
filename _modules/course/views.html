@@ -1,0 +1,618 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">icalendar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">unquote</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http.response</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span><span class="p">,</span> <span class="n">translate_url</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">url_has_allowed_host_and_scheme</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_for_language</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoSuchContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.submission_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Submission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings_text</span><span class="p">,</span> <span class="n">remove_query_param_from_url</span><span class="p">,</span> <span class="n">is_ajax</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTemplateView</span><span class="p">,</span> <span class="n">BaseRedirectMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">,</span> <span class="n">BaseView</span><span class="p">,</span> <span class="n">BaseRedirectView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfileView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroupsForm</span><span class="p">,</span> <span class="n">GroupSelectForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Course</span><span class="p">,</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">Enrollment</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnrollInfoVisiblePermission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.renders</span><span class="w"> </span><span class="kn">import</span> <span class="n">group_info_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CourseInstanceBaseView</span><span class="p">,</span>
+    <span class="n">CourseInstanceMixin</span><span class="p">,</span>
+    <span class="n">CourseMixin</span><span class="p">,</span>
+    <span class="n">CourseModuleBaseView</span><span class="p">,</span>
+    <span class="n">EnrollableViewMixin</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="HomeView">
+<a class="viewcode-back" href="../../course.html#course.views.HomeView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">HomeView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/index.html&quot;</span>
+
+<div class="viewcode-block" id="HomeView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.views.HomeView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">welcome_text</span> <span class="o">=</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;WELCOME_TEXT&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">internal_user_label</span> <span class="o">=</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;INTERNAL_USER_LABEL&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">external_user_label</span> <span class="o">=</span> <span class="n">settings_text</span><span class="p">(</span><span class="s1">&#39;EXTERNAL_USER_LABEL&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_language_toggle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">my_instances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_instances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">end_threshold</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">is_logged_in</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+            <span class="n">is_logged_in</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_teaching</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">ending_time__gte</span><span class="o">=</span><span class="n">end_threshold</span>
+                <span class="p">):</span>
+                <span class="n">my_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_assisting</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">ending_time__gte</span><span class="o">=</span><span class="n">end_threshold</span>
+                <span class="p">):</span>
+                <span class="k">if</span> <span class="n">instance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">my_instances</span><span class="p">:</span>
+                    <span class="n">my_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_enrolled</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">ending_time__gte</span><span class="o">=</span><span class="n">end_threshold</span><span class="p">,</span>
+                    <span class="n">visible_to_students</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">):</span>
+                <span class="k">if</span> <span class="n">instance</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">my_instances</span><span class="p">:</span>
+                    <span class="n">my_instances</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+        <span class="n">all_instances</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_visible</span><span class="p">(</span><span class="n">user</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">ending_time__gte</span><span class="o">=</span><span class="n">end_threshold</span><span class="p">)</span>
+        <span class="n">all_instances</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_instances</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">my_instances</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_instances</span> <span class="o">=</span> <span class="n">all_instances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_instances</span> <span class="o">=</span> <span class="n">my_instances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_logged_in</span> <span class="o">=</span> <span class="n">is_logged_in</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;welcome_text&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;internal_user_label&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;external_user_label&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;my_instances&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;all_instances&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;is_logged_in&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;show_language_toggle&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ArchiveView">
+<a class="viewcode-back" href="../../course.html#course.views.ArchiveView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ArchiveView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/archive.html&quot;</span>
+
+<div class="viewcode-block" id="ArchiveView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.views.ArchiveView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_visible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_language_toggle</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;instances&quot;</span><span class="p">,</span> <span class="s2">&quot;show_language_toggle&quot;</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CourseInstancesView">
+<a class="viewcode-back" href="../../course.html#course.views.CourseInstancesView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseInstancesView</span><span class="p">(</span><span class="n">UserProfileView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/course_instances.html&quot;</span>
+
+<div class="viewcode-block" id="CourseInstancesView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.views.CourseInstancesView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">course</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Course</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_slug&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course</span><span class="o">=</span><span class="n">course</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instances</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span>
+                <span class="o">.</span><span class="n">get_visible</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course</span><span class="o">=</span><span class="n">course</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-starting_time&#39;</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_INSTANCES_NOT_VISIBLE_TO_STUDENTS&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;NO_COURSE_INSTANCES_OF_COURSE&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;instances&quot;</span><span class="p">,</span> <span class="s2">&quot;msg&quot;</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="LastInstanceView">
+<a class="viewcode-back" href="../../course.html#course.views.LastInstanceView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LastInstanceView</span><span class="p">(</span><span class="n">CourseMixin</span><span class="p">,</span> <span class="n">BaseRedirectView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+
+<div class="viewcode-block" id="LastInstanceView.get_resource_objects">
+<a class="viewcode-back" href="../../course.html#course.views.LastInstanceView.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">course_instances</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-starting_time&#39;</span><span class="p">)</span>
+        <span class="n">instance_ids_with_open_course_modules</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">course_instance__course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+                <span class="n">status__in</span><span class="o">=</span><span class="p">(</span><span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">READY</span><span class="p">,</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">UNLISTED</span><span class="p">),</span>
+                <span class="n">opening_time__lte</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">values_list</span><span class="p">(</span><span class="s1">&#39;course_instance_id&#39;</span><span class="p">,</span> <span class="n">flat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">order_by</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="n">latest_open</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">latest_visible</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">latest_hidden</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">instance</span> <span class="ow">in</span> <span class="n">course_instances</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">instance_ids_with_open_course_modules</span>
+                        <span class="ow">and</span> <span class="n">instance</span><span class="o">.</span><span class="n">starting_time</span> <span class="o">&lt;=</span> <span class="n">now</span>
+                        <span class="p">):</span>
+                    <span class="n">latest_open</span> <span class="o">=</span> <span class="n">instance</span>
+                    <span class="k">break</span>
+                <span class="n">latest_visible</span> <span class="o">=</span> <span class="n">latest_visible</span> <span class="ow">or</span> <span class="n">instance</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">latest_hidden</span> <span class="o">=</span> <span class="n">latest_hidden</span> <span class="ow">or</span> <span class="n">instance</span>
+
+        <span class="k">if</span> <span class="n">latest_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">latest_open</span>
+        <span class="k">elif</span> <span class="n">latest_visible</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">latest_visible</span>
+        <span class="k">elif</span> <span class="n">latest_hidden</span> <span class="ow">and</span> <span class="n">latest_hidden</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">latest_hidden</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;NO_COURSE_INSTANCES_OF_COURSE&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="LastInstanceView.get">
+<a class="viewcode-back" href="../../course.html#course.views.LastInstanceView.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">())</span></div>
+</div>
+
+
+<div class="viewcode-block" id="InstanceView">
+<a class="viewcode-back" href="../../course.html#course.views.InstanceView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InstanceView</span><span class="p">(</span><span class="n">EnrollableViewMixin</span><span class="p">,</span> <span class="n">BaseRedirectMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span>
+    <span class="c1"># ACCESS.STUDENT requires users to log in, but the access mode is dropped</span>
+    <span class="c1"># in public courses. CourseVisiblePermission has more restrictions as well.</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/course.html&quot;</span>
+
+<div class="viewcode-block" id="InstanceView.get">
+<a class="viewcode-back" href="../../course.html#course.views.InstanceView.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># external LTI Tool Providers may return the user to the course instance view</span>
+        <span class="c1"># with a message given in GET query parameters</span>
+        <span class="n">lti_error_msg</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lti_errormsg&#39;</span><span class="p">)</span>
+        <span class="n">lti_msg</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;lti_msg&#39;</span><span class="p">)</span>
+        <span class="c1"># message HTML is not escaped in the templates so escape it here</span>
+        <span class="k">if</span> <span class="n">lti_error_msg</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">lti_error_msg</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">lti_msg</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">lti_msg</span><span class="p">))</span>
+
+        <span class="c1"># PENDING student has enrolled, but not yet responded to the enrollment questionnaire.</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+            <span class="n">enrollment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span>
+            <span class="k">if</span> <span class="n">enrollment</span> <span class="ow">and</span> <span class="n">enrollment</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">PENDING</span><span class="p">:</span>
+                <span class="n">exercise</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">find_enrollment_exercise</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">is_external</span><span class="p">)</span>
+                <span class="c1"># For PENDING student, it should not be possible for exercise to be null,</span>
+                <span class="c1"># but better be careful. In that case, proceeding to the course seems OK.</span>
+                <span class="k">if</span> <span class="n">exercise</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Enroll">
+<a class="viewcode-back" href="../../course.html#course.views.Enroll">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Enroll</span><span class="p">(</span><span class="n">EnrollableViewMixin</span><span class="p">,</span> <span class="n">BaseRedirectMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="n">permission_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">EnrollInfoVisiblePermission</span><span class="p">]</span>
+    <span class="n">course_permission_classes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/enroll.html&quot;</span>
+
+<div class="viewcode-block" id="Enroll.post">
+<a class="viewcode-back" href="../../course.html#course.views.Enroll.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_student</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enrollable</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ENROLLMENT_ERROR_CANNOT_ENROLL_OR_ALREADY_ENROLLED&#39;</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_enrollment_open</span><span class="p">():</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ENROLLMENT_ERROR_ENROLLMENT_NOT_OPEN&#39;</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">()</span>
+
+        <span class="c1"># Support enrollment questionnaires.</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">find_enrollment_exercise</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">is_external</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exercise</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">from_sis</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_pending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">exercise</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Unenroll">
+<a class="viewcode-back" href="../../course.html#course.views.Unenroll">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Unenroll</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span>
+
+<div class="viewcode-block" id="Unenroll.post">
+<a class="viewcode-back" href="../../course.html#course.views.Unenroll.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">enrollment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">enrollment</span>
+            <span class="ow">and</span> <span class="n">enrollment</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_ROLE</span><span class="o">.</span><span class="n">STUDENT</span>
+            <span class="ow">and</span> <span class="n">enrollment</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">ACTIVE</span>
+        <span class="p">):</span>
+            <span class="n">enrollment</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">REMOVED</span>
+            <span class="n">enrollment</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span>
+                <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;UNENROLL_SUCCESS -- </span><span class="si">{course}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">course</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;home&#39;</span><span class="p">))</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;UNENROLL_ERROR_ONLY_ENROLLED&#39;</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ModuleView">
+<a class="viewcode-back" href="../../course.html#course.views.ModuleView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModuleView</span><span class="p">(</span><span class="n">CourseModuleBaseView</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/module.html&quot;</span>
+
+<div class="viewcode-block" id="ModuleView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.views.ModuleView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">now</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">flat_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+            <span class="n">cur</span><span class="p">,</span> <span class="n">_tree</span><span class="p">,</span> <span class="n">prev</span><span class="p">,</span> <span class="n">nex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous</span> <span class="o">=</span> <span class="n">prev</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current</span> <span class="o">=</span> <span class="n">cur</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next</span> <span class="o">=</span> <span class="n">nex</span>
+        <span class="k">except</span> <span class="n">NoSuchContent</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Http404</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s1">&#39;now&#39;</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">,</span> <span class="s1">&#39;previous&#39;</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;next&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CalendarExport">
+<a class="viewcode-back" href="../../course.html#course.views.CalendarExport">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CalendarExport</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseView</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CalendarExport.get">
+<a class="viewcode-back" href="../../course.html#course.views.CalendarExport.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">cal</span> <span class="o">=</span> <span class="n">icalendar</span><span class="o">.</span><span class="n">Calendar</span><span class="p">()</span>
+        <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;prodid&#39;</span><span class="p">,</span> <span class="s1">&#39;-// </span><span class="si">{}</span><span class="s1"> calendar //&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">BRAND_NAME</span><span class="p">))</span>
+        <span class="n">cal</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span> <span class="s1">&#39;2.0&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_modules</span><span class="o">.</span><span class="n">exclude</span><span class="p">(</span><span class="n">status__exact</span><span class="o">=</span><span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span><span class="p">):</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">icalendar</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;summary&#39;</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;dtstart&#39;</span><span class="p">,</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;dtend&#39;</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">)</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;dtstamp&#39;</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">)</span>
+            <span class="n">event</span><span class="p">[</span><span class="s1">&#39;uid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;module/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/A+&quot;</span>
+            <span class="n">cal</span><span class="o">.</span><span class="n">add_component</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">cal</span><span class="o">.</span><span class="n">to_ical</span><span class="p">(),</span>
+            <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/calendar; charset=utf-8&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GroupsView">
+<a class="viewcode-back" href="../../course.html#course.views.GroupsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GroupsView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/groups.html&quot;</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">GroupsForm</span>
+
+<div class="viewcode-block" id="GroupsView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.views.GroupsView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enrollment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s1">&#39;enrollment&#39;</span><span class="p">,</span><span class="s1">&#39;groups&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupsView.get_form_kwargs">
+<a class="viewcode-back" href="../../course.html#course.views.GroupsView.get_form_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_form_kwargs</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;instance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="GroupsView.get_success_url">
+<a class="viewcode-back" href="../../course.html#course.views.GroupsView.get_success_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;groups&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupsView.form_valid">
+<a class="viewcode-back" href="../../course.html#course.views.GroupsView.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;NEW_STUDENT_GROUP_CREATED&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GroupSelect">
+<a class="viewcode-back" href="../../course.html#course.views.GroupSelect">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GroupSelect</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseFormView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span>
+    <span class="n">form_class</span> <span class="o">=</span> <span class="n">GroupSelectForm</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;course/_group_info.html&quot;</span>
+
+<div class="viewcode-block" id="GroupSelect.get_form_kwargs">
+<a class="viewcode-back" href="../../course.html#course.views.GroupSelect.get_form_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_form_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_form_kwargs</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;instance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+
+<div class="viewcode-block" id="GroupSelect.get_success_url">
+<a class="viewcode-back" href="../../course.html#course.views.GroupSelect.get_success_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_success_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GroupSelect.get">
+<a class="viewcode-back" href="../../course.html#course.views.GroupSelect.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">http_method_not_allowed</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupSelect.form_invalid">
+<a class="viewcode-back" href="../../course.html#course.views.GroupSelect.form_invalid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_invalid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s1">&#39;Invalid group selection&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GroupSelect.form_valid">
+<a class="viewcode-back" href="../../course.html#course.views.GroupSelect.form_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">form_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">form</span><span class="p">):</span>
+        <span class="n">enrollment</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">is_ajax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">render_to_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span>
+                <span class="o">**</span><span class="n">group_info_context</span><span class="p">(</span><span class="n">enrollment</span><span class="o">.</span><span class="n">selected_group</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">profile</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">form_valid</span><span class="p">(</span><span class="n">form</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LanguageView">
+<a class="viewcode-back" href="../../course.html#course.views.LanguageView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LanguageView</span><span class="p">(</span><span class="n">CourseInstanceMixin</span><span class="p">,</span> <span class="n">BaseView</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LanguageView.post">
+<a class="viewcode-back" href="../../course.html#course.views.LanguageView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">LANGUAGE_PARAMETER</span> <span class="o">=</span> <span class="s1">&#39;language&#39;</span>
+        <span class="c1"># pylint: disable-next=redefined-builtin</span>
+        <span class="nb">next</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">)),</span> <span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nb">next</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_ajax</span><span class="p">(</span><span class="n">request</span><span class="p">))</span> <span class="ow">and</span>
+                <span class="ow">not</span> <span class="n">url_has_allowed_host_and_scheme</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="nb">next</span><span class="p">,</span>
+                                <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">{</span><span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()},</span>
+                                <span class="n">require_https</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">is_secure</span><span class="p">())):</span>
+            <span class="nb">next</span> <span class="o">=</span> <span class="n">remove_query_param_from_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;HTTP_REFERER&#39;</span><span class="p">),</span> <span class="s1">&#39;hl&#39;</span><span class="p">)</span>
+            <span class="nb">next</span> <span class="o">=</span> <span class="nb">next</span> <span class="ow">and</span> <span class="n">unquote</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span>  <span class="c1"># HTTP_REFERER may be encoded.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">url_has_allowed_host_and_scheme</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="nb">next</span><span class="p">,</span>
+                                <span class="n">allowed_hosts</span><span class="o">=</span><span class="p">{</span><span class="n">request</span><span class="o">.</span><span class="n">get_host</span><span class="p">()},</span>
+                                <span class="n">require_https</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">is_secure</span><span class="p">()):</span>
+                <span class="nb">next</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="nb">next</span><span class="p">)</span> <span class="k">if</span> <span class="nb">next</span> <span class="k">else</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">204</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">lang_code</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">LANGUAGE_PARAMETER</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">lang_code</span> <span class="ow">and</span> <span class="n">check_for_language</span><span class="p">(</span><span class="n">lang_code</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">next</span><span class="p">:</span>
+                    <span class="n">next_trans</span> <span class="o">=</span> <span class="n">translate_url</span><span class="p">(</span><span class="nb">next</span><span class="p">,</span> <span class="n">lang_code</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">next_trans</span> <span class="o">!=</span> <span class="nb">next</span><span class="p">:</span>
+                        <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="n">next_trans</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+                    <span class="n">enrollment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_course_data</span>
+                    <span class="k">if</span> <span class="n">enrollment</span><span class="p">:</span>
+                        <span class="n">enrollment</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">lang_code</span>
+                        <span class="n">enrollment</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">userprofile</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+                        <span class="n">userprofile</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">lang_code</span>
+                        <span class="n">userprofile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">set_cookie</span><span class="p">(</span>
+                        <span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_NAME</span><span class="p">,</span> <span class="n">lang_code</span><span class="p">,</span>
+                        <span class="n">max_age</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_AGE</span><span class="p">,</span>
+                        <span class="n">path</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_PATH</span><span class="p">,</span>
+                        <span class="n">domain</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">LANGUAGE_COOKIE_DOMAIN</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">REQUEST_LANG</span> <span class="o">=</span> <span class="n">lang_code</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AllSubmissionsView">
+<a class="viewcode-back" href="../../course.html#course.views.AllSubmissionsView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AllSubmissionsView</span><span class="p">(</span><span class="n">CourseInstanceBaseView</span><span class="p">):</span>
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;course/staff/all_submissions_table.html&#39;</span>
+
+<div class="viewcode-block" id="AllSubmissionsView.get_common_objects">
+<a class="viewcode-back" href="../../course.html#course.views.AllSubmissionsView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="n">row_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">submissions_data</span> <span class="o">=</span> <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercise__course_module__course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">submission</span> <span class="ow">in</span> <span class="n">submissions_data</span><span class="p">:</span>
+            <span class="n">row_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;submission&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="p">,</span>
+                <span class="s1">&#39;exercise&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span>
+                <span class="s1">&#39;submitters&#39;</span><span class="p">:</span> <span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+                <span class="s1">&#39;is_teacher&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span>
+            <span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">submissiontags</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_limit</span> <span class="o">=</span> <span class="mi">50</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limited</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;limited&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission_data</span> <span class="o">=</span> <span class="n">row_data</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">default_limit</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">limited</span> <span class="k">else</span> <span class="n">row_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">not_all_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_without_limited</span> <span class="o">+</span> <span class="s1">&#39;?limited=true&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_without_limited</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span>
+            <span class="s1">&#39;submission_data&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;count&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;default_limit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;tags&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;limited&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;not_all_url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;all_url&#39;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,681 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>authorization package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">authorization package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-authorization.exceptions">authorization.exceptions module</a><ul>
+<li><a class="reference internal" href="#authorization.exceptions.ValidationFailed"><code class="docutils literal notranslate"><span class="pre">ValidationFailed</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-authorization.models">authorization.models module</a><ul>
+<li><a class="reference internal" href="#authorization.models.JWTAccessible"><code class="docutils literal notranslate"><span class="pre">JWTAccessible</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.models.JWTAccessible.from_jwt_permission"><code class="docutils literal notranslate"><span class="pre">JWTAccessible.from_jwt_permission()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.models.JWTAccessible.from_jwt_permission_dict"><code class="docutils literal notranslate"><span class="pre">JWTAccessible.from_jwt_permission_dict()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.models.JWTAccessible.has_access"><code class="docutils literal notranslate"><span class="pre">JWTAccessible.has_access()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.models.JWTAccessible.has_create_access"><code class="docutils literal notranslate"><span class="pre">JWTAccessible.has_create_access()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-authorization.object_permissions">authorization.object_permissions module</a><ul>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissionList"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionList</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissionList.add"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionList.add()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissionList.add_create"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionList.add_create()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissionList.from_payload"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionList.from_payload()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissionList.get_create"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionList.get_create()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissionList.get_creates"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionList.get_creates()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissionList.has"><code class="docutils literal notranslate"><span class="pre">ObjectPermissionList.has()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissions"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissions.from_payload"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions.from_payload()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.object_permissions.ObjectPermissions.to_payload_permissions"><code class="docutils literal notranslate"><span class="pre">ObjectPermissions.to_payload_permissions()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.object_permissions.register_jwt_accessible_class"><code class="docutils literal notranslate"><span class="pre">register_jwt_accessible_class()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-authorization.permissions">authorization.permissions module</a><ul>
+<li><a class="reference internal" href="#authorization.permissions.AccessModePermission"><code class="docutils literal notranslate"><span class="pre">AccessModePermission</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.permissions.AccessModePermission.has_permission"><code class="docutils literal notranslate"><span class="pre">AccessModePermission.has_permission()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.permissions.AccessModePermission.message"><code class="docutils literal notranslate"><span class="pre">AccessModePermission.message</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.permissions.FilterBackend"><code class="docutils literal notranslate"><span class="pre">FilterBackend</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.permissions.FilterBackend.filter_queryset"><code class="docutils literal notranslate"><span class="pre">FilterBackend.filter_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.permissions.FilterBackend.get_fields"><code class="docutils literal notranslate"><span class="pre">FilterBackend.get_fields()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.permissions.MessageMixin"><code class="docutils literal notranslate"><span class="pre">MessageMixin</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.permissions.MessageMixin.error_msg"><code class="docutils literal notranslate"><span class="pre">MessageMixin.error_msg()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.permissions.NoPermission"><code class="docutils literal notranslate"><span class="pre">NoPermission</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.permissions.NoPermission.has_object_permission"><code class="docutils literal notranslate"><span class="pre">NoPermission.has_object_permission()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.permissions.NoPermission.has_permission"><code class="docutils literal notranslate"><span class="pre">NoPermission.has_permission()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.permissions.OAuth2ScopeChecker"><code class="docutils literal notranslate"><span class="pre">OAuth2ScopeChecker</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.permissions.OAuth2ScopeChecker.check_token_scope"><code class="docutils literal notranslate"><span class="pre">OAuth2ScopeChecker.check_token_scope()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.permissions.OAuth2TokenPermission"><code class="docutils literal notranslate"><span class="pre">OAuth2TokenPermission</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.permissions.OAuth2TokenPermission.has_permission"><code class="docutils literal notranslate"><span class="pre">OAuth2TokenPermission.has_permission()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.permissions.ObjectVisibleBasePermission"><code class="docutils literal notranslate"><span class="pre">ObjectVisibleBasePermission</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.permissions.ObjectVisibleBasePermission.has_object_permission"><code class="docutils literal notranslate"><span class="pre">ObjectVisibleBasePermission.has_object_permission()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.permissions.ObjectVisibleBasePermission.has_permission"><code class="docutils literal notranslate"><span class="pre">ObjectVisibleBasePermission.has_permission()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.permissions.ObjectVisibleBasePermission.is_object_visible"><code class="docutils literal notranslate"><span class="pre">ObjectVisibleBasePermission.is_object_visible()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.permissions.ObjectVisibleBasePermission.model"><code class="docutils literal notranslate"><span class="pre">ObjectVisibleBasePermission.model</span></code></a></li>
+<li><a class="reference internal" href="#authorization.permissions.ObjectVisibleBasePermission.obj_var"><code class="docutils literal notranslate"><span class="pre">ObjectVisibleBasePermission.obj_var</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-authorization.views">authorization.views module</a><ul>
+<li><a class="reference internal" href="#authorization.views.AuthDispatchBase"><code class="docutils literal notranslate"><span class="pre">AuthDispatchBase</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.views.AuthDispatchBase.dispatch"><code class="docutils literal notranslate"><span class="pre">AuthDispatchBase.dispatch()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthDispatchBase.handle_exception"><code class="docutils literal notranslate"><span class="pre">AuthDispatchBase.handle_exception()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthDispatchBase.initialize_request"><code class="docutils literal notranslate"><span class="pre">AuthDispatchBase.initialize_request()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthDispatchBase.validate_request"><code class="docutils literal notranslate"><span class="pre">AuthDispatchBase.validate_request()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.views.AuthenticationMixin"><code class="docutils literal notranslate"><span class="pre">AuthenticationMixin</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.views.AuthenticationMixin.handle_no_permission"><code class="docutils literal notranslate"><span class="pre">AuthenticationMixin.handle_no_permission()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthenticationMixin.perform_authentication"><code class="docutils literal notranslate"><span class="pre">AuthenticationMixin.perform_authentication()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthenticationMixin.validate_request"><code class="docutils literal notranslate"><span class="pre">AuthenticationMixin.validate_request()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.views.AuthorizationMixin"><code class="docutils literal notranslate"><span class="pre">AuthorizationMixin</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.views.AuthorizationMixin.check_object_permissions"><code class="docutils literal notranslate"><span class="pre">AuthorizationMixin.check_object_permissions()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthorizationMixin.check_permissions"><code class="docutils literal notranslate"><span class="pre">AuthorizationMixin.check_permissions()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthorizationMixin.get_permissions"><code class="docutils literal notranslate"><span class="pre">AuthorizationMixin.get_permissions()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthorizationMixin.permission_classes"><code class="docutils literal notranslate"><span class="pre">AuthorizationMixin.permission_classes</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthorizationMixin.permission_denied"><code class="docutils literal notranslate"><span class="pre">AuthorizationMixin.permission_denied()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.AuthorizationMixin.validate_request"><code class="docutils literal notranslate"><span class="pre">AuthorizationMixin.validate_request()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#authorization.views.AuthorizedResourceMixin"><code class="docutils literal notranslate"><span class="pre">AuthorizedResourceMixin</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.ResourceMixin"><code class="docutils literal notranslate"><span class="pre">ResourceMixin</span></code></a><ul>
+<li><a class="reference internal" href="#authorization.views.ResourceMixin.context_properties"><code class="docutils literal notranslate"><span class="pre">ResourceMixin.context_properties</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.ResourceMixin.get_common_objects"><code class="docutils literal notranslate"><span class="pre">ResourceMixin.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.ResourceMixin.get_context_data"><code class="docutils literal notranslate"><span class="pre">ResourceMixin.get_context_data()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.ResourceMixin.get_resource_objects"><code class="docutils literal notranslate"><span class="pre">ResourceMixin.get_resource_objects()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.ResourceMixin.note"><code class="docutils literal notranslate"><span class="pre">ResourceMixin.note()</span></code></a></li>
+<li><a class="reference internal" href="#authorization.views.ResourceMixin.validate_request"><code class="docutils literal notranslate"><span class="pre">ResourceMixin.validate_request()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-authorization">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">authorization package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/authorization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="authorization-package">
+<h1>authorization package<a class="headerlink" href="#authorization-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="authorization.api.html">authorization.api package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authorization.api.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.api.html#module-authorization.api.mixins">authorization.api.mixins module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authorization.api.html#authorization.api.mixins.ApiResourceMixin"><code class="docutils literal notranslate"><span class="pre">ApiResourceMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="authorization.api.html#authorization.api.mixins.ApiResourceMixin.get_member_object"><code class="docutils literal notranslate"><span class="pre">ApiResourceMixin.get_member_object()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="authorization.api.html#authorization.api.mixins.ApiResourceMixin.get_object_or_none"><code class="docutils literal notranslate"><span class="pre">ApiResourceMixin.get_object_or_none()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="authorization.api.html#authorization.api.mixins.ApiResourceMixin.initial"><code class="docutils literal notranslate"><span class="pre">ApiResourceMixin.initial()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.api.html#module-authorization.api.views">authorization.api.views module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="authorization.api.html#authorization.api.views.RemoteAuthenticationView"><code class="docutils literal notranslate"><span class="pre">RemoteAuthenticationView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="authorization.api.html#authorization.api.views.RemoteAuthenticationView.get"><code class="docutils literal notranslate"><span class="pre">RemoteAuthenticationView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="authorization.api.html#authorization.api.views.RemoteAuthenticationView.get_expiration_time"><code class="docutils literal notranslate"><span class="pre">RemoteAuthenticationView.get_expiration_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="authorization.api.html#authorization.api.views.RemoteAuthenticationView.permission_classes"><code class="docutils literal notranslate"><span class="pre">RemoteAuthenticationView.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="authorization.api.html#authorization.api.views.RemoteAuthenticationView.post"><code class="docutils literal notranslate"><span class="pre">RemoteAuthenticationView.post()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="authorization.api.html#module-authorization.api">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="authorization.migrations.html">authorization.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="authorization.migrations.html#module-authorization.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-authorization.exceptions">
+<span id="authorization-exceptions-module"></span><h2>authorization.exceptions module<a class="headerlink" href="#module-authorization.exceptions" title="Link to this heading"></a></h2>
+<dl class="py exception">
+<dt class="sig sig-object py" id="authorization.exceptions.ValidationFailed">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.exceptions.</span></span><span class="sig-name descname"><span class="pre">ValidationFailed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/exceptions.html#ValidationFailed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.exceptions.ValidationFailed" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-authorization.models">
+<span id="authorization-models-module"></span><h2>authorization.models module<a class="headerlink" href="#module-authorization.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.models.JWTAccessible">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.models.</span></span><span class="sig-name descname"><span class="pre">JWTAccessible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/models.html#JWTAccessible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.models.JWTAccessible" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Manager</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">_ModelT</span></code>]</p>
+<p>Simple Manager base class to get an object from the A+ auth library JWT permission dict.</p>
+<p>Note: not an actual model but a manager</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.models.JWTAccessible.from_jwt_permission">
+<span class="sig-name descname"><span class="pre">from_jwt_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AbstractBaseUser</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AnonymousUser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permission</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Permission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_permission_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">_ModelT</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/authorization/models.html#JWTAccessible.from_jwt_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.models.JWTAccessible.from_jwt_permission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.models.JWTAccessible.from_jwt_permission_dict">
+<span class="sig-name descname"><span class="pre">from_jwt_permission_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">QuerySet</span></span></span><a class="reference internal" href="_modules/authorization/models.html#JWTAccessible.from_jwt_permission_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.models.JWTAccessible.from_jwt_permission_dict" title="Link to this definition"></a></dt>
+<dd><p>Return objects corresponding to a dictionary in a JWT payload’s permission list.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.models.JWTAccessible.has_access">
+<span class="sig-name descname"><span class="pre">has_access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AbstractBaseUser</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AnonymousUser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permission</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Permission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_ModelT</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/authorization/models.html#JWTAccessible.has_access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.models.JWTAccessible.has_access" title="Link to this definition"></a></dt>
+<dd><p>Check that &lt;payload&gt; has &lt;permission&gt; access to &lt;instance&gt;.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.models.JWTAccessible.has_create_access">
+<span class="sig-name descname"><span class="pre">has_create_access</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AbstractBaseUser</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AnonymousUser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/authorization/models.html#JWTAccessible.has_create_access"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.models.JWTAccessible.has_create_access" title="Link to this definition"></a></dt>
+<dd><p>Check that &lt;payload&gt; has create access to kwargs.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-authorization.object_permissions">
+<span id="authorization-object-permissions-module"></span><h2>authorization.object_permissions module<a class="headerlink" href="#module-authorization.object_permissions" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissionList">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.object_permissions.</span></span><span class="sig-name descname"><span class="pre">ObjectPermissionList</span></span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissionList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissionList" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">_objT</span></code>]</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissionList.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">permission</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Permission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_objT</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissionList.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissionList.add" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissionList.add_create">
+<span class="sig-name descname"><span class="pre">add_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissionList.add_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissionList.add_create" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissionList.from_payload">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AbstractBaseUser</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AnonymousUser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Payload</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permission_items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PermissionItemList</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissionList.from_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissionList.from_payload" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissionList.get_create">
+<span class="sig-name descname"><span class="pre">get_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raise_if_multiple</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Permission</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissionList.get_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissionList.get_create" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissionList.get_creates">
+<span class="sig-name descname"><span class="pre">get_creates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Generator</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Permission</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissionList.get_creates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissionList.get_creates" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissionList.has">
+<span class="sig-name descname"><span class="pre">has</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_objT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permission</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Permission</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissionList.has"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissionList.has" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.object_permissions.</span></span><span class="sig-name descname"><span class="pre">ObjectPermissions</span></span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissions" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create permissions are dicts because the objects don’t exist yet.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissions.from_payload">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">AbstractBaseUser</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">AnonymousUser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Payload</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissions.from_payload"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissions.from_payload" title="Link to this definition"></a></dt>
+<dd><p>Extracts object from JWT payload’s permissions and checks access.
+Raise AuthenticationFailed if user has no access.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.object_permissions.ObjectPermissions.to_payload_permissions">
+<span class="sig-name descname"><span class="pre">to_payload_permissions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Permissions</span></span></span><a class="reference internal" href="_modules/authorization/object_permissions.html#ObjectPermissions.to_payload_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.ObjectPermissions.to_payload_permissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="authorization.object_permissions.register_jwt_accessible_class">
+<span class="sig-prename descclassname"><span class="pre">authorization.object_permissions.</span></span><span class="sig-name descname"><span class="pre">register_jwt_accessible_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">TModel</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">TModel</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/authorization/object_permissions.html#register_jwt_accessible_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.object_permissions.register_jwt_accessible_class" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">authorization.object_permissions.</span></span><span class="sig-name descname"><span class="pre">register_jwt_accessible_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">TModel</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">TModel</span><span class="p"><span class="pre">]</span></span></span></span></dt>
+<dd><p>a decorator to register a model to be accessible through JWT</p>
+<p>cls.objects must inherit JWTAccessible</p>
+</dd></dl>
+
+</section>
+<section id="module-authorization.permissions">
+<span id="authorization-permissions-module"></span><h2>authorization.permissions module<a class="headerlink" href="#module-authorization.permissions" title="Link to this heading"></a></h2>
+<p>Base permission classes.</p>
+<p>These classes use same interface than ones in django-rest-framework and
+are usable with APIViews too.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.permissions.AccessModePermission">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.permissions.</span></span><span class="sig-name descname"><span class="pre">AccessModePermission</span></span><a class="reference internal" href="_modules/authorization/permissions.html#AccessModePermission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.AccessModePermission" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#authorization.permissions.MessageMixin" title="authorization.permissions.MessageMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code></p>
+<p>If view has access_mode that is not anonymous, then require authentication</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.AccessModePermission.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#AccessModePermission.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.AccessModePermission.has_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="authorization.permissions.AccessModePermission.message">
+<span class="sig-name descname"><span class="pre">message</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ACCESS_PERMISSION_DENIED_MSG'</span></em><a class="headerlink" href="#authorization.permissions.AccessModePermission.message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.permissions.FilterBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.permissions.</span></span><span class="sig-name descname"><span class="pre">FilterBackend</span></span><a class="reference internal" href="_modules/authorization/permissions.html#FilterBackend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.FilterBackend" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>FilterBackend interface</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.FilterBackend.filter_queryset">
+<span class="sig-name descname"><span class="pre">filter_queryset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queryset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#FilterBackend.filter_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.FilterBackend.filter_queryset" title="Link to this definition"></a></dt>
+<dd><p>Return a filtered queryset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.FilterBackend.get_fields">
+<span class="sig-name descname"><span class="pre">get_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#FilterBackend.get_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.FilterBackend.get_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.permissions.MessageMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.permissions.</span></span><span class="sig-name descname"><span class="pre">MessageMixin</span></span><a class="reference internal" href="_modules/authorization/permissions.html#MessageMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.MessageMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Adds easy way to specify what exactly caused the PermissionDenied</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.MessageMixin.error_msg">
+<span class="sig-name descname"><span class="pre">error_msg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#MessageMixin.error_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.MessageMixin.error_msg" title="Link to this definition"></a></dt>
+<dd><p>Add extra text to self.message about the reason why permission
+was denied. Uses lazy object so the message string is evaluated
+only when rendered.</p>
+<p>If optional argument <cite>format</cite> is given, then it’s used with format_lazy
+to format the message with the dictionary arguments from <cite>format</cite> arg.</p>
+<p>Optional argument <cite>delim</cite> can be used to change the string used to join
+self.message and <cite>message</cite>.</p>
+<p>If optional argument <cite>replace</cite> is true, then self.message is replaced with
+the <cite>message</cite>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.permissions.NoPermission">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.permissions.</span></span><span class="sig-name descname"><span class="pre">NoPermission</span></span><a class="reference internal" href="_modules/authorization/permissions.html#NoPermission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.NoPermission" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code></p>
+<p>Base Permission class that gives no access permission to anyone.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.NoPermission.has_object_permission">
+<span class="sig-name descname"><span class="pre">has_object_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#NoPermission.has_object_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.NoPermission.has_object_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.NoPermission.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#NoPermission.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.NoPermission.has_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.permissions.OAuth2ScopeChecker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.permissions.</span></span><span class="sig-name descname"><span class="pre">OAuth2ScopeChecker</span></span><a class="reference internal" href="_modules/authorization/permissions.html#OAuth2ScopeChecker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.OAuth2ScopeChecker" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>To be inherited by View classes that wish to use OAuth2.
+Defines check_token_scope to verify if provided bearer token has
+sufficient privileges to access the view.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.OAuth2ScopeChecker.check_token_scope">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_token_scope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scopes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/authorization/permissions.html#OAuth2ScopeChecker.check_token_scope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.OAuth2ScopeChecker.check_token_scope" title="Link to this definition"></a></dt>
+<dd><p>Returns true if the scope(s) required by the current view is included in the
+given scopes list.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.permissions.OAuth2TokenPermission">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.permissions.</span></span><span class="sig-name descname"><span class="pre">OAuth2TokenPermission</span></span><a class="reference internal" href="_modules/authorization/permissions.html#OAuth2TokenPermission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.OAuth2TokenPermission" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code></p>
+<p>Permission controlled by OAuth2 Bearer tokens.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.OAuth2TokenPermission.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HttpRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#authorization.permissions.OAuth2ScopeChecker" title="authorization.permissions.OAuth2ScopeChecker"><span class="pre">OAuth2ScopeChecker</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/authorization/permissions.html#OAuth2TokenPermission.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.OAuth2TokenPermission.has_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.permissions.ObjectVisibleBasePermission">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.permissions.</span></span><span class="sig-name descname"><span class="pre">ObjectVisibleBasePermission</span></span><a class="reference internal" href="_modules/authorization/permissions.html#ObjectVisibleBasePermission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.ObjectVisibleBasePermission" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#authorization.permissions.MessageMixin" title="authorization.permissions.MessageMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.ObjectVisibleBasePermission.has_object_permission">
+<span class="sig-name descname"><span class="pre">has_object_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#ObjectVisibleBasePermission.has_object_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.ObjectVisibleBasePermission.has_object_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.ObjectVisibleBasePermission.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#ObjectVisibleBasePermission.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.ObjectVisibleBasePermission.has_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.permissions.ObjectVisibleBasePermission.is_object_visible">
+<span class="sig-name descname"><span class="pre">is_object_visible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/permissions.html#ObjectVisibleBasePermission.is_object_visible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.permissions.ObjectVisibleBasePermission.is_object_visible" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="authorization.permissions.ObjectVisibleBasePermission.model">
+<span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#authorization.permissions.ObjectVisibleBasePermission.model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="authorization.permissions.ObjectVisibleBasePermission.obj_var">
+<span class="sig-name descname"><span class="pre">obj_var</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#authorization.permissions.ObjectVisibleBasePermission.obj_var" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-authorization.views">
+<span id="authorization-views-module"></span><h2>authorization.views module<a class="headerlink" href="#module-authorization.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.views.AuthDispatchBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.views.</span></span><span class="sig-name descname"><span class="pre">AuthDispatchBase</span></span><a class="reference internal" href="_modules/authorization/views.html#AuthDispatchBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthDispatchBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthDispatchBase.dispatch">
+<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthDispatchBase.dispatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthDispatchBase.dispatch" title="Link to this definition"></a></dt>
+<dd><p>Hook to dispatch chain. This method is called before View.dispatch
+routes the http method call to actual handler (done by super().dispatch())</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthDispatchBase.handle_exception">
+<span class="sig-name descname"><span class="pre">handle_exception</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthDispatchBase.handle_exception"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthDispatchBase.handle_exception" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthDispatchBase.initialize_request">
+<span class="sig-name descname"><span class="pre">initialize_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthDispatchBase.initialize_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthDispatchBase.initialize_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthDispatchBase.validate_request">
+<span class="sig-name descname"><span class="pre">validate_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthDispatchBase.validate_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthDispatchBase.validate_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.views.AuthenticationMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.views.</span></span><span class="sig-name descname"><span class="pre">AuthenticationMixin</span></span><a class="reference internal" href="_modules/authorization/views.html#AuthenticationMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthenticationMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AccessMixin</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthenticationMixin.handle_no_permission">
+<span class="sig-name descname"><span class="pre">handle_no_permission</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthenticationMixin.handle_no_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthenticationMixin.handle_no_permission" title="Link to this definition"></a></dt>
+<dd><p>Will be called by self.permission_denied() when user doesn’t
+have permission.</p>
+<dl class="simple">
+<dt>This method has logic copied from</dt><dd><p>django.contrib.auth.mixins.AccessMixin.handle_no_permission()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthenticationMixin.perform_authentication">
+<span class="sig-name descname"><span class="pre">perform_authentication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthenticationMixin.perform_authentication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthenticationMixin.perform_authentication" title="Link to this definition"></a></dt>
+<dd><p>Perform authentication on the incoming request.
+Note that if you override this and simply ‘pass’, then authentication
+will instead be performed lazily, the first time either
+<cite>request.user</cite> or <cite>request.auth</cite> is accessed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthenticationMixin.validate_request">
+<span class="sig-name descname"><span class="pre">validate_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthenticationMixin.validate_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthenticationMixin.validate_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.views.AuthorizationMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.views.</span></span><span class="sig-name descname"><span class="pre">AuthorizationMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthorizationMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthorizationMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Authorization mixin adds components to handle access control restrictions
+to different views.
+This mixin expect common django View stack and hooks in via dispatch() method.</p>
+<p>This class has a lot of influence from django-rest-framework</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthorizationMixin.check_object_permissions">
+<span class="sig-name descname"><span class="pre">check_object_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthorizationMixin.check_object_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthorizationMixin.check_object_permissions" title="Link to this definition"></a></dt>
+<dd><p>Check if the request should be permitted for a given object.
+Raises an appropriate exception if the request is not permitted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthorizationMixin.check_permissions">
+<span class="sig-name descname"><span class="pre">check_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthorizationMixin.check_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthorizationMixin.check_permissions" title="Link to this definition"></a></dt>
+<dd><p>Check if the request should be permitted.
+Raises an appropriate exception if the request is not permitted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthorizationMixin.get_permissions">
+<span class="sig-name descname"><span class="pre">get_permissions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthorizationMixin.get_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthorizationMixin.get_permissions" title="Link to this definition"></a></dt>
+<dd><p>Instantiates and returns the list of permissions that this view requires.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="authorization.views.AuthorizationMixin.permission_classes">
+<span class="sig-name descname"><span class="pre">permission_classes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[&lt;class</span> <span class="pre">'authorization.permissions.NoPermission'&gt;]</span></em><a class="headerlink" href="#authorization.views.AuthorizationMixin.permission_classes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthorizationMixin.permission_denied">
+<span class="sig-name descname"><span class="pre">permission_denied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthorizationMixin.permission_denied"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthorizationMixin.permission_denied" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.AuthorizationMixin.validate_request">
+<span class="sig-name descname"><span class="pre">validate_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthorizationMixin.validate_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthorizationMixin.validate_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.views.AuthorizedResourceMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.views.</span></span><span class="sig-name descname"><span class="pre">AuthorizedResourceMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#AuthorizedResourceMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.AuthorizedResourceMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#authorization.views.AuthenticationMixin" title="authorization.views.AuthenticationMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationMixin</span></code></a>, <a class="reference internal" href="#authorization.views.ResourceMixin" title="authorization.views.ResourceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceMixin</span></code></a>, <a class="reference internal" href="#authorization.views.AuthorizationMixin" title="authorization.views.AuthorizationMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthorizationMixin</span></code></a>, <a class="reference internal" href="#authorization.views.AuthDispatchBase" title="authorization.views.AuthDispatchBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthDispatchBase</span></code></a></p>
+<p>AuthorizedResourceMixin handles correct ordering of actions in
+Authentication and Authorization chain with required resource objects loaded</p>
+<dl class="simple">
+<dt>call order:</dt><dd><ul class="simple">
+<li><p>AuthenticationMixin.perform_authentication()  Make sure we have user</p></li>
+<li><p>ResourceMixin.get_resource_objects()          Load resource objects used for authorization</p></li>
+<li><p>AuthorizationMixin.check_permissions()        Check authorization using permissions</p></li>
+<li><p>ResourceMixin.get_common_objects()            Load common resources after accepted control</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="authorization.views.ResourceMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">authorization.views.</span></span><span class="sig-name descname"><span class="pre">ResourceMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#ResourceMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.ResourceMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="authorization.views.ResourceMixin.context_properties">
+<span class="sig-name descname"><span class="pre">context_properties</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#authorization.views.ResourceMixin.context_properties" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.ResourceMixin.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#ResourceMixin.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.ResourceMixin.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.ResourceMixin.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/authorization/views.html#ResourceMixin.get_context_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.ResourceMixin.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Add member variables recorded with .note() to context_data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.ResourceMixin.get_resource_objects">
+<span class="sig-name descname"><span class="pre">get_resource_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#ResourceMixin.get_resource_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.ResourceMixin.get_resource_objects" title="Link to this definition"></a></dt>
+<dd><p>Get the resource objects sufficient to determine the existance.
+Should raise Http404 if the request does not reach a resource.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.ResourceMixin.note">
+<span class="sig-name descname"><span class="pre">note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/authorization/views.html#ResourceMixin.note"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.ResourceMixin.note" title="Link to this definition"></a></dt>
+<dd><p>The class attribute names given in argument list are marked
+“interesting” for the view. In a TemplateView these will be
+injected to the template context.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="authorization.views.ResourceMixin.validate_request">
+<span class="sig-name descname"><span class="pre">validate_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/authorization/views.html#ResourceMixin.validate_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#authorization.views.ResourceMixin.validate_request" title="Link to this definition"></a></dt>
+<dd><p>Call .get_resource_objects before .validate_request()
+Call .get_common_objects() after .validate_request()</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-authorization">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-authorization" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.api.renderers &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.api.renderers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.api.renderers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">loader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">renderers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rest_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">status</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.parsers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIOutcomeXMLParser</span>
+
+
+<div class="viewcode-block" id="validation_errors_to_description">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.renderers.validation_errors_to_description">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validation_errors_to_description</span><span class="p">(</span><span class="n">errors</span><span class="p">):</span>
+    <span class="c1"># errors is a dict mapping serializer field names to error strings</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># noqa: E741</span>
+    <span class="k">for</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">errors_list</span> <span class="ow">in</span> <span class="n">errors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field_name</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors_list</span><span class="p">))</span>
+    <span class="k">return</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LTIOutcomeResponseRenderer">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.renderers.LTIOutcomeResponseRenderer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTIOutcomeResponseRenderer</span><span class="p">(</span><span class="n">renderers</span><span class="o">.</span><span class="n">BaseRenderer</span><span class="p">):</span>
+    <span class="n">media_type</span> <span class="o">=</span> <span class="s1">&#39;application/xml&#39;</span>
+    <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;xml&#39;</span>
+    <span class="n">charset</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span>
+
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;external_services/lti_outcome_response.xml&#39;</span>
+
+    <span class="n">CODE_MAJOR_SUCCESS</span> <span class="o">=</span> <span class="s1">&#39;success&#39;</span>
+    <span class="n">CODE_MAJOR_FAILURE</span> <span class="o">=</span> <span class="s1">&#39;failure&#39;</span>
+    <span class="n">CODE_MAJOR_UNSUPPORTED</span> <span class="o">=</span> <span class="s1">&#39;unsupported&#39;</span>
+    <span class="n">CODE_MINOR_INVALID_SOURCE_DATA</span> <span class="o">=</span> <span class="s1">&#39;invalidsourcedata&#39;</span>
+    <span class="c1"># LTI status info codes: IMS General Web Services WSDL Binding Guidelines</span>
+    <span class="c1"># https://www.imsglobal.org/gws/gwsv1p0/imsgws_wsdlBindv1p0.html#1642084</span>
+    <span class="c1"># pylint: disable-next=arguments-renamed unused-argument too-many-locals</span>
+<div class="viewcode-block" id="LTIOutcomeResponseRenderer.render">
+<a class="viewcode-back" href="../../../external_services.api.html#external_services.api.renderers.LTIOutcomeResponseRenderer.render">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">media_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">renderer_context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">renderer_context</span> <span class="o">=</span> <span class="n">renderer_context</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">code_major</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;code_major&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CODE_MAJOR_SUCCESS</span><span class="p">)</span>
+        <span class="n">code_minor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">renderer_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">renderer_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="p">)</span>
+        <span class="n">error_detail</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;detail&#39;</span><span class="p">)</span>
+        <span class="c1"># detail is usually a str or string-like rest_framework.exceptions.ErrorDetail,</span>
+        <span class="c1"># but for ValidationErros it is a dict mapping serializer field names to error strings.</span>
+        <span class="c1"># In addition, detail is a list if the exercise does not accept the student&#39;s submission.</span>
+        <span class="c1"># data may also contain some of the normal LTI request data in addition to the error detail</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error_detail</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">error_detail</span> <span class="o">=</span> <span class="n">validation_errors_to_description</span><span class="p">(</span><span class="n">error_detail</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">error_detail</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">error_detail</span> <span class="o">=</span> <span class="s1">&#39;; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">error_detail</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">error_detail</span> <span class="ow">or</span> <span class="p">(</span><span class="n">response</span> <span class="ow">and</span> <span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">exception</span> <span class="ow">or</span>
+                            <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">)):</span>
+            <span class="n">code_major</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CODE_MAJOR_FAILURE</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">:</span>
+                <span class="c1"># probably validation or parse error</span>
+                <span class="n">code_minor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CODE_MINOR_INVALID_SOURCE_DATA</span>
+
+        <span class="c1"># define the description for the response</span>
+        <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+            <span class="n">operation</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;req_type&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_REPLACE</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Score </span><span class="si">{}</span><span class="s1"> added to sourcedId </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourced_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">operation</span> <span class="o">==</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_READ</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;SourcedId </span><span class="si">{}</span><span class="s1"> has the score </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sourced_id&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> operation is not supported&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">error_detail</span><span class="p">)</span> <span class="k">if</span> <span class="n">error_detail</span> <span class="k">else</span> <span class="s1">&#39;Operation failed&#39;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># In case data does not contain normal LTI request data,</span>
+                <span class="c1"># try to update the data with the request body data (from the parser).</span>
+                <span class="c1"># The response XML may then refer to the request message ID, etc.</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="c1"># only set keys to data that do not exist there yet</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">data</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span> <span class="c1"># pylint: disable=bare-except</span>
+                <span class="k">pass</span>
+
+        <span class="n">ctx</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;msg_id&#39;</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span> <span class="c1"># new unique id, 32 characters</span>
+            <span class="s1">&#39;code_major&#39;</span><span class="p">:</span> <span class="n">code_major</span><span class="p">,</span>
+            <span class="s1">&#39;code_minor&#39;</span><span class="p">:</span> <span class="n">code_minor</span><span class="p">,</span>
+            <span class="s1">&#39;severity&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;severity&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="n">description</span><span class="p">,</span>
+            <span class="s1">&#39;msg_ref_id&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;msgid&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="c1"># copy msgid from the request</span>
+            <span class="s1">&#39;operation&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;req_type&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;score&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;UNSUPPORTED&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">CODE_MAJOR_UNSUPPORTED</span><span class="p">,</span>
+            <span class="s1">&#39;SUCCESS&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">CODE_MAJOR_SUCCESS</span><span class="p">,</span>
+            <span class="s1">&#39;READ_RESULT&#39;</span><span class="p">:</span> <span class="n">LTIOutcomeXMLParser</span><span class="o">.</span><span class="n">TYPE_READ</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">template_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

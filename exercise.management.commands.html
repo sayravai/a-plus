@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.management.commands package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">exercise.management.commands package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-exercise.management.commands.export">exercise.management.commands.export module</a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.add_arguments"><code class="docutils literal notranslate"><span class="pre">Command.add_arguments()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.export_category"><code class="docutils literal notranslate"><span class="pre">Command.export_category()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.export_course"><code class="docutils literal notranslate"><span class="pre">Command.export_course()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.export_exercise"><code class="docutils literal notranslate"><span class="pre">Command.export_exercise()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.export_exercises"><code class="docutils literal notranslate"><span class="pre">Command.export_exercises()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.export_json"><code class="docutils literal notranslate"><span class="pre">Command.export_json()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.export_views"><code class="docutils literal notranslate"><span class="pre">Command.export_views()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.print_row"><code class="docutils literal notranslate"><span class="pre">Command.print_row()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.quote"><code class="docutils literal notranslate"><span class="pre">Command.quote()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export.Command.strip_html_tags"><code class="docutils literal notranslate"><span class="pre">Command.strip_html_tags()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.management.commands.export_submissions">exercise.management.commands.export_submissions module</a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command.add_arguments"><code class="docutils literal notranslate"><span class="pre">Command.add_arguments()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command.parse_comma_list_file"><code class="docutils literal notranslate"><span class="pre">Command.parse_comma_list_file()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command.write_exercise_csv"><code class="docutils literal notranslate"><span class="pre">Command.write_exercise_csv()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command.write_results_csv"><code class="docutils literal notranslate"><span class="pre">Command.write_results_csv()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.export_submissions.Command.write_submission_csv"><code class="docutils literal notranslate"><span class="pre">Command.write_submission_csv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.management.commands.list_exercises_services">exercise.management.commands.list_exercises_services module</a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.list_exercises_services.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.list_exercises_services.Command.add_arguments"><code class="docutils literal notranslate"><span class="pre">Command.add_arguments()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.list_exercises_services.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.list_exercises_services.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.management.commands.tags">exercise.management.commands.tags module</a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.add_arguments"><code class="docutils literal notranslate"><span class="pre">Command.add_arguments()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.read_user"><code class="docutils literal notranslate"><span class="pre">Command.read_user()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.read_user_tag"><code class="docutils literal notranslate"><span class="pre">Command.read_user_tag()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.set_tagone"><code class="docutils literal notranslate"><span class="pre">Command.set_tagone()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.set_tags"><code class="docutils literal notranslate"><span class="pre">Command.set_tags()</span></code></a></li>
+<li><a class="reference internal" href="#exercise.management.commands.tags.Command.tag_users"><code class="docutils literal notranslate"><span class="pre">Command.tag_users()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-exercise.management.commands">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">exercise.management.commands package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/exercise.management.commands.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="exercise-management-commands-package">
+<h1>exercise.management.commands package<a class="headerlink" href="#exercise-management-commands-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-exercise.management.commands.export">
+<span id="exercise-management-commands-export-module"></span><h2>exercise.management.commands.export module<a class="headerlink" href="#module-exercise.management.commands.export" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.management.commands.export.</span></span><span class="sig-name descname"><span class="pre">Command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.add_arguments">
+<span class="sig-name descname"><span class="pre">add_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.add_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.add_arguments" title="Link to this definition"></a></dt>
+<dd><p>Entry point for subclassed commands to add custom arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.export_category">
+<span class="sig-name descname"><span class="pre">export_category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.export_category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.export_category" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.export_course">
+<span class="sig-name descname"><span class="pre">export_course</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.export_course"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.export_course" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.export_exercise">
+<span class="sig-name descname"><span class="pre">export_exercise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.export_exercise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.export_exercise" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.export_exercises">
+<span class="sig-name descname"><span class="pre">export_exercises</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.export_exercises"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.export_exercises" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.export_json">
+<span class="sig-name descname"><span class="pre">export_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.export_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.export_json" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.export_views">
+<span class="sig-name descname"><span class="pre">export_views</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.export_views"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.export_views" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.handle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.handle" title="Link to this definition"></a></dt>
+<dd><p>The actual logic of the command. Subclasses must implement
+this method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.help">
+<span class="sig-name descname"><span class="pre">help</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Exports</span> <span class="pre">submission</span> <span class="pre">data.'</span></em><a class="headerlink" href="#exercise.management.commands.export.Command.help" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.print_row">
+<span class="sig-name descname"><span class="pre">print_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quote</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.print_row"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.print_row" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.quote">
+<span class="sig-name descname"><span class="pre">quote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.quote"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.quote" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export.Command.strip_html_tags">
+<span class="sig-name descname"><span class="pre">strip_html_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export.html#Command.strip_html_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export.Command.strip_html_tags" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-exercise.management.commands.export_submissions">
+<span id="exercise-management-commands-export-submissions-module"></span><h2>exercise.management.commands.export_submissions module<a class="headerlink" href="#module-exercise.management.commands.export_submissions" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.management.commands.export_submissions.</span></span><span class="sig-name descname"><span class="pre">Command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export_submissions.html#Command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export_submissions.Command" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command.add_arguments">
+<span class="sig-name descname"><span class="pre">add_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export_submissions.html#Command.add_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export_submissions.Command.add_arguments" title="Link to this definition"></a></dt>
+<dd><p>Entry point for subclassed commands to add custom arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export_submissions.html#Command.handle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export_submissions.Command.handle" title="Link to this definition"></a></dt>
+<dd><p>The actual logic of the command. Subclasses must implement
+this method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command.help">
+<span class="sig-name descname"><span class="pre">help</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Exports</span> <span class="pre">submission</span> <span class="pre">and</span> <span class="pre">exercise</span> <span class="pre">data</span> <span class="pre">from</span> <span class="pre">given</span> <span class="pre">course</span> <span class="pre">instances</span> <span class="pre">into</span> <span class="pre">CSV</span> <span class="pre">files'</span></em><a class="headerlink" href="#exercise.management.commands.export_submissions.Command.help" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command.parse_comma_list_file">
+<span class="sig-name descname"><span class="pre">parse_comma_list_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export_submissions.html#Command.parse_comma_list_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export_submissions.Command.parse_comma_list_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command.write_exercise_csv">
+<span class="sig-name descname"><span class="pre">write_exercise_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exercise_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercises</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export_submissions.html#Command.write_exercise_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export_submissions.Command.write_exercise_csv" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command.write_results_csv">
+<span class="sig-name descname"><span class="pre">write_results_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submissions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_student_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_user_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export_submissions.html#Command.write_results_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export_submissions.Command.write_results_csv" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.export_submissions.Command.write_submission_csv">
+<span class="sig-name descname"><span class="pre">write_submission_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submissions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_deadline_deviations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_max_submissions_deviations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_deadline_deviations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_max_submission_deviations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_student_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_user_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/export_submissions.html#Command.write_submission_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.export_submissions.Command.write_submission_csv" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-exercise.management.commands.list_exercises_services">
+<span id="exercise-management-commands-list-exercises-services-module"></span><h2>exercise.management.commands.list_exercises_services module<a class="headerlink" href="#module-exercise.management.commands.list_exercises_services" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.management.commands.list_exercises_services.Command">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.management.commands.list_exercises_services.</span></span><span class="sig-name descname"><span class="pre">Command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/list_exercises_services.html#Command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.list_exercises_services.Command" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.list_exercises_services.Command.add_arguments">
+<span class="sig-name descname"><span class="pre">add_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/list_exercises_services.html#Command.add_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.list_exercises_services.Command.add_arguments" title="Link to this definition"></a></dt>
+<dd><p>Entry point for subclassed commands to add custom arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.list_exercises_services.Command.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/list_exercises_services.html#Command.handle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.list_exercises_services.Command.handle" title="Link to this definition"></a></dt>
+<dd><p>The actual logic of the command. Subclasses must implement
+this method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.management.commands.list_exercises_services.Command.help">
+<span class="sig-name descname"><span class="pre">help</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Collects</span> <span class="pre">information</span> <span class="pre">about</span> <span class="pre">exercise</span> <span class="pre">services</span> <span class="pre">courses</span> <span class="pre">use'</span></em><a class="headerlink" href="#exercise.management.commands.list_exercises_services.Command.help" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-exercise.management.commands.tags">
+<span id="exercise-management-commands-tags-module"></span><h2>exercise.management.commands.tags module<a class="headerlink" href="#module-exercise.management.commands.tags" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exercise.management.commands.tags.</span></span><span class="sig-name descname"><span class="pre">Command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.add_arguments">
+<span class="sig-name descname"><span class="pre">add_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command.add_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command.add_arguments" title="Link to this definition"></a></dt>
+<dd><p>Entry point for subclassed commands to add custom arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command.handle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command.handle" title="Link to this definition"></a></dt>
+<dd><p>The actual logic of the command. Subclasses must implement
+this method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.help">
+<span class="sig-name descname"><span class="pre">help</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Operates</span> <span class="pre">on</span> <span class="pre">student</span> <span class="pre">tags.'</span></em><a class="headerlink" href="#exercise.management.commands.tags.Command.help" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.read_user">
+<span class="sig-name descname"><span class="pre">read_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command.read_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command.read_user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.read_user_tag">
+<span class="sig-name descname"><span class="pre">read_user_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command.read_user_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command.read_user_tag" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.set_tagone">
+<span class="sig-name descname"><span class="pre">set_tagone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command.set_tagone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command.set_tagone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.set_tags">
+<span class="sig-name descname"><span class="pre">set_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command.set_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command.set_tags" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exercise.management.commands.tags.Command.tag_users">
+<span class="sig-name descname"><span class="pre">tag_users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">users</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exercise/management/commands/tags.html#Command.tag_users"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#exercise.management.commands.tags.Command.tag_users" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-exercise.management.commands">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-exercise.management.commands" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

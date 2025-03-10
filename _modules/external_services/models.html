@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.models &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urljoin</span><span class="p">,</span> <span class="n">urlsplit</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inheritance.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelWithInheritance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultForeignKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UrlMixin</span>
+
+
+<div class="viewcode-block" id="LinkService">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LinkService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LinkService</span><span class="p">(</span><span class="n">ModelWithInheritance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A link to an external service.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">DESTINATION_REGION</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">([</span>
+        <span class="p">(</span><span class="s1">&#39;INTERNAL&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;DESTINATION_INTERNAL_PRIVACY_NOTICE&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;ORGANIZATION&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;DESTINATION_ORGANIZATION_PRIVACY_NOTICE&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;EEA&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;DESTINATION_EEA_PRIVACY_NOTICE&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;PRIVACYSHIELD&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;DESTINATION_PRIVACYSHIELD_PRIVACY_NOTICE&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;GLOBAL&#39;</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;DESTINATION_GLOBAL_PRIVACY_NOTICE&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;GDPR_COMPLIANT&#39;</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;DESTINATION_GLOBAL_GDPR_PRIVACY_NOTICE&#39;</span><span class="p">)),</span>
+    <span class="p">])</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_URL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SERVICE_URL&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">destination_region</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveSmallIntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_DESTINATION_REGION&#39;</span><span class="p">),</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">DESTINATION_REGION</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">DESTINATION_REGION</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SERVICE_DESTINATION_REGION_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">privacy_notice_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_PRIVACY_NOTICE_URL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SERVICE_PRIVACY_NOTICE_URL_HELPTEXT&#39;</span><span class="p">))</span>
+    <span class="n">menu_label</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_LABEL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SERVICE_MENU_LABEL_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">menu_icon_class</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_ICON_CLASS&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;globe&quot;</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SERVICE_MENU_ICON_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">enabled</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ENABLED&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SERVICE_ENABLED_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_LINK_SERVICE&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_LINK_SERVICE_PLURAL&#39;</span><span class="p">)</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;menu_label&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;[Disabled] &quot;</span> <span class="o">+</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="LinkService.clean">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LinkService.clean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_region</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">DESTINATION_REGION</span><span class="o">.</span><span class="n">ORGANIZATION</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">privacy_notice_url</span><span class="p">:</span>
+            <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;privacy_notice_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SERVICE_ERROR_PRIVACY_NOTICE_URL_MANDATORY&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">url_parts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">urlsplit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;GET&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sends_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="LinkService.get_url">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LinkService.get_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{}):</span> <span class="c1"># pylint: disable=dangerous-default-value</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Return the URL to the launch page of this service.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">destination_region</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">DESTINATION_REGION</span><span class="o">.</span><span class="n">INTERNAL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;external-service-link&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_final_url</span><span class="p">(</span><span class="n">replace</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LinkService.get_final_url">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LinkService.get_final_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_final_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Return the launch URL for this service.</span>
+
+<span class="sd">        The optional replace parameter may be a relative URL that is joined to</span>
+<span class="sd">        the URL path of this service. The relative URL must not include a domain.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">if</span> <span class="n">replace</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="s1">&#39;://&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">replace</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">replace</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;//&#39;</span><span class="p">),</span> <span class="s2">&quot;Replace can&#39;t include domain&quot;</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">replace</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">url</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LTIService">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LTIService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTIService</span><span class="p">(</span><span class="n">LinkService</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A provider of an LTI service.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">LTI_ACCESS</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">([</span>
+        <span class="p">(</span><span class="s1">&#39;ANON_API_NO&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LTI_SERVICE_ANONYMOUS_NO_API&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;PUBLIC_API_NO&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LTI_SERVICE_PUBLIC_NO_API&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;PUBLIC_API_YES&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LTI_SERVICE_PUBLIC_YES_API&#39;</span><span class="p">)),</span>
+    <span class="p">])</span>
+    <span class="n">access_settings</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ACCESS_SETTINGS&#39;</span><span class="p">),</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">LTI_ACCESS</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">LTI_ACCESS</span><span class="o">.</span><span class="n">ANON_API_NO</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LTI_SERVICE_ACCESS_SETTINGS_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">consumer_key</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONSUMER_KEY&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LTI_SERVICE_CONSUMER_KEY_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">consumer_secret</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_CONSUMER_SECRET&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LTI_SERVICE_CONSUMER_SECRET_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_LTI_SERVICE&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_LTI_SERVICE_PLURAL&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s2">&quot;(LTI) </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;[Disabled] &quot;</span> <span class="o">+</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;POST&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sends_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">share_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_anonymous</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_anonymous</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_settings</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">LTI_ACCESS</span><span class="o">.</span><span class="n">ANON_API_NO</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">api_access</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_settings</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">LTI_ACCESS</span><span class="o">.</span><span class="n">PUBLIC_API_YES</span>
+
+<div class="viewcode-block" id="LTIService.get_url">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LTIService.get_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{}):</span> <span class="c1"># pylint: disable=dangerous-default-value</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;lti-login&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LTI1p3Service">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LTI1p3Service">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LTI1p3Service</span><span class="p">(</span><span class="n">LinkService</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Settings for a remote LTI v1.3 Tool.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Verbose names are intentionally non-translated, because they would not make sense in Finnish.</span>
+    <span class="n">login_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Login initiation URL&quot;</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">client_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Client ID&quot;</span><span class="p">,</span>
+        <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">deployment_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Deployment ID&quot;</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">jwks_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;JWKS URL for tool&#39;s public key&quot;</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Note that setting share_name to False is not the same as LTI&#39;s &quot;anonymous mode&quot;,</span>
+    <span class="c1"># because the A+ user ID will still be provided to the tool.</span>
+    <span class="c1"># Otherwise we would not be able to connect incoming scores with the correct user.</span>
+    <span class="n">share_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="s2">&quot;Share launcher&#39;s name, email and student ID with the tool&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_LTI1P3_SERVICE&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_LTI1P3_SERVICE_PLURAL&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Sends A+ user id</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sends_user_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="LTI1p3Service.get_url">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.LTI1p3Service.get_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;lti-login&#39;</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;POST&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="MenuItemManager">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.MenuItemManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MenuItemManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MenuItemManager.get_queryset">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.MenuItemManager.get_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">select_related</span><span class="p">(</span>
+            <span class="s1">&#39;course_instance&#39;</span><span class="p">,</span> <span class="s1">&#39;course_instance__course&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MenuItem">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.MenuItem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MenuItem</span><span class="p">(</span><span class="n">UrlMixin</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Attaches link to course menu.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ACCESS</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">([</span>
+        <span class="p">(</span><span class="s1">&#39;STUDENT&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_ACCESS_ALL&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;ASSISTANT&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_ACCESS_ASSISTANTS_AND_TEACHERS&#39;</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s1">&#39;TEACHER&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_ACCESS_TEACHERS&#39;</span><span class="p">)),</span>
+    <span class="p">])</span>
+    <span class="n">course_instance</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span>
+        <span class="n">CourseInstance</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_COURSE_INSTANCE&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">related_name</span><span class="o">=</span><span class="s2">&quot;ext_services&quot;</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_COURSE_INSTANCE_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">access</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ACCESS&#39;</span><span class="p">),</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">choices</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">DefaultForeignKey</span><span class="p">(</span>
+        <span class="n">LinkService</span><span class="p">,</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_SERVICE&#39;</span><span class="p">),</span>
+        <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_SERVICE_HELPTEXT&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">menu_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_URL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_MENU_URL_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">menu_group_label</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_GROUP_LABEL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_MENU_GROUP_LABEL_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">menu_label</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_LABEL&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_MENU_LINK_LABEL_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">menu_icon_class</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_ICON_CLASS&#39;</span><span class="p">),</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_MENU_ICON_CLASS_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">menu_weight</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_MENU_WEIGHT&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MENU_ITEM_MENU_WEIGHT_HELPTEXT&#39;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">enabled</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span>
+        <span class="n">verbose_name</span><span class="o">=</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LABEL_ENABLED&#39;</span><span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_MENU_ITEM&#39;</span><span class="p">)</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODEL_NAME_MENU_ITEM_PLURAL&#39;</span><span class="p">)</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;course_instance&quot;</span><span class="p">,</span> <span class="s2">&quot;menu_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;menu_label&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;[Disabled] &quot;</span> <span class="o">+</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="MenuItem.clean">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.MenuItem.clean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span><span class="p">:</span>
+                <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;menu_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span>
+                    <span class="s1">&#39;MENU_ITEM_ERROR_MENU_URL_REQUIRED_WHEN_NO_PRECONFIGURED_SERVICE_SELECTED&#39;</span>
+                <span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_label</span><span class="p">:</span>
+                <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;menu_label&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span>
+                    <span class="s1">&#39;MENU_ITEM_ERROR_MENU_LABEL_REQUIRED_WHEN_NO_PRECONFIGURED_SERVICE_SELECTED&#39;</span>
+                <span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span> <span class="ow">and</span> <span class="s1">&#39;://&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span><span class="p">:</span>
+            <span class="n">errors</span><span class="p">[</span><span class="s1">&#39;menu_url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span>
+                <span class="s1">&#39;MENU_ITEM_ERROR_SCHEME_IN_MENU_URL_AND_PRECONFIGURED_SERVICE_SELECTED&#39;</span>
+            <span class="p">))</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
+
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_label</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_label</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">menu_label</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">icon_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_icon_class</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_icon_class</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">menu_icon_class</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
+            <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;course_slug&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                <span class="s2">&quot;instance_slug&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                <span class="s2">&quot;menu_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">as_leaf_class</span><span class="p">()</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">replace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;://&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span>
+        <span class="k">return</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">final_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">as_leaf_class</span><span class="p">()</span><span class="o">.</span><span class="n">get_final_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_url</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MenuItem.get_url_kwargs">
+<a class="viewcode-back" href="../../external_services.html#external_services.forms.MenuItem.get_url_kwargs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_url_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">menu_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">get_url_kwargs</span><span class="p">())</span> <span class="c1"># pylint: disable=use-dict-literal</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

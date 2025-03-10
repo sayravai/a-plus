@@ -1,0 +1,644 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>news package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">news package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-news.admin">news.admin module</a><ul>
+<li><a class="reference internal" href="#news.admin.NewsAdmin"><code class="docutils literal notranslate"><span class="pre">NewsAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#news.admin.NewsAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">NewsAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#news.admin.NewsAdmin.list_display_links"><code class="docutils literal notranslate"><span class="pre">NewsAdmin.list_display_links</span></code></a></li>
+<li><a class="reference internal" href="#news.admin.NewsAdmin.list_filter"><code class="docutils literal notranslate"><span class="pre">NewsAdmin.list_filter</span></code></a></li>
+<li><a class="reference internal" href="#news.admin.NewsAdmin.media"><code class="docutils literal notranslate"><span class="pre">NewsAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#news.admin.NewsAdmin.raw_id_fields"><code class="docutils literal notranslate"><span class="pre">NewsAdmin.raw_id_fields</span></code></a></li>
+<li><a class="reference internal" href="#news.admin.NewsAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">NewsAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-news.cache">news.cache module</a><ul>
+<li><a class="reference internal" href="#news.cache.CachedNews"><code class="docutils literal notranslate"><span class="pre">CachedNews</span></code></a><ul>
+<li><a class="reference internal" href="#news.cache.CachedNews.KEY_PREFIX"><code class="docutils literal notranslate"><span class="pre">CachedNews.KEY_PREFIX</span></code></a></li>
+<li><a class="reference internal" href="#news.cache.CachedNews.for_staff"><code class="docutils literal notranslate"><span class="pre">CachedNews.for_staff()</span></code></a></li>
+<li><a class="reference internal" href="#news.cache.CachedNews.for_user"><code class="docutils literal notranslate"><span class="pre">CachedNews.for_user()</span></code></a></li>
+<li><a class="reference internal" href="#news.cache.CachedNews.is_visible"><code class="docutils literal notranslate"><span class="pre">CachedNews.is_visible()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#news.cache.invalidate_content"><code class="docutils literal notranslate"><span class="pre">invalidate_content()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-news.forms">news.forms module</a><ul>
+<li><a class="reference internal" href="#news.forms.NewsForm"><code class="docutils literal notranslate"><span class="pre">NewsForm</span></code></a><ul>
+<li><a class="reference internal" href="#news.forms.NewsForm.Meta"><code class="docutils literal notranslate"><span class="pre">NewsForm.Meta</span></code></a><ul>
+<li><a class="reference internal" href="#news.forms.NewsForm.Meta.fields"><code class="docutils literal notranslate"><span class="pre">NewsForm.Meta.fields</span></code></a></li>
+<li><a class="reference internal" href="#news.forms.NewsForm.Meta.model"><code class="docutils literal notranslate"><span class="pre">NewsForm.Meta.model</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#news.forms.NewsForm.base_fields"><code class="docutils literal notranslate"><span class="pre">NewsForm.base_fields</span></code></a></li>
+<li><a class="reference internal" href="#news.forms.NewsForm.declared_fields"><code class="docutils literal notranslate"><span class="pre">NewsForm.declared_fields</span></code></a></li>
+<li><a class="reference internal" href="#news.forms.NewsForm.media"><code class="docutils literal notranslate"><span class="pre">NewsForm.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-news.models">news.models module</a><ul>
+<li><a class="reference internal" href="#news.models.News"><code class="docutils literal notranslate"><span class="pre">News</span></code></a><ul>
+<li><a class="reference internal" href="#news.models.News.AUDIENCE"><code class="docutils literal notranslate"><span class="pre">News.AUDIENCE</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">News.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">News.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.audience"><code class="docutils literal notranslate"><span class="pre">News.audience</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.body"><code class="docutils literal notranslate"><span class="pre">News.body</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.course_instance"><code class="docutils literal notranslate"><span class="pre">News.course_instance</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.course_instance_id"><code class="docutils literal notranslate"><span class="pre">News.course_instance_id</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.get_audience_display"><code class="docutils literal notranslate"><span class="pre">News.get_audience_display()</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.get_language_display"><code class="docutils literal notranslate"><span class="pre">News.get_language_display()</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.get_next_by_publish"><code class="docutils literal notranslate"><span class="pre">News.get_next_by_publish()</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.get_previous_by_publish"><code class="docutils literal notranslate"><span class="pre">News.get_previous_by_publish()</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.get_url_kwargs"><code class="docutils literal notranslate"><span class="pre">News.get_url_kwargs()</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.id"><code class="docutils literal notranslate"><span class="pre">News.id</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.language"><code class="docutils literal notranslate"><span class="pre">News.language</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.objects"><code class="docutils literal notranslate"><span class="pre">News.objects</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.pin"><code class="docutils literal notranslate"><span class="pre">News.pin</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.publish"><code class="docutils literal notranslate"><span class="pre">News.publish</span></code></a></li>
+<li><a class="reference internal" href="#news.models.News.title"><code class="docutils literal notranslate"><span class="pre">News.title</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-news.urls">news.urls module</a></li>
+<li><a class="reference internal" href="#module-news.views">news.views module</a><ul>
+<li><a class="reference internal" href="#news.views.EditNewsView"><code class="docutils literal notranslate"><span class="pre">EditNewsView</span></code></a><ul>
+<li><a class="reference internal" href="#news.views.EditNewsView.access_mode"><code class="docutils literal notranslate"><span class="pre">EditNewsView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#news.views.EditNewsView.form_class"><code class="docutils literal notranslate"><span class="pre">EditNewsView.form_class</span></code></a></li>
+<li><a class="reference internal" href="#news.views.EditNewsView.form_valid"><code class="docutils literal notranslate"><span class="pre">EditNewsView.form_valid()</span></code></a></li>
+<li><a class="reference internal" href="#news.views.EditNewsView.get_form_kwargs"><code class="docutils literal notranslate"><span class="pre">EditNewsView.get_form_kwargs()</span></code></a></li>
+<li><a class="reference internal" href="#news.views.EditNewsView.get_success_url"><code class="docutils literal notranslate"><span class="pre">EditNewsView.get_success_url()</span></code></a></li>
+<li><a class="reference internal" href="#news.views.EditNewsView.news_item_kw"><code class="docutils literal notranslate"><span class="pre">EditNewsView.news_item_kw</span></code></a></li>
+<li><a class="reference internal" href="#news.views.EditNewsView.template_name"><code class="docutils literal notranslate"><span class="pre">EditNewsView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#news.views.ListNewsView"><code class="docutils literal notranslate"><span class="pre">ListNewsView</span></code></a><ul>
+<li><a class="reference internal" href="#news.views.ListNewsView.access_mode"><code class="docutils literal notranslate"><span class="pre">ListNewsView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#news.views.ListNewsView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">ListNewsView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#news.views.ListNewsView.template_name"><code class="docutils literal notranslate"><span class="pre">ListNewsView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#news.views.RemoveNewsView"><code class="docutils literal notranslate"><span class="pre">RemoveNewsView</span></code></a><ul>
+<li><a class="reference internal" href="#news.views.RemoveNewsView.access_mode"><code class="docutils literal notranslate"><span class="pre">RemoveNewsView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#news.views.RemoveNewsView.get_resource_objects"><code class="docutils literal notranslate"><span class="pre">RemoveNewsView.get_resource_objects()</span></code></a></li>
+<li><a class="reference internal" href="#news.views.RemoveNewsView.news_item_kw"><code class="docutils literal notranslate"><span class="pre">RemoveNewsView.news_item_kw</span></code></a></li>
+<li><a class="reference internal" href="#news.views.RemoveNewsView.post"><code class="docutils literal notranslate"><span class="pre">RemoveNewsView.post()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#news.views.RemoveSelectedNewsView"><code class="docutils literal notranslate"><span class="pre">RemoveSelectedNewsView</span></code></a><ul>
+<li><a class="reference internal" href="#news.views.RemoveSelectedNewsView.access_mode"><code class="docutils literal notranslate"><span class="pre">RemoveSelectedNewsView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#news.views.RemoveSelectedNewsView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">RemoveSelectedNewsView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#news.views.RemoveSelectedNewsView.post"><code class="docutils literal notranslate"><span class="pre">RemoveSelectedNewsView.post()</span></code></a></li>
+<li><a class="reference internal" href="#news.views.RemoveSelectedNewsView.template_name"><code class="docutils literal notranslate"><span class="pre">RemoveSelectedNewsView.template_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-news">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">news package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/news.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="news-package">
+<h1>news package<a class="headerlink" href="#news-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="news.migrations.html">news.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="news.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="news.migrations.html#module-news.migrations.0001_initial">news.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="news.migrations.html#news.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="news.migrations.html#module-news.migrations.0002_remove_news_alert">news.migrations.0002_remove_news_alert module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="news.migrations.html#news.migrations.0002_remove_news_alert.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0002_remove_news_alert.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0002_remove_news_alert.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="news.migrations.html#module-news.migrations.0003_alter_news_audience">news.migrations.0003_alter_news_audience module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="news.migrations.html#news.migrations.0003_alter_news_audience.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0003_alter_news_audience.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0003_alter_news_audience.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="news.migrations.html#module-news.migrations.0004_auto_20210812_1536">news.migrations.0004_auto_20210812_1536 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="news.migrations.html#news.migrations.0004_auto_20210812_1536.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0004_auto_20210812_1536.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0004_auto_20210812_1536.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="news.migrations.html#module-news.migrations.0005_news_language">news.migrations.0005_news_language module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="news.migrations.html#news.migrations.0005_news_language.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0005_news_language.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="news.migrations.html#news.migrations.0005_news_language.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="news.migrations.html#module-news.migrations">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="news.templatetags.html">news.templatetags package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="news.templatetags.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="news.templatetags.html#module-news.templatetags.news">news.templatetags.news module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="news.templatetags.html#news.templatetags.news.is_published"><code class="docutils literal notranslate"><span class="pre">is_published()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="news.templatetags.html#news.templatetags.news.news_audience"><code class="docutils literal notranslate"><span class="pre">news_audience()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="news.templatetags.html#news.templatetags.news.user_news"><code class="docutils literal notranslate"><span class="pre">user_news()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="news.templatetags.html#module-news.templatetags">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-news.admin">
+<span id="news-admin-module"></span><h2>news.admin module<a class="headerlink" href="#module-news.admin" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="news.admin.NewsAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.admin.</span></span><span class="sig-name descname"><span class="pre">NewsAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/admin.html#NewsAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.admin.NewsAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.admin.NewsAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course_instance',</span> <span class="pre">'title',</span> <span class="pre">'publish',</span> <span class="pre">'audience',</span> <span class="pre">'pin')</span></em><a class="headerlink" href="#news.admin.NewsAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.admin.NewsAdmin.list_display_links">
+<span class="sig-name descname"><span class="pre">list_display_links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('title',)</span></em><a class="headerlink" href="#news.admin.NewsAdmin.list_display_links" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.admin.NewsAdmin.list_filter">
+<span class="sig-name descname"><span class="pre">list_filter</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(&lt;class</span> <span class="pre">'lib.admin_helpers.RecentCourseInstanceListFilter'&gt;,</span> <span class="pre">'publish')</span></em><a class="headerlink" href="#news.admin.NewsAdmin.list_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="news.admin.NewsAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#news.admin.NewsAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.admin.NewsAdmin.raw_id_fields">
+<span class="sig-name descname"><span class="pre">raw_id_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course_instance',)</span></em><a class="headerlink" href="#news.admin.NewsAdmin.raw_id_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.admin.NewsAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('course_instance__instance_name',</span> <span class="pre">'course_instance__course__code',</span> <span class="pre">'course_instance__course__name',</span> <span class="pre">'title')</span></em><a class="headerlink" href="#news.admin.NewsAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-news.cache">
+<span id="news-cache-module"></span><h2>news.cache module<a class="headerlink" href="#module-news.cache" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="news.cache.CachedNews">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.cache.</span></span><span class="sig-name descname"><span class="pre">CachedNews</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">course_instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/cache.html#CachedNews"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.cache.CachedNews" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.cache.html#lib.cache.cached_old.CachedAbstract" title="lib.cache.cached_old.CachedAbstract"><code class="xref py py-class docutils literal notranslate"><span class="pre">CachedAbstract</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.cache.CachedNews.KEY_PREFIX">
+<span class="sig-name descname"><span class="pre">KEY_PREFIX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'news'</span></em><a class="headerlink" href="#news.cache.CachedNews.KEY_PREFIX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.cache.CachedNews.for_staff">
+<span class="sig-name descname"><span class="pre">for_staff</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/cache.html#CachedNews.for_staff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.cache.CachedNews.for_staff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.cache.CachedNews.for_user">
+<span class="sig-name descname"><span class="pre">for_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_external</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/cache.html#CachedNews.for_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.cache.CachedNews.for_user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.cache.CachedNews.is_visible">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_visible</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">when</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/cache.html#CachedNews.is_visible"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.cache.CachedNews.is_visible" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="news.cache.invalidate_content">
+<span class="sig-prename descclassname"><span class="pre">news.cache.</span></span><span class="sig-name descname"><span class="pre">invalidate_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/cache.html#invalidate_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.cache.invalidate_content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-news.forms">
+<span id="news-forms-module"></span><h2>news.forms module<a class="headerlink" href="#module-news.forms" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="news.forms.NewsForm">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.forms.</span></span><span class="sig-name descname"><span class="pre">NewsForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_id='id_%s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_class=&lt;class</span> <span class="pre">'django.forms.utils.ErrorList'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_suffix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty_permitted=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_required_attribute=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/forms.html#NewsForm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.forms.NewsForm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelForm</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="news.forms.NewsForm.Meta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/news/forms.html#NewsForm.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.forms.NewsForm.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.forms.NewsForm.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['audience',</span> <span class="pre">'publish',</span> <span class="pre">'pin',</span> <span class="pre">'email_students',</span> <span class="pre">'email_staff',</span> <span class="pre">'language',</span> <span class="pre">'title',</span> <span class="pre">'body']</span></em><a class="headerlink" href="#news.forms.NewsForm.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.forms.NewsForm.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#news.forms.NewsForm.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#news.models.News" title="news.models.News"><code class="xref py py-class docutils literal notranslate"><span class="pre">News</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.forms.NewsForm.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'audience':</span> <span class="pre">&lt;django.forms.fields.TypedChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'body':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'email_staff':</span> <span class="pre">&lt;django.forms.fields.BooleanField</span> <span class="pre">object&gt;,</span> <span class="pre">'email_students':</span> <span class="pre">&lt;django.forms.fields.BooleanField</span> <span class="pre">object&gt;,</span> <span class="pre">'language':</span> <span class="pre">&lt;django.forms.fields.TypedChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'pin':</span> <span class="pre">&lt;django.forms.fields.BooleanField</span> <span class="pre">object&gt;,</span> <span class="pre">'publish':</span> <span class="pre">&lt;django.forms.fields.DateTimeField</span> <span class="pre">object&gt;,</span> <span class="pre">'title':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#news.forms.NewsForm.base_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.forms.NewsForm.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email_staff':</span> <span class="pre">&lt;django.forms.fields.BooleanField</span> <span class="pre">object&gt;,</span> <span class="pre">'email_students':</span> <span class="pre">&lt;django.forms.fields.BooleanField</span> <span class="pre">object&gt;}</span></em><a class="headerlink" href="#news.forms.NewsForm.declared_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="news.forms.NewsForm.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#news.forms.NewsForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-news.models">
+<span id="news-models-module"></span><h2>news.models module<a class="headerlink" href="#module-news.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="news.models.News">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.models.</span></span><span class="sig-name descname"><span class="pre">News</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">course_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audience</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">publish</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">body</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/models.html#News"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.models.News" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code>, <a class="reference internal" href="lib.html#lib.models.UrlMixin" title="lib.models.UrlMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">UrlMixin</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.AUDIENCE">
+<span class="sig-name descname"><span class="pre">AUDIENCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;lib.helpers.Enum</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#news.models.News.AUDIENCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="news.models.News.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#news.models.News.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="news.models.News.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#news.models.News.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.audience">
+<span class="sig-name descname"><span class="pre">audience</span></span><a class="headerlink" href="#news.models.News.audience" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.body">
+<span class="sig-name descname"><span class="pre">body</span></span><a class="headerlink" href="#news.models.News.body" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.course_instance">
+<span class="sig-name descname"><span class="pre">course_instance</span></span><a class="headerlink" href="#news.models.News.course_instance" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a many-to-one or
+one-to-one (via ForwardOneToOneDescriptor subclass) relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Child.parent</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardManyToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.course_instance_id">
+<span class="sig-name descname"><span class="pre">course_instance_id</span></span><a class="headerlink" href="#news.models.News.course_instance_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.models.News.get_audience_display">
+<span class="sig-name descname"><span class="pre">get_audience_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.IntegerField:</span> <span class="pre">audience&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news.models.News.get_audience_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.models.News.get_language_display">
+<span class="sig-name descname"><span class="pre">get_language_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.CharField:</span> <span class="pre">language&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news.models.News.get_language_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.models.News.get_next_by_publish">
+<span class="sig-name descname"><span class="pre">get_next_by_publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">publish&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news.models.News.get_next_by_publish" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.models.News.get_previous_by_publish">
+<span class="sig-name descname"><span class="pre">get_previous_by_publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">publish&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#news.models.News.get_previous_by_publish" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.models.News.get_url_kwargs">
+<span class="sig-name descname"><span class="pre">get_url_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/models.html#News.get_url_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.models.News.get_url_kwargs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#news.models.News.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.language">
+<span class="sig-name descname"><span class="pre">language</span></span><a class="headerlink" href="#news.models.News.language" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#news.models.News.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.pin">
+<span class="sig-name descname"><span class="pre">pin</span></span><a class="headerlink" href="#news.models.News.pin" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.publish">
+<span class="sig-name descname"><span class="pre">publish</span></span><a class="headerlink" href="#news.models.News.publish" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.models.News.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#news.models.News.title" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-news.urls">
+<span id="news-urls-module"></span><h2>news.urls module<a class="headerlink" href="#module-news.urls" title="Link to this heading"></a></h2>
+</section>
+<section id="module-news.views">
+<span id="news-views-module"></span><h2>news.views module<a class="headerlink" href="#module-news.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="news.views.EditNewsView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.views.</span></span><span class="sig-name descname"><span class="pre">EditNewsView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#EditNewsView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.EditNewsView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="course.html#course.viewbase.CourseInstanceMixin" title="course.viewbase.CourseInstanceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseInstanceMixin</span></code></a>, <a class="reference internal" href="lib.html#lib.viewbase.BaseFormView" title="lib.viewbase.BaseFormView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseFormView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.EditNewsView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#news.views.EditNewsView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.EditNewsView.form_class">
+<span class="sig-name descname"><span class="pre">form_class</span></span><a class="headerlink" href="#news.views.EditNewsView.form_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#news.forms.NewsForm" title="news.forms.NewsForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">NewsForm</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.EditNewsView.form_valid">
+<span class="sig-name descname"><span class="pre">form_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#EditNewsView.form_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.EditNewsView.form_valid" title="Link to this definition"></a></dt>
+<dd><p>If the form is valid, redirect to the supplied URL.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.EditNewsView.get_form_kwargs">
+<span class="sig-name descname"><span class="pre">get_form_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#EditNewsView.get_form_kwargs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.EditNewsView.get_form_kwargs" title="Link to this definition"></a></dt>
+<dd><p>Return the keyword arguments for instantiating the form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.EditNewsView.get_success_url">
+<span class="sig-name descname"><span class="pre">get_success_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#EditNewsView.get_success_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.EditNewsView.get_success_url" title="Link to this definition"></a></dt>
+<dd><p>Return the URL to redirect to after processing a valid form.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.EditNewsView.news_item_kw">
+<span class="sig-name descname"><span class="pre">news_item_kw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'news_id'</span></em><a class="headerlink" href="#news.views.EditNewsView.news_item_kw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.EditNewsView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'news/edit.html'</span></em><a class="headerlink" href="#news.views.EditNewsView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="news.views.ListNewsView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.views.</span></span><span class="sig-name descname"><span class="pre">ListNewsView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#ListNewsView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.ListNewsView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="course.html#course.viewbase.CourseInstanceBaseView" title="course.viewbase.CourseInstanceBaseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseInstanceBaseView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.ListNewsView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#news.views.ListNewsView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.ListNewsView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#ListNewsView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.ListNewsView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.ListNewsView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'news/list.html'</span></em><a class="headerlink" href="#news.views.ListNewsView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="news.views.RemoveNewsView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.views.</span></span><span class="sig-name descname"><span class="pre">RemoveNewsView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#RemoveNewsView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.RemoveNewsView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="course.html#course.viewbase.CourseInstanceMixin" title="course.viewbase.CourseInstanceMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseInstanceMixin</span></code></a>, <a class="reference internal" href="lib.html#lib.viewbase.BaseRedirectView" title="lib.viewbase.BaseRedirectView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRedirectView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.RemoveNewsView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#news.views.RemoveNewsView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.RemoveNewsView.get_resource_objects">
+<span class="sig-name descname"><span class="pre">get_resource_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#RemoveNewsView.get_resource_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.RemoveNewsView.get_resource_objects" title="Link to this definition"></a></dt>
+<dd><p>Get the resource objects sufficient to determine the existance.
+Should raise Http404 if the request does not reach a resource.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.RemoveNewsView.news_item_kw">
+<span class="sig-name descname"><span class="pre">news_item_kw</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'news_id'</span></em><a class="headerlink" href="#news.views.RemoveNewsView.news_item_kw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.RemoveNewsView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#RemoveNewsView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.RemoveNewsView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="news.views.RemoveSelectedNewsView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">news.views.</span></span><span class="sig-name descname"><span class="pre">RemoveSelectedNewsView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#RemoveSelectedNewsView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.RemoveSelectedNewsView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="course.html#course.viewbase.CourseInstanceBaseView" title="course.viewbase.CourseInstanceBaseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">CourseInstanceBaseView</span></code></a>, <a class="reference internal" href="lib.html#lib.viewbase.BaseRedirectView" title="lib.viewbase.BaseRedirectView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseRedirectView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.RemoveSelectedNewsView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#news.views.RemoveSelectedNewsView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.RemoveSelectedNewsView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#RemoveSelectedNewsView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.RemoveSelectedNewsView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="news.views.RemoveSelectedNewsView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/news/views.html#RemoveSelectedNewsView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#news.views.RemoveSelectedNewsView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="news.views.RemoveSelectedNewsView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'news/list.html'</span></em><a class="headerlink" href="#news.views.RemoveSelectedNewsView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-news">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-news" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

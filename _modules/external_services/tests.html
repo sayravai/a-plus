@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>external_services.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">external_services.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for external_services.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Course</span><span class="p">,</span> <span class="n">CourseInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedCourseMenu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinkService</span><span class="p">,</span> <span class="n">LTIService</span><span class="p">,</span> <span class="n">MenuItem</span>
+
+
+<div class="viewcode-block" id="ExternalServicesTest">
+<a class="viewcode-back" href="../../external_services.html#external_services.tests.ExternalServicesTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExternalServicesTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="ExternalServicesTest.setUpTestData">
+<a class="viewcode-back" href="../../external_services.html#external_services.tests.ExternalServicesTest.setUpTestData">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpTestData</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assistant</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser2&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assistant</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testPassword&quot;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">assistant</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">link_service</span> <span class="o">=</span> <span class="n">LinkService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.external-service.com&quot;</span><span class="p">,</span>
+            <span class="n">destination_region</span><span class="o">=</span><span class="n">LinkService</span><span class="o">.</span><span class="n">DESTINATION_REGION</span><span class="o">.</span><span class="n">INTERNAL</span><span class="p">,</span>
+            <span class="n">menu_label</span><span class="o">=</span><span class="s2">&quot;External Service&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">disabled_link_service</span> <span class="o">=</span> <span class="n">LinkService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.disabled-external-service.com&quot;</span><span class="p">,</span>
+            <span class="n">destination_region</span><span class="o">=</span><span class="n">LinkService</span><span class="o">.</span><span class="n">DESTINATION_REGION</span><span class="o">.</span><span class="n">INTERNAL</span><span class="p">,</span>
+            <span class="n">menu_label</span><span class="o">=</span><span class="s2">&quot;Disabled External Service&quot;</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">lti_service</span> <span class="o">=</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;http://www.lti-service.com&quot;</span><span class="p">,</span>
+            <span class="n">destination_region</span><span class="o">=</span><span class="n">LinkService</span><span class="o">.</span><span class="n">DESTINATION_REGION</span><span class="o">.</span><span class="n">INTERNAL</span><span class="p">,</span>
+            <span class="n">menu_label</span><span class="o">=</span><span class="s2">&quot;LTI Service&quot;</span><span class="p">,</span>
+            <span class="n">menu_icon_class</span><span class="o">=</span><span class="s2">&quot;star&quot;</span><span class="p">,</span>
+            <span class="n">access_settings</span> <span class="o">=</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">LTI_ACCESS</span><span class="o">.</span><span class="n">PUBLIC_API_NO</span><span class="p">,</span>
+            <span class="n">consumer_key</span><span class="o">=</span><span class="s2">&quot;123456789&quot;</span><span class="p">,</span>
+            <span class="n">consumer_secret</span><span class="o">=</span><span class="s2">&quot;987654321&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course</span> <span class="o">=</span> <span class="n">Course</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;test course&quot;</span><span class="p">,</span>
+            <span class="n">code</span><span class="o">=</span><span class="s2">&quot;123456&quot;</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;Course-Url&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">today</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">instance_name</span><span class="o">=</span><span class="s2">&quot;Fall 2011&quot;</span><span class="p">,</span>
+            <span class="n">starting_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">today</span><span class="p">,</span>
+            <span class="n">ending_time</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">tomorrow</span><span class="p">,</span>
+            <span class="n">course</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="s2">&quot;T-00.1000_2011&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">add_assistant</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">assistant</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">menu_item1</span> <span class="o">=</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">link_service</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">access</span><span class="o">=</span><span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span><span class="p">,</span>
+            <span class="n">menu_label</span><span class="o">=</span><span class="s2">&quot;Overriden Label&quot;</span><span class="p">,</span>
+            <span class="n">menu_icon_class</span><span class="o">=</span><span class="s2">&quot;star&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">menu_item2</span> <span class="o">=</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">link_service</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">access</span><span class="o">=</span><span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">menu_item3</span> <span class="o">=</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">disabled_link_service</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">access</span><span class="o">=</span><span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">menu_item4</span> <span class="o">=</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">lti_service</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">access</span><span class="o">=</span><span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">STUDENT</span>
+        <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">menu_item5</span> <span class="o">=</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">service</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">lti_service</span><span class="p">,</span>
+            <span class="n">course_instance</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+            <span class="n">access</span><span class="o">=</span><span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExternalServicesTest.test_menuitem_label">
+<a class="viewcode-back" href="../../external_services.html#external_services.tests.ExternalServicesTest.test_menuitem_label">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_menuitem_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Overriden Label&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item1</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;External Service&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item2</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;Disabled External Service&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item3</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;LTI Service&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item4</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;LTI Service&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item5</span><span class="o">.</span><span class="n">label</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExternalServicesTest.test_menuitem_icon_class">
+<a class="viewcode-back" href="../../external_services.html#external_services.tests.ExternalServicesTest.test_menuitem_icon_class">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_menuitem_icon_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item1</span><span class="o">.</span><span class="n">icon_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;globe&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item2</span><span class="o">.</span><span class="n">icon_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;globe&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item3</span><span class="o">.</span><span class="n">icon_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item4</span><span class="o">.</span><span class="n">icon_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;star&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item5</span><span class="o">.</span><span class="n">icon_class</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExternalServicesTest.test_menuitem_url">
+<a class="viewcode-back" href="../../external_services.html#external_services.tests.ExternalServicesTest.test_menuitem_url">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_menuitem_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;http://www.external-service.com&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item1</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;http://www.external-service.com&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item2</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;http://www.disabled-external-service.com&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item3</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;/Course-Url/T-00.1000_2011/lti-login/4/&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item4</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s2">&quot;/Course-Url/T-00.1000_2011/lti-login/5/&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item5</span><span class="o">.</span><span class="n">url</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExternalServicesTest.test_view">
+<a class="viewcode-back" href="../../external_services.html#external_services.tests.ExternalServicesTest.test_view">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item4</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">302</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testPassword&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s2">&quot;oauth_signature&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_item5</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;testUser2&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;testPassword&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_item5</span><span class="o">.</span><span class="n">access</span> <span class="o">=</span> <span class="n">MenuItem</span><span class="o">.</span><span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_item5</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">403</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">add_teacher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">assistant</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExternalServicesTest.test_cached">
+<a class="viewcode-back" href="../../external_services.html#external_services.tests.ExternalServicesTest.test_cached">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_cached</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">menu</span> <span class="o">=</span> <span class="n">CachedCourseMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course_instance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">student_link_groups</span><span class="p">()),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">student_link_groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">]),</span> <span class="mi">4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">staff_link_groups</span><span class="p">()),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">menu</span><span class="o">.</span><span class="n">staff_link_groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;items&#39;</span><span class="p">]),</span> <span class="mi">1</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

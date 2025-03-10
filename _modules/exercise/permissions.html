@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.permissions &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.permissions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.permissions</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ACCESS</span><span class="p">,</span>
+    <span class="n">ObjectVisibleBasePermission</span><span class="p">,</span>
+    <span class="n">FilterBackend</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTExerciseReadPermission</span><span class="p">,</span> <span class="n">JWTSubmissionReadPermission</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraderUser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LearningObject</span><span class="p">,</span>
+    <span class="n">BaseExercise</span><span class="p">,</span>
+    <span class="n">Submission</span><span class="p">,</span>
+    <span class="n">SubmittedFile</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="ExerciseVisiblePermissionBase">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.ExerciseVisiblePermissionBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseVisiblePermissionBase</span><span class="p">(</span><span class="n">ObjectVisibleBasePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_VISIBILITY_PERMISSION_DENIED_MSG&#39;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LearningObject</span>
+    <span class="n">obj_var</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+
+<div class="viewcode-block" id="ExerciseVisiblePermissionBase.is_object_visible">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.ExerciseVisiblePermissionBase.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">exercise</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find out if Exercise (LearningObject) is visible to user</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">exercise</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_VISIBILITY_ERROR_NOT_VISIBLE&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">exercise</span><span class="o">.</span><span class="n">is_submittable</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">have_exercises_been_opened</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="n">exercise</span><span class="o">.</span><span class="n">status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT</span><span class="p">,</span>
+                <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">ENROLLMENT_EXTERNAL</span><span class="p">,</span>
+                <span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span>
+                <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_VISIBILITY_ERROR_NOT_OPEN_YET -- </span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">exercise</span><span class="o">.</span><span class="n">course_module</span><span class="o">.</span><span class="n">opening_time</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">exercise</span><span class="o">.</span><span class="n">audience</span> <span class="o">==</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">AUDIENCE</span><span class="o">.</span><span class="n">REGISTERED_USERS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_VISIBLITY_ERROR_ONLY_RESISTERED_USERS&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">exercise</span><span class="o">.</span><span class="n">audience</span> <span class="o">==</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">is_external</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_VISIBLITY_ERROR_ONLY_INTERNAL_USERS&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">exercise</span><span class="o">.</span><span class="n">audience</span> <span class="o">==</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">course_instance</span><span class="o">.</span><span class="n">is_student</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">is_external</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_VISIBLITY_ERROR_ONLY_EXTERNAL_USERS&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">can_be_shown_as_module_model_solution</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;MODULE_MODEL_ANSWER_VISIBILITY_PERMISSION_DENIED_MSG&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="n">ExerciseVisiblePermission</span> <span class="o">=</span> <span class="n">ExerciseVisiblePermissionBase</span> <span class="o">|</span> <span class="n">JWTExerciseReadPermission</span>
+
+
+<div class="viewcode-block" id="BaseExerciseAssistantPermission">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.BaseExerciseAssistantPermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseExerciseAssistantPermission</span><span class="p">(</span><span class="n">ObjectVisibleBasePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_ASSISTANT_PERMISSION_DENIED_MSG&#39;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">BaseExercise</span>
+    <span class="n">obj_var</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+
+<div class="viewcode-block" id="BaseExerciseAssistantPermission.is_object_visible">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.BaseExerciseAssistantPermission.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">exercise</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make sure views that require assistant are also visible to them.</span>
+<span class="sd">        Also if view is for grading, make sure assistant is allowed to grade.</span>
+
+<span class="sd">        We expect that AccessModePermission is checked first</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">access_mode</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">get_access_mode</span><span class="p">()</span>
+        <span class="n">is_teacher</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">is_teacher</span>
+
+        <span class="c1"># NOTE: AccessModePermission will make sure that user</span>
+        <span class="c1"># is assistant when access_mode &gt;= ACCESS.ASSISTANT</span>
+
+        <span class="k">if</span> <span class="n">access_mode</span> <span class="o">&gt;=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ASSISTANT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">is_teacher</span> <span class="ow">or</span> <span class="n">exercise</span><span class="o">.</span><span class="n">allow_assistant_viewing</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_ASSISTANT_PERMISSION_ERROR_NO_ASSISTANT_VIEWING&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">access_mode</span> <span class="o">==</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">GRADING</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">is_teacher</span> <span class="ow">or</span> <span class="n">exercise</span><span class="o">.</span><span class="n">allow_assistant_grading</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_ASSISTANT_PERMISSION_NO_ASSISTANT_GRADING&#39;</span><span class="p">))</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionVisiblePermissionBase">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.SubmissionVisiblePermissionBase">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionVisiblePermissionBase</span><span class="p">(</span><span class="n">ObjectVisibleBasePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;SUBMISSION_VISIBILITY_PERMISSION_DENIED_MSG&#39;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Submission</span>
+    <span class="n">obj_var</span> <span class="o">=</span> <span class="s1">&#39;submission&#39;</span>
+
+<div class="viewcode-block" id="SubmissionVisiblePermissionBase.is_object_visible">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.SubmissionVisiblePermissionBase.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">submission</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">GraderUser</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">User</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">is_teacher</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">is_assistant</span> <span class="ow">and</span> <span class="n">submission</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">allow_assistant_viewing</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="n">submission</span><span class="o">.</span><span class="n">is_submitter</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;SUBMISSION_VISIBILITY_ERROR_ONLY_SUBMITTER&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="n">SubmissionVisiblePermission</span> <span class="o">=</span> <span class="n">SubmissionVisiblePermissionBase</span> <span class="o">|</span> <span class="n">JWTSubmissionReadPermission</span>
+
+
+<div class="viewcode-block" id="SubmissionVisibleFilter">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.SubmissionVisibleFilter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionVisibleFilter</span><span class="p">(</span><span class="n">FilterBackend</span><span class="p">):</span>
+<div class="viewcode-block" id="SubmissionVisibleFilter.filter_queryset">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.SubmissionVisibleFilter.filter_queryset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filter_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">is_super</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">is_staff</span> <span class="ow">or</span> <span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">issubclass</span><span class="p">(</span><span class="n">queryset</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">Submission</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="ow">not</span> <span class="n">view</span><span class="o">.</span><span class="n">is_teacher</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_super</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">is_assistant</span><span class="p">:</span>
+                <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">exercise__allow_assistant_viewing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">submitters</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queryset</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmittedFileVisiblePermission">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.SubmittedFileVisiblePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmittedFileVisiblePermission</span><span class="p">(</span><span class="n">SubmissionVisiblePermissionBase</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">SubmittedFile</span>
+
+<div class="viewcode-block" id="SubmittedFileVisiblePermission.is_object_visible">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.SubmittedFileVisiblePermission.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">is_object_visible</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">file</span><span class="o">.</span><span class="n">submission</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ModelVisiblePermission">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.ModelVisiblePermission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelVisiblePermission</span><span class="p">(</span><span class="n">ObjectVisibleBasePermission</span><span class="p">):</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_MODEL_ANSWER_VISIBILITY_PERMISSION_DENIED_MSG&#39;</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">BaseExercise</span>
+    <span class="n">obj_var</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+
+<div class="viewcode-block" id="ModelVisiblePermission.is_object_visible">
+<a class="viewcode-back" href="../../exercise.html#exercise.permissions.ModelVisiblePermission.is_object_visible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_object_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">exercise</span><span class="p">):</span> <span class="c1"># pylint: disable=arguments-renamed</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find out if exercise&#39;s model answer is visible to user</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">view</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">can_show_model_solutions_to_student</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;EXERCISE_MODEL_ANSWER_VISIBILITY_ERROR_NOT_ALLOWED_VIEWING&#39;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

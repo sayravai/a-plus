@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>lti_tool.views &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">lti_tool.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for lti_tool.views</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.clickjacking</span><span class="w"> </span><span class="kn">import</span> <span class="n">xframe_options_exempt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.csrf</span><span class="w"> </span><span class="kn">import</span> <span class="n">csrf_exempt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">login</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">method_decorator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.contrib.django</span><span class="w"> </span><span class="kn">import</span> <span class="n">DjangoOIDCLogin</span><span class="p">,</span> <span class="n">DjangoMessageLaunch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.deep_link_resource</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeepLinkResource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.lineitem</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineItem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylti1p3.exception</span><span class="w"> </span><span class="kn">import</span> <span class="n">LtiException</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">InstanceView</span><span class="p">,</span> <span class="n">ModuleView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">Enrollment</span><span class="p">,</span> <span class="n">CourseModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstanceBaseView</span><span class="p">,</span> <span class="n">CourseModuleBaseView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectEntryBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseBaseView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObject</span><span class="p">,</span> <span class="n">BaseExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseView</span><span class="p">,</span> <span class="n">SubmissionView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.localization_syntax</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_localized</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTemplateView</span><span class="p">,</span> <span class="n">BaseRedirectView</span><span class="p">,</span> <span class="n">BaseMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">authorization.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ACCESS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_tool_conf</span><span class="p">,</span>
+    <span class="n">get_launch_data_storage</span><span class="p">,</span>
+    <span class="n">get_launch_url</span><span class="p">,</span>
+    <span class="n">parse_lti_session_params</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;aplus.lti_tool&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="lti_login">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.lti_login">[docs]</a>
+<span class="nd">@csrf_exempt</span>
+<span class="nd">@xframe_options_exempt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lti_login</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">tool_conf</span> <span class="o">=</span> <span class="n">get_tool_conf</span><span class="p">()</span>
+    <span class="n">launch_data_storage</span> <span class="o">=</span> <span class="n">get_launch_data_storage</span><span class="p">()</span>
+
+    <span class="n">oidc_login</span> <span class="o">=</span> <span class="n">DjangoOIDCLogin</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">tool_conf</span><span class="p">,</span> <span class="n">launch_data_storage</span><span class="o">=</span><span class="n">launch_data_storage</span><span class="p">)</span>
+    <span class="n">target_link_uri</span> <span class="o">=</span> <span class="n">get_launch_url</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">oidc_login</span><span class="o">.</span><span class="n">enable_check_cookies</span><span class="p">()</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">target_link_uri</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="LtiLaunchView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiLaunchView">[docs]</a>
+<span class="nd">@method_decorator</span><span class="p">(</span><span class="n">csrf_exempt</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dispatch&#39;</span><span class="p">)</span>
+<span class="nd">@method_decorator</span><span class="p">(</span><span class="n">xframe_options_exempt</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dispatch&#39;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiLaunchView</span><span class="p">(</span><span class="n">BaseRedirectView</span><span class="p">):</span>
+
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ANONYMOUS</span>
+
+<div class="viewcode-block" id="LtiLaunchView.post">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiLaunchView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">tool_conf</span> <span class="o">=</span> <span class="n">get_tool_conf</span><span class="p">()</span>
+        <span class="n">launch_data_storage</span> <span class="o">=</span> <span class="n">get_launch_data_storage</span><span class="p">()</span>
+        <span class="n">message_launch</span> <span class="o">=</span> <span class="n">DjangoMessageLaunch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">tool_conf</span><span class="p">,</span> <span class="n">launch_data_storage</span><span class="o">=</span><span class="n">launch_data_storage</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span> <span class="o">=</span> <span class="n">message_launch</span><span class="o">.</span><span class="n">get_launch_data</span><span class="p">()</span>
+
+        <span class="c1"># Get or create user</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Moodle sends username in this parameter</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s1">&#39;https://purl.imsglobal.org/spec/lti/claim/ext&#39;</span><span class="p">][</span><span class="s1">&#39;user_username&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="c1"># Email always received, use as fallback</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">User</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+                <span class="n">username</span><span class="p">,</span>
+                <span class="n">email</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">],</span>
+                <span class="n">first_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s2">&quot;given_name&quot;</span><span class="p">],</span>
+                <span class="n">last_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s2">&quot;family_name&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+            <span class="n">profile</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/launch_presentation&quot;</span><span class="p">][</span><span class="s2">&quot;locale&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">profile</span><span class="o">.</span><span class="n">student_id</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/lis&quot;</span><span class="p">][</span><span class="s2">&quot;person_sourcedid&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="c1"># Note: profile.organization is not set since we can&#39;t know it</span>
+            <span class="c1"># based on the LTI launch.</span>
+            <span class="n">profile</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">login</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;django.contrib.auth.backends.ModelBackend&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s2">&quot;lti-launch-id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">message_launch</span><span class="o">.</span><span class="n">get_launch_id</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">message_launch</span><span class="o">.</span><span class="n">is_resource_launch</span><span class="p">():</span>
+            <span class="n">launch_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/custom&quot;</span><span class="p">]</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">CourseInstance</span><span class="p">,</span>
+                <span class="n">course__url</span><span class="o">=</span><span class="n">launch_params</span><span class="p">[</span><span class="s2">&quot;course_slug&quot;</span><span class="p">],</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">launch_params</span><span class="p">[</span><span class="s2">&quot;instance_slug&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">roles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="p">[</span><span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/roles&quot;</span><span class="p">]</span>
+            <span class="n">is_course_teacher</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">is_course_staff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;http://purl.imsglobal.org/vocab/lis/v2/membership#Learner&quot;</span> <span class="ow">in</span> <span class="n">roles</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_course_teacher</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">enroll_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;exercise_path&quot;</span> <span class="ow">in</span> <span class="n">launch_params</span><span class="p">:</span>
+                <span class="n">url_params</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">launch_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;exercise_path&quot;</span><span class="p">,</span> <span class="s2">&quot;module_slug&quot;</span><span class="p">,</span> <span class="s2">&quot;course_slug&quot;</span><span class="p">,</span> <span class="s2">&quot;instance_slug&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;lti-exercise&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">url_params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;module_slug&quot;</span> <span class="ow">in</span> <span class="n">launch_params</span><span class="p">:</span>
+                <span class="n">url_params</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">launch_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;module_slug&quot;</span><span class="p">,</span> <span class="s2">&quot;course_slug&quot;</span><span class="p">,</span> <span class="s2">&quot;instance_slug&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;lti-module&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">url_params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;course_slug&quot;</span> <span class="ow">in</span> <span class="n">launch_params</span> <span class="ow">and</span> <span class="s2">&quot;instance_slug&quot;</span> <span class="ow">in</span> <span class="n">launch_params</span><span class="p">:</span>
+                <span class="n">url_params</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">launch_params</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;course_slug&quot;</span><span class="p">,</span> <span class="s2">&quot;instance_slug&quot;</span><span class="p">]</span>
+                <span class="p">}</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;lti-course&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">url_params</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">LtiException</span><span class="p">(</span><span class="s2">&quot;Invalid parameters for an LTI launch&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">message_launch</span><span class="o">.</span><span class="n">is_deep_link_launch</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;lti-select-content&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">LtiException</span><span class="p">(</span><span class="s2">&quot;Invalid LTI launch type&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiSessionMixin">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSessionMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiSessionMixin</span><span class="p">(</span><span class="n">BaseMixin</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LtiSessionMixin.dispatch">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSessionMixin.dispatch">[docs]</a>
+    <span class="nd">@method_decorator</span><span class="p">(</span><span class="n">xframe_options_exempt</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LtiSessionMixin.get_resource_objects">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSessionMixin.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span> <span class="o">=</span> <span class="n">parse_lti_session_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;LTI_TOOL_ERROR_NO_SESSION_OR_LAUNCH_FOUND&quot;</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">PermissionDenied</span><span class="p">(</span><span class="s2">&quot;No LTI session/launch found.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lti_scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://purl.imsglobal.org/spec/lti/claim/custom&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LtiSessionMixin.get_common_objects">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSessionMixin.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disable_staff_nav</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission_poll_ready_url_name</span> <span class="o">=</span> <span class="s2">&quot;lti-submission&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span>
+            <span class="s2">&quot;disable_staff_nav&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;submission_poll_ready_url_name&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiInstanceView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiInstanceView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiInstanceView</span><span class="p">(</span><span class="n">LtiSessionMixin</span><span class="p">,</span> <span class="n">InstanceView</span><span class="p">):</span>
+
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;lti_tool/lti_course.html&quot;</span>
+
+<div class="viewcode-block" id="LtiInstanceView.get">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiInstanceView.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Edit links to point to LTI views</span>
+        <span class="n">module_model_objs</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="n">learningobjects</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module__course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="n">module_model_obj</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">module_model_objs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">module_model_obj</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;lti-module&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="n">lo_model_obj</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">learningobjects</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">exercise</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">lo_model_obj</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;lti-exercise&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiModuleView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiModuleView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiModuleView</span><span class="p">(</span><span class="n">LtiSessionMixin</span><span class="p">,</span> <span class="n">ModuleView</span><span class="p">):</span>
+
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;lti_tool/lti_module.html&quot;</span>
+
+<div class="viewcode-block" id="LtiModuleView.get">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiModuleView.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">learningobjects</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">learningobjects_dict</span> <span class="o">=</span> <span class="p">{</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">learningobjects</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exercise</span><span class="p">,</span> <span class="n">LearningObjectEntryBase</span><span class="p">):</span>
+                <span class="n">learningobj</span> <span class="o">=</span> <span class="n">learningobjects_dict</span><span class="p">[</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+                <span class="n">exercise</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">learningobj</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;lti-exercise&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiExerciseView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiExerciseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiExerciseView</span><span class="p">(</span><span class="n">LtiSessionMixin</span><span class="p">,</span> <span class="n">ExerciseView</span><span class="p">):</span>
+
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;lti_tool/lti_exercise.html&quot;</span>
+    <span class="n">post_url_name</span> <span class="o">=</span> <span class="s2">&quot;lti-exercise&quot;</span>
+    <span class="n">submission_url_name</span> <span class="o">=</span> <span class="s2">&quot;lti-submission&quot;</span>
+    <span class="n">exercise_url_name</span> <span class="o">=</span> <span class="s2">&quot;lti-exercise&quot;</span>
+
+    <span class="c1"># The dispatch method needs to be overridden here so that we can apply</span>
+    <span class="c1"># different method decorators specifically in this class.</span>
+    <span class="c1"># csrf_exempt is needed since it is used in ExerciseView and</span>
+    <span class="c1"># the exercise forms do not include any csrf token.</span>
+<div class="viewcode-block" id="LtiExerciseView.dispatch">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiExerciseView.dispatch">[docs]</a>
+    <span class="nd">@method_decorator</span><span class="p">(</span><span class="n">csrf_exempt</span><span class="p">)</span>
+    <span class="nd">@method_decorator</span><span class="p">(</span><span class="n">xframe_options_exempt</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LtiExerciseView.post">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiExerciseView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">redirect_view</span><span class="o">=</span><span class="s1">&#39;lti-submission&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiSubmissionView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSubmissionView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiSubmissionView</span><span class="p">(</span><span class="n">LtiSessionMixin</span><span class="p">,</span> <span class="n">SubmissionView</span><span class="p">):</span>
+
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;lti_tool/lti_submission.html&quot;</span>
+    <span class="n">submission_url_name</span> <span class="o">=</span> <span class="s2">&quot;lti-submission&quot;</span>
+    <span class="n">exercise_url_name</span> <span class="o">=</span> <span class="s1">&#39;lti-exercise&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="LtiSelectContentMixin">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectContentMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiSelectContentMixin</span><span class="p">(</span><span class="n">LtiSessionMixin</span><span class="p">):</span>
+
+    <span class="n">access_mode</span> <span class="o">=</span> <span class="n">ACCESS</span><span class="o">.</span><span class="n">TEACHER</span>
+
+<div class="viewcode-block" id="LtiSelectContentMixin.get_resource_objects">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectContentMixin.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># If the session (cookie) has been lost,</span>
+            <span class="c1"># AnonymousUser does not have a user profile.</span>
+            <span class="n">user_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_teacher</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_teacher</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span>
+                <span class="ow">or</span> <span class="n">Enrollment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">user_profile</span><span class="o">=</span><span class="n">user_profile</span><span class="p">,</span>
+                    <span class="n">role</span><span class="o">=</span><span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_ROLE</span><span class="o">.</span><span class="n">TEACHER</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="n">Enrollment</span><span class="o">.</span><span class="n">ENROLLMENT_STATUS</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LtiSelectContentMixin.get_common_objects">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectContentMixin.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="c1">#FIXME do not include old, closed courses so that the course lists are reasonable</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">teaching_courses</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">teaching_courses</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_teaching</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiSelectContentView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectContentView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiSelectContentView</span><span class="p">(</span><span class="n">LtiSelectContentMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;lti_tool/course_list.html&quot;</span>
+
+<div class="viewcode-block" id="LtiSelectContentView.get_common_objects">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectContentView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">teaching_courses</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;instances&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiSelectCourseView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectCourseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiSelectCourseView</span><span class="p">(</span><span class="n">LtiSelectContentMixin</span><span class="p">,</span> <span class="n">CourseInstanceBaseView</span><span class="p">):</span>
+
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;lti_tool/module_list.html&quot;</span>
+
+<div class="viewcode-block" id="LtiSelectCourseView.post">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectCourseView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Create gradebook items</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span><span class="o">.</span><span class="n">get_ags</span><span class="p">()</span>
+        <span class="n">lineitems</span> <span class="o">=</span> <span class="n">ags</span><span class="o">.</span><span class="n">get_lineitems</span><span class="p">()</span>
+        <span class="n">exercises</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module__course_instance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">:</span>
+            <span class="n">lineitem_exists</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">([</span><span class="n">li</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="n">lineitems</span> <span class="k">if</span> <span class="n">li</span><span class="p">[</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lineitem_exists</span><span class="p">:</span>
+                <span class="n">li</span> <span class="o">=</span> <span class="n">LineItem</span><span class="p">()</span>
+                <span class="n">li</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">))</span><span class="o">.</span><span class="n">set_score_maximum</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">max_points</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">pick_localized</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s1">&#39;en&#39;</span><span class="p">))</span>
+                <span class="n">ags</span><span class="o">.</span><span class="n">find_or_create_lineitem</span><span class="p">(</span><span class="n">li</span><span class="p">)</span>
+
+        <span class="c1"># Send activity settings</span>
+        <span class="n">deep_link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span><span class="o">.</span><span class="n">get_deep_link</span><span class="p">()</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">DeepLinkResource</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">set_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;lti-launch&#39;</span><span class="p">)))</span>
+            <span class="o">.</span><span class="n">set_custom_params</span><span class="p">({</span>
+                <span class="s2">&quot;course_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_slug&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;instance_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;instance_slug&#39;</span><span class="p">]</span>
+            <span class="p">})</span>
+            <span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">pick_localized</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">),</span>
+                    <span class="n">pick_localized</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">instance_name</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">deep_link</span><span class="o">.</span><span class="n">output_response_form</span><span class="p">([</span><span class="n">resource</span><span class="p">]))</span></div>
+
+
+    <span class="c1"># Get list of modules in course</span>
+<div class="viewcode-block" id="LtiSelectCourseView.get">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectCourseView.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">course_modules</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;modules&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiSelectModuleView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectModuleView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiSelectModuleView</span><span class="p">(</span><span class="n">LtiSelectContentMixin</span><span class="p">,</span> <span class="n">CourseModuleBaseView</span><span class="p">):</span>
+
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;lti_tool/exercise_list.html&quot;</span>
+
+<div class="viewcode-block" id="LtiSelectModuleView.post">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectModuleView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Create gradebook items</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span><span class="o">.</span><span class="n">get_ags</span><span class="p">()</span>
+        <span class="n">lineitems</span> <span class="o">=</span> <span class="n">ags</span><span class="o">.</span><span class="n">get_lineitems</span><span class="p">()</span>
+        <span class="n">exercises</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">:</span>
+            <span class="n">lineitem_exists</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">([</span><span class="n">li</span> <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="n">lineitems</span> <span class="k">if</span> <span class="n">li</span><span class="p">[</span><span class="s1">&#39;tag&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lineitem_exists</span><span class="p">:</span>
+                <span class="n">li</span> <span class="o">=</span> <span class="n">LineItem</span><span class="p">()</span>
+                <span class="n">li</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">))</span><span class="o">.</span><span class="n">set_score_maximum</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">max_points</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">pick_localized</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s1">&#39;en&#39;</span><span class="p">))</span>
+                <span class="n">ags</span><span class="o">.</span><span class="n">find_or_create_lineitem</span><span class="p">(</span><span class="n">li</span><span class="p">)</span>
+
+        <span class="c1"># Send activity settings</span>
+        <span class="n">deep_link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span><span class="o">.</span><span class="n">get_deep_link</span><span class="p">()</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">DeepLinkResource</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">set_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;lti-launch&#39;</span><span class="p">)))</span>
+            <span class="o">.</span><span class="n">set_custom_params</span><span class="p">({</span>
+                <span class="s2">&quot;course_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_slug&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;instance_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;instance_slug&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;module_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;module_slug&#39;</span><span class="p">]</span>
+            <span class="p">})</span>
+            <span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">pick_localized</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">),</span> <span class="s1">&#39;en&#39;</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">deep_link</span><span class="o">.</span><span class="n">output_response_form</span><span class="p">([</span><span class="n">resource</span><span class="p">]))</span></div>
+
+
+    <span class="c1"># Get list of exercises in module</span>
+<div class="viewcode-block" id="LtiSelectModuleView.get">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectModuleView.get">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learningobjects</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">course_module</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learningobjects_dict</span> <span class="o">=</span> <span class="p">{</span> <span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">learningobjects</span> <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flat_module</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">flat_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">))</span>
+        <span class="n">exercises</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">flat_module</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">LearningObjectEntryBase</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">exercise</span> <span class="ow">in</span> <span class="n">exercises</span><span class="p">:</span>
+            <span class="n">learningobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learningobjects_dict</span><span class="p">[</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+            <span class="n">exercise</span><span class="o">.</span><span class="n">link</span> <span class="o">=</span> <span class="n">learningobj</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;lti-select-exercise&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;learningobjects&quot;</span><span class="p">,</span> <span class="s2">&quot;flat_module&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="LtiSelectExerciseView">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectExerciseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LtiSelectExerciseView</span><span class="p">(</span><span class="n">LtiSelectContentMixin</span><span class="p">,</span> <span class="n">ExerciseBaseView</span><span class="p">):</span>
+
+<div class="viewcode-block" id="LtiSelectExerciseView.post">
+<a class="viewcode-back" href="../../lti_tool.html#lti_tool.views.LtiSelectExerciseView.post">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Create gradebook items</span>
+        <span class="n">ags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span><span class="o">.</span><span class="n">get_ags</span><span class="p">()</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">children</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">li</span> <span class="o">=</span> <span class="n">LineItem</span><span class="p">()</span>
+                    <span class="n">li</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">id</span><span class="p">))</span><span class="o">.</span><span class="n">set_score_maximum</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">max_points</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">pick_localized</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s1">&#39;en&#39;</span><span class="p">))</span>
+                    <span class="n">ags</span><span class="o">.</span><span class="n">find_or_create_lineitem</span><span class="p">(</span><span class="n">li</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">li</span> <span class="o">=</span> <span class="n">LineItem</span><span class="p">()</span>
+                    <span class="p">(</span><span class="n">li</span><span class="o">.</span><span class="n">set_tag</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+                        <span class="o">.</span><span class="n">set_score_maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">max_points</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">pick_localized</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">),</span> <span class="s1">&#39;en&#39;</span><span class="p">)))</span>
+                    <span class="n">ags</span><span class="o">.</span><span class="n">find_or_create_lineitem</span><span class="p">(</span><span class="n">li</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Importing LTI exercise with no max_points attribute&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Send activity settings</span>
+        <span class="n">deep_link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_launch</span><span class="o">.</span><span class="n">get_deep_link</span><span class="p">()</span>
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">DeepLinkResource</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">set_url</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="n">reverse</span><span class="p">(</span><span class="s1">&#39;lti-launch&#39;</span><span class="p">)))</span>
+            <span class="o">.</span><span class="n">set_custom_params</span><span class="p">({</span>
+                <span class="s2">&quot;course_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;course_slug&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;instance_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;instance_slug&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;module_slug&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;module_slug&#39;</span><span class="p">],</span>
+                <span class="s2">&quot;exercise_path&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;exercise_path&#39;</span><span class="p">]</span>
+            <span class="p">})</span>
+            <span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">pick_localized</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">),</span> <span class="s1">&#39;en&#39;</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">deep_link</span><span class="o">.</span><span class="n">output_response_form</span><span class="p">([</span><span class="n">resource</span><span class="p">]))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

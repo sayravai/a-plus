@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edit_course.tests &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edit_course.tests</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edit_course.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="kn">import</span> <span class="n">dumps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">override_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseExercise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.testdata</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseTestCase</span>
+
+
+<div class="viewcode-block" id="CourseCloneTest">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.tests.CourseCloneTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CourseCloneTest</span><span class="p">(</span><span class="n">CourseTestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="CourseCloneTest.test_course_clone">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.tests.CourseCloneTest.test_course_clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_course_clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">add_assistant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span><span class="p">)</span>
+        <span class="n">instance_url</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">url</span>
+        <span class="n">course_name</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">visible</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span>
+        <span class="n">teacher_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_as_id</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="n">assistant_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_as_id</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">assistants</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;course-clone&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;testTeacher&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testPassword&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Full clone</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;another1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;instance_name&#39;</span><span class="p">:</span> <span class="s1">&#39;instance1&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;teachers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;assistants&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;menuitems&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;usertags&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;key_year&#39;</span><span class="p">:</span> <span class="mi">2022</span><span class="p">,</span>
+            <span class="s1">&#39;key_month&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">,</span>
+        <span class="p">},</span> <span class="n">follow</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="n">stripped_content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;modal-submit-error alert alert-danger&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="s2">&quot;alert alert-danger&quot;</span><span class="p">,</span> <span class="n">stripped_content</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">&quot;alert alert-success&quot;</span><span class="p">,</span> <span class="n">stripped_content</span><span class="p">)</span>
+
+        <span class="c1"># Partial clone</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;another2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;instance_name&#39;</span><span class="p">:</span> <span class="s1">&#39;instance2&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;teachers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;assistants&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;menuitems&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;usertags&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;key_year&#39;</span><span class="p">:</span> <span class="mi">2022</span><span class="p">,</span>
+            <span class="s1">&#39;key_month&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">,</span>
+        <span class="p">},</span> <span class="n">follow</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="n">stripped_content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;modal-submit-error alert alert-danger&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="s2">&quot;alert alert-danger&quot;</span><span class="p">,</span> <span class="n">stripped_content</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">&quot;alert alert-success&quot;</span><span class="p">,</span> <span class="n">stripped_content</span><span class="p">)</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">instance_url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">course_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_as_id</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="n">teacher_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_as_id</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">assistants</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="n">assistant_names</span><span class="p">)</span>
+
+        <span class="c1"># Check the full clone</span>
+        <span class="n">new_instance_1</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">course</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;another1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_instance_1</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">course_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_instance_1</span><span class="o">.</span><span class="n">instance_name</span><span class="p">,</span> <span class="s2">&quot;instance1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">new_instance_1</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_as_id</span><span class="p">(</span><span class="n">new_instance_1</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="n">teacher_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_as_id</span><span class="p">(</span><span class="n">new_instance_1</span><span class="o">.</span><span class="n">assistants</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="n">assistant_names</span><span class="p">)</span>
+
+        <span class="c1"># Check the partial clone</span>
+        <span class="n">new_instance_2</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">course</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;another2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_instance_2</span><span class="o">.</span><span class="n">course</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">course_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_instance_2</span><span class="o">.</span><span class="n">instance_name</span><span class="p">,</span> <span class="s2">&quot;instance2&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">new_instance_2</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_as_id</span><span class="p">(</span><span class="n">new_instance_2</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span> <span class="n">teacher_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">new_instance_2</span><span class="o">.</span><span class="n">assistants</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_as_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_as_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_as_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="vm">__class__</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">items</span><span class="p">]</span>
+
+<div class="viewcode-block" id="CourseCloneTest.test_clone_from_sis">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.tests.CourseCloneTest.test_clone_from_sis">[docs]</a>
+    <span class="nd">@override_settings</span><span class="p">(</span><span class="n">SIS_PLUGIN_MODULE</span> <span class="o">=</span> <span class="s1">&#39;course.sis_test&#39;</span><span class="p">)</span>
+    <span class="nd">@override_settings</span><span class="p">(</span><span class="n">SIS_PLUGIN_CLASS</span> <span class="o">=</span> <span class="s1">&#39;SisTest&#39;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_clone_from_sis</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;course-clone&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;testTeacher&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testPassword&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Full clone</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;url&#39;</span><span class="p">:</span> <span class="s1">&#39;sis-test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;instance_name&#39;</span><span class="p">:</span> <span class="s1">&#39;sis-instance&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;teachers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;assistants&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;menuitems&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;usertags&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s1">&#39;key_year&#39;</span><span class="p">:</span> <span class="mi">2022</span><span class="p">,</span>
+            <span class="s1">&#39;key_month&#39;</span><span class="p">:</span> <span class="s1">&#39;Test&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sis&#39;</span><span class="p">:</span> <span class="s1">&#39;123&#39;</span><span class="p">,</span>
+        <span class="p">},</span> <span class="n">follow</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+        <span class="n">stripped_content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;modal-submit-error alert alert-danger&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertNotIn</span><span class="p">(</span><span class="s2">&quot;alert alert-danger&quot;</span><span class="p">,</span> <span class="n">stripped_content</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">&quot;alert alert-success&quot;</span><span class="p">,</span> <span class="n">stripped_content</span><span class="p">)</span>
+
+        <span class="c1"># The asserted values are coming from in sis_test.py</span>
+        <span class="n">sis_instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">course</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">course</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;sis-test&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">sis_instance</span><span class="o">.</span><span class="n">visible_to_students</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">sis_instance</span><span class="o">.</span><span class="n">teachers</span><span class="o">.</span><span class="n">all</span><span class="p">()),</span>
+            <span class="p">[</span> <span class="s2">&quot;testTeacher&quot;</span><span class="p">,</span> <span class="s2">&quot;teacher-A&quot;</span> <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">sis_instance</span><span class="o">.</span><span class="n">starting_time</span><span class="p">,</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">&quot;2022-05-31 21:00:00+00:00&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>
+            <span class="n">sis_instance</span><span class="o">.</span><span class="n">ending_time</span><span class="p">,</span>
+            <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="s2">&quot;2022-08-19 21:00:00+00:00&quot;</span><span class="p">)</span>
+        <span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="BatchAssessTest">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.tests.BatchAssessTest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BatchAssessTest</span><span class="p">(</span><span class="n">CourseTestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BatchAssessTest.setUpTestData">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.tests.BatchAssessTest.setUpTestData">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUpTestData</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">setUpCourse</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BatchAssessTest.test_batch_assess">
+<a class="viewcode-back" href="../../edit_course.html#edit_course.tests.BatchAssessTest.test_batch_assess">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_batch_assess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="s1">&#39;batch-assess&#39;</span><span class="p">)</span> <span class="c1"># pylint: disable=unused-variable</span>
+
+        <span class="n">json_to_post</span> <span class="o">=</span> <span class="n">dumps</span><span class="p">({</span>
+          <span class="s1">&#39;objects&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+              <span class="s1">&#39;students_by_student_id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">student_id</span><span class="p">],</span>
+              <span class="s1">&#39;feedback&#39;</span><span class="p">:</span> <span class="s1">&#39;Generic exercise feedback&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;grader&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">teacher</span><span class="o">.</span><span class="n">userprofile</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+              <span class="s1">&#39;exercise_id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+              <span class="s1">&#39;submission_time&#39;</span><span class="p">:</span> <span class="s1">&#39;2014-09-24 11:50&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;points&#39;</span><span class="p">:</span> <span class="mi">99</span>
+            <span class="p">}</span>
+          <span class="p">]</span>
+        <span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s1">&#39;testTeacher&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;testPassword&#39;</span><span class="p">)</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s1">&#39;/course/instance/teachers/batch-assess/&#39;</span><span class="p">,</span>
+            <span class="p">{</span><span class="s1">&#39;submissions_json&#39;</span><span class="p">:</span> <span class="n">json_to_post</span><span class="p">},</span> <span class="n">follow</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertContains</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s1">&#39;New submissions stored.&#39;</span><span class="p">)</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="n">exercise</span><span class="o">.</span><span class="n">get_submissions_for_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">student</span><span class="o">.</span><span class="n">userprofile</span><span class="p">,</span> <span class="n">exclude_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">subs</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">feedback</span><span class="p">,</span> <span class="s1">&#39;Generic exercise feedback&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">grade</span><span class="p">,</span> <span class="mi">99</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

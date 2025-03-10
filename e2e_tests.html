@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>e2e_tests package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">e2e_tests package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-e2e_tests.conftest">e2e_tests.conftest module</a><ul>
+<li><a class="reference internal" href="#e2e_tests.conftest.django_server"><code class="docutils literal notranslate"><span class="pre">django_server()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-e2e_tests.helpers">e2e_tests.helpers module</a><ul>
+<li><a class="reference internal" href="#e2e_tests.helpers.File"><code class="docutils literal notranslate"><span class="pre">File</span></code></a></li>
+<li><a class="reference internal" href="#e2e_tests.helpers.login"><code class="docutils literal notranslate"><span class="pre">login()</span></code></a></li>
+<li><a class="reference internal" href="#e2e_tests.helpers.logout"><code class="docutils literal notranslate"><span class="pre">logout()</span></code></a></li>
+<li><a class="reference internal" href="#e2e_tests.helpers.upload_submission"><code class="docutils literal notranslate"><span class="pre">upload_submission()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-e2e_tests.test_compare_submissions">e2e_tests.test_compare_submissions module</a><ul>
+<li><a class="reference internal" href="#e2e_tests.test_compare_submissions.test_compare_submissions"><code class="docutils literal notranslate"><span class="pre">test_compare_submissions()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-e2e_tests.test_example">e2e_tests.test_example module</a><ul>
+<li><a class="reference internal" href="#e2e_tests.test_example.test_course_has_heading"><code class="docutils literal notranslate"><span class="pre">test_course_has_heading()</span></code></a></li>
+<li><a class="reference internal" href="#e2e_tests.test_example.test_frontpage_has_title"><code class="docutils literal notranslate"><span class="pre">test_frontpage_has_title()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-e2e_tests.test_points_goal_set">e2e_tests.test_points_goal_set module</a><ul>
+<li><a class="reference internal" href="#e2e_tests.test_points_goal_set.test_points_goal_reached"><code class="docutils literal notranslate"><span class="pre">test_points_goal_reached()</span></code></a></li>
+<li><a class="reference internal" href="#e2e_tests.test_points_goal_set.test_points_goal_set"><code class="docutils literal notranslate"><span class="pre">test_points_goal_set()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-e2e_tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">e2e_tests package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/e2e_tests.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="e2e-tests-package">
+<h1>e2e_tests package<a class="headerlink" href="#e2e-tests-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-e2e_tests.conftest">
+<span id="e2e-tests-conftest-module"></span><h2>e2e_tests.conftest module<a class="headerlink" href="#module-e2e_tests.conftest" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.conftest.django_server">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.conftest.</span></span><span class="sig-name descname"><span class="pre">django_server</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/e2e_tests/conftest.html#django_server"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.conftest.django_server" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-e2e_tests.helpers">
+<span id="e2e-tests-helpers-module"></span><h2>e2e_tests.helpers module<a class="headerlink" href="#module-e2e_tests.helpers" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="e2e_tests.helpers.File">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">e2e_tests.helpers.</span></span><span class="sig-name descname"><span class="pre">File</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/e2e_tests/helpers.html#File"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.helpers.File" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.helpers.login">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.helpers.</span></span><span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/e2e_tests/helpers.html#login"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.helpers.login" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.helpers.logout">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.helpers.</span></span><span class="sig-name descname"><span class="pre">logout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/e2e_tests/helpers.html#logout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.helpers.logout" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.helpers.upload_submission">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.helpers.</span></span><span class="sig-name descname"><span class="pre">upload_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chapter_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#e2e_tests.helpers.File" title="e2e_tests.helpers.File"><span class="pre">File</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/e2e_tests/helpers.html#upload_submission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.helpers.upload_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-e2e_tests.test_compare_submissions">
+<span id="e2e-tests-test-compare-submissions-module"></span><h2>e2e_tests.test_compare_submissions module<a class="headerlink" href="#module-e2e_tests.test_compare_submissions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.test_compare_submissions.test_compare_submissions">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.test_compare_submissions.</span></span><span class="sig-name descname"><span class="pre">test_compare_submissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/e2e_tests/test_compare_submissions.html#test_compare_submissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.test_compare_submissions.test_compare_submissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-e2e_tests.test_example">
+<span id="e2e-tests-test-example-module"></span><h2>e2e_tests.test_example module<a class="headerlink" href="#module-e2e_tests.test_example" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.test_example.test_course_has_heading">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.test_example.</span></span><span class="sig-name descname"><span class="pre">test_course_has_heading</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/e2e_tests/test_example.html#test_course_has_heading"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.test_example.test_course_has_heading" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.test_example.test_frontpage_has_title">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.test_example.</span></span><span class="sig-name descname"><span class="pre">test_frontpage_has_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/e2e_tests/test_example.html#test_frontpage_has_title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.test_example.test_frontpage_has_title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-e2e_tests.test_points_goal_set">
+<span id="e2e-tests-test-points-goal-set-module"></span><h2>e2e_tests.test_points_goal_set module<a class="headerlink" href="#module-e2e_tests.test_points_goal_set" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.test_points_goal_set.test_points_goal_reached">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.test_points_goal_set.</span></span><span class="sig-name descname"><span class="pre">test_points_goal_reached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/e2e_tests/test_points_goal_set.html#test_points_goal_reached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.test_points_goal_set.test_points_goal_reached" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="e2e_tests.test_points_goal_set.test_points_goal_set">
+<span class="sig-prename descclassname"><span class="pre">e2e_tests.test_points_goal_set.</span></span><span class="sig-name descname"><span class="pre">test_points_goal_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Page</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/e2e_tests/test_points_goal_set.html#test_points_goal_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#e2e_tests.test_points_goal_set.test_points_goal_set" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-e2e_tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-e2e_tests" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

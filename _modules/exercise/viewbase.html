@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>exercise.viewbase &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">exercise.viewbase</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for exercise.viewbase</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.formats</span><span class="w"> </span><span class="kn">import</span> <span class="n">date_format</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseModuleMixin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.viewbase</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseTemplateView</span><span class="p">,</span> <span class="n">BaseView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.pseudonymize</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_user</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.content</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectContent</span><span class="p">,</span> <span class="n">ModuleContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">NoSuchContent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningObjectPoints</span><span class="p">,</span> <span class="n">SubmissionEntry</span><span class="p">,</span> <span class="n">ExercisePoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.permissions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ExerciseVisiblePermission</span><span class="p">,</span>
+    <span class="n">BaseExerciseAssistantPermission</span><span class="p">,</span>
+    <span class="n">SubmissionVisiblePermission</span><span class="p">,</span>
+    <span class="n">ModelVisiblePermission</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LearningObject</span><span class="p">,</span>
+    <span class="n">BaseExercise</span><span class="p">,</span>
+    <span class="n">Submission</span><span class="p">,</span>
+    <span class="n">RevealRule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.exercise_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseTask</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.reveal_states</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExerciseRevealState</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.tasks</span><span class="w"> </span><span class="kn">import</span> <span class="n">regrade_exercises</span>
+
+
+<div class="viewcode-block" id="ExerciseBaseMixin">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseBaseMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseBaseMixin</span><span class="p">:</span>
+    <span class="n">context_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;exercise&quot;</span><span class="p">]</span>
+    <span class="n">exercise_kw</span> <span class="o">=</span> <span class="s2">&quot;exercise_path&quot;</span>
+    <span class="n">exercise_permission_classes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">ExerciseVisiblePermission</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ExerciseBaseMixin.get_permissions">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseBaseMixin.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">Perm</span><span class="p">()</span> <span class="k">for</span> <span class="n">Perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_permission_classes</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+
+
+    <span class="c1"># get_exercise_object</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exercise</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LearningObject</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_exercise_object</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseRevealRuleMixin">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseRevealRuleMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseRevealRuleMixin</span><span class="p">:</span>
+    <span class="n">context_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;feedback_revealed&quot;</span><span class="p">,</span> <span class="s2">&quot;feedback_hidden_description&quot;</span><span class="p">,</span> <span class="s2">&quot;model_revealed&quot;</span><span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">feedback_reveal_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">str</span><span class="p">]]]:</span>
+        <span class="n">feedback_revealed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">feedback_hidden_description</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">User</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">active_submission_feedback_reveal_rule</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">ExerciseRevealState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">feedback_revealed</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">is_revealed</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">TIME</span><span class="p">,</span>
+                <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE</span><span class="p">,</span>
+                <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_ALL</span><span class="p">,</span>
+                <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_OR_FULL_POINTS</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">reveal_time</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">get_reveal_time</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="n">formatted_time</span> <span class="o">=</span> <span class="n">date_format</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">reveal_time</span><span class="p">),</span> <span class="s2">&quot;DATETIME_FORMAT&quot;</span><span class="p">)</span>
+                <span class="n">feedback_hidden_description</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;RESULTS_WILL_BE_REVEALED -- </span><span class="si">{time}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">time</span><span class="o">=</span><span class="n">formatted_time</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">feedback_hidden_description</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;RESULTS_ARE_CURRENTLY_HIDDEN&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">feedback_revealed</span><span class="p">,</span> <span class="n">feedback_hidden_description</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">feedback_revealed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">feedback_reveal_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">feedback_hidden_description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feedback_reveal_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">feedback_reveal_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">feedback_reveal_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_revealed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">model_revealed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">User</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">model_revealed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="o">.</span><span class="n">can_show_model_solutions_to_student</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model_revealed</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseMixin">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseMixin</span><span class="p">(</span><span class="n">ExerciseRevealRuleMixin</span><span class="p">,</span> <span class="n">ExerciseBaseMixin</span><span class="p">,</span> <span class="n">CourseModuleMixin</span><span class="p">):</span>
+    <span class="n">exercise_permission_classes</span> <span class="o">=</span> <span class="n">ExerciseBaseMixin</span><span class="o">.</span><span class="n">exercise_permission_classes</span> <span class="o">+</span> <span class="p">(</span>
+        <span class="n">BaseExerciseAssistantPermission</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">submission_url_name</span> <span class="o">=</span> <span class="s1">&#39;submission&#39;</span>
+    <span class="n">exercise_url_name</span> <span class="o">=</span> <span class="s1">&#39;exercise&#39;</span>
+    <span class="n">context_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;summary&quot;</span><span class="p">,</span> <span class="s2">&quot;submissions&quot;</span><span class="p">,</span> <span class="s2">&quot;previous&quot;</span><span class="p">,</span> <span class="s2">&quot;current&quot;</span><span class="p">,</span> <span class="s2">&quot;next&quot;</span><span class="p">,</span> <span class="s2">&quot;breadcrumb&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ExerciseMixin.get_exercise_object">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseMixin.get_exercise_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercise_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">exercise_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_bare</span><span class="o">.</span><span class="n">find_path</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise_kw</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">exercise_id</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">NoSuchContent</span><span class="p">,</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;Learning object not found&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span></div>
+
+
+<div class="viewcode-block" id="ExerciseMixin.get_common_objects">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseMixin.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">now</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pseudonymize&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;now&quot;</span><span class="p">,</span> <span class="s2">&quot;submission_url_name&quot;</span><span class="p">,</span> <span class="s2">&quot;exercise_url_name&quot;</span><span class="p">,</span> <span class="s2">&quot;pseudonymize&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExerciseMixin.get_summary_user">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseMixin.get_summary_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_summary_user</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span></div>
+
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">exercise_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+                <span class="n">LearningObjectContent</span><span class="p">,</span>
+                <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ModuleContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span><span class="p">]],</span>
+                <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ModuleContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span><span class="p">]],</span>
+                <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ModuleContent</span><span class="p">,</span> <span class="n">LearningObjectContent</span><span class="p">]]</span>
+            <span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">current</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LearningObjectContent</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;exercise_info&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">or</span> <span class="s2">&quot;content&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">LearningObjectContent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">breadcrumb</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_info</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">previous</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_info</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exercise_info</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExercisePoints</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cached points for a submittable exercise. Raises AttributeError (i.e. signal to python that</span>
+<span class="sd">        the attribute doesn&#39;t exist) if the exercise is not submittable&quot;&quot;&quot;</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">LearningObjectPoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_summary_user</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_course_staff</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">ExercisePoints</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;LearningObject &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="si">}</span><span class="s2">&#39; is not submittable&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">entry</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submissions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SubmissionEntry</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="o">.</span><span class="n">submissions</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseBaseView">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseBaseView</span><span class="p">(</span><span class="n">ExerciseMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseTemplateBaseView">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseTemplateBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseTemplateBaseView</span><span class="p">(</span><span class="n">ExerciseMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseModelMixin">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseModelMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseModelMixin</span><span class="p">(</span><span class="n">ExerciseMixin</span><span class="p">):</span>
+    <span class="n">model_permission_classes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">ModelVisiblePermission</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ExerciseModelMixin.get_permissions">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseModelMixin.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">Perm</span><span class="p">()</span> <span class="k">for</span> <span class="n">Perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_permission_classes</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+
+
+<div class="viewcode-block" id="ExerciseModelMixin.get_exercise_object">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseModelMixin.get_exercise_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_exercise_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">exercise</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_exercise_object</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exercise</span><span class="o">.</span><span class="n">is_submittable</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;This learning object does not have a model answer.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">exercise</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ExerciseModelBaseView">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseModelBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseModelBaseView</span><span class="p">(</span><span class="n">ExerciseModelMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="SubmissionBaseMixin">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionBaseMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionBaseMixin</span><span class="p">:</span>
+    <span class="n">submission_kw</span> <span class="o">=</span> <span class="s2">&quot;submission_id&quot;</span>
+    <span class="n">submission_permission_classes</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">SubmissionVisiblePermission</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">submitter</span><span class="p">:</span> <span class="n">UserProfile</span>
+    <span class="n">submission</span><span class="p">:</span> <span class="n">Submission</span>
+
+<div class="viewcode-block" id="SubmissionBaseMixin.get_permissions">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionBaseMixin.get_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">perms</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_permissions</span><span class="p">()</span>
+        <span class="n">perms</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">Perm</span><span class="p">()</span> <span class="k">for</span> <span class="n">Perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission_permission_classes</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">perms</span></div>
+
+
+    <span class="c1"># get_submission_object</span>
+
+<div class="viewcode-block" id="SubmissionBaseMixin.get_resource_objects">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionBaseMixin.get_resource_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_resource_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_resource_objects</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">submission</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_submission_object</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">is_submitter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">submitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">userprofile</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">submitter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">submitters</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;submission&quot;</span><span class="p">,</span> <span class="s2">&quot;submitter&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubmissionMixin">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionMixin">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionMixin</span><span class="p">(</span><span class="n">SubmissionBaseMixin</span><span class="p">,</span> <span class="n">ExerciseMixin</span><span class="p">):</span>
+    <span class="n">context_properties</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;submission_entry&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="SubmissionMixin.get_submission_object">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionMixin.get_submission_object">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_submission_object</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Submission</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_object_or_404</span><span class="p">(</span>
+            <span class="n">Submission</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span>
+                <span class="n">models</span><span class="o">.</span><span class="n">Prefetch</span><span class="p">(</span><span class="s1">&#39;submitters&#39;</span><span class="p">,</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_tags</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">))</span>
+            <span class="p">),</span>
+            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">submission_kw</span><span class="p">],</span>
+            <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SubmissionMixin.get_summary_user">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionMixin.get_summary_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_summary_user</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">User</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">submitter</span><span class="p">:</span>
+            <span class="c1"># The submission has no submitters.</span>
+            <span class="c1"># Use None (AnonymousUser) in the ExercisePoints</span>
+            <span class="c1"># so that it does not pick submissions from request.user (the teacher).</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">format_user</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudonymize</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">submitter</span><span class="o">.</span><span class="n">user</span></div>
+
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submission_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">submissions</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submissions</span><span class="p">)</span> <span class="o">-</span> <span class="nb">list</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">submissions</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">submission</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SubmissionBaseView">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionBaseView</span><span class="p">(</span><span class="n">SubmissionMixin</span><span class="p">,</span> <span class="n">BaseTemplateView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SubmissionDraftBaseView">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.SubmissionDraftBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubmissionDraftBaseView</span><span class="p">(</span><span class="n">ExerciseMixin</span><span class="p">,</span> <span class="n">BaseView</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ExerciseListBaseView">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseListBaseView">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExerciseListBaseView</span><span class="p">(</span><span class="n">ExerciseBaseView</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Common base class for ListSubmissionView and ListSubmittersView.</span>
+<span class="sd">    Presently just for common mass regrade implementation.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+<div class="viewcode-block" id="ExerciseListBaseView.get_common_objects">
+<a class="viewcode-back" href="../../exercise.html#exercise.viewbase.ExerciseListBaseView.get_common_objects">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_common_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_common_objects</span><span class="p">()</span>
+
+        <span class="c1"># Regrade button text changes dynamically if regrade is ongoing.</span>
+        <span class="c1"># For now only teachers (and admins) can start mass regrade.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regrade_button</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;REGRADE&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resultinfo</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">allow_regrade</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_teacher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">ExerciseTask</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">exercise</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exercise</span><span class="p">,</span>
+                <span class="n">task_type</span><span class="o">=</span><span class="n">ExerciseTask</span><span class="o">.</span><span class="n">TASK_TYPE</span><span class="o">.</span><span class="n">REGRADE</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">regrade_exercises</span><span class="o">.</span><span class="n">AsyncResult</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;PROGRESS&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">regrade_button</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;REGRADING_PCT -- </span><span class="si">{percent}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">percent</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;current&#39;</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">/</span> <span class="n">result</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">)))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resultinfo</span> <span class="o">=</span> <span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;REGRADING_PROGRESS -- </span><span class="si">{current}</span><span class="s1">, </span><span class="si">{total}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">current</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;current&#39;</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;total&#39;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">result</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;PENDING&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">regrade_button</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;REGRADING&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">resultinfo</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;STARTING_REGRADE&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Ensure that database does not have reference to stale Celery task</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">forget</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">ExerciseTask</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">note</span><span class="p">(</span><span class="s2">&quot;regrade_button&quot;</span><span class="p">,</span> <span class="s2">&quot;allow_regrade&quot;</span><span class="p">,</span> <span class="s2">&quot;resultinfo&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

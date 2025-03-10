@@ -1,0 +1,1198 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edit_course.operations.configure &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edit_course.operations.configure</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edit_course.operations.configure</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.payload</span><span class="w"> </span><span class="kn">import</span> <span class="n">Permission</span><span class="p">,</span> <span class="n">Permissions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aplus_auth.requests</span><span class="w"> </span><span class="kn">import</span> <span class="n">get</span> <span class="k">as</span> <span class="n">aplus_get</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">transaction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">LearningObjectCategory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">LearningObject</span><span class="p">,</span>
+    <span class="n">CourseChapter</span><span class="p">,</span>
+    <span class="n">BaseExercise</span><span class="p">,</span>
+    <span class="n">LTIExercise</span><span class="p">,</span>
+    <span class="n">LTI1p3Exercise</span><span class="p">,</span>
+    <span class="n">RevealRule</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">external_services.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">LTIService</span><span class="p">,</span> <span class="n">LTI1p3Service</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.localization_syntax</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_localization</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+
+
+<div class="viewcode-block" id="parse_date">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_date">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_date</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">allow_null</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">,</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S&#39;</span><span class="p">,</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M&#39;</span><span class="p">,</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H&#39;</span><span class="p">,</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">timezone</span><span class="o">.</span><span class="n">make_aware</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">fmt</span><span class="p">),</span>
+                <span class="n">timezone</span><span class="o">.</span><span class="n">get_current_timezone</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_PARSING_DATE -- </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="parse_duration">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_duration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_duration</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;y&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">timezone</span><span class="o">.</span><span class="n">make_aware</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="n">begin</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">month</span><span class="p">,</span>
+                    <span class="n">begin</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">second</span><span class="p">),</span>
+                    <span class="n">timezone</span><span class="o">.</span><span class="n">get_current_timezone</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>
+                <span class="n">yi</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">while</span> <span class="n">begin</span><span class="o">.</span><span class="n">month</span> <span class="o">+</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
+                    <span class="n">yi</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">begin</span><span class="o">.</span><span class="n">month</span> <span class="o">+</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">12</span>
+                <span class="k">return</span> <span class="n">timezone</span><span class="o">.</span><span class="n">make_aware</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="n">begin</span><span class="o">.</span><span class="n">year</span> <span class="o">+</span> <span class="n">yi</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">month</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span>
+                    <span class="n">begin</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">hour</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span> <span class="n">begin</span><span class="o">.</span><span class="n">second</span><span class="p">),</span>
+                    <span class="n">timezone</span><span class="o">.</span><span class="n">get_current_timezone</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">begin</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">begin</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">begin</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">weeks</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_PARSING_TIME_DURATION -- </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="parse_int">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_int">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_int</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_PARSING_INT -- </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="parse_float">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_float">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_PARSING_FLOAT -- </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="parse_bool">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_bool">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_bool</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="s2">&quot;Yes&quot;</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="parse_choices">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_choices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_choices</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">choices</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+    <span class="c1"># value is the value in the JSON.</span>
+    <span class="c1"># choices is a dict of accepted values:</span>
+    <span class="c1"># it maps expected JSON values to the corresponding model/database field values.</span>
+    <span class="c1"># field_name is the name of the JSON field.</span>
+    <span class="n">parsed_value</span> <span class="o">=</span> <span class="n">choices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">parsed_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">format_lazy</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_JSON_FIELD_UNKNOWN_VALUE -- </span><span class="si">{field}</span><span class="s1">, </span><span class="si">{value}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="n">field</span><span class="o">=</span><span class="n">field_name</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">parsed_value</span></div>
+
+
+
+<div class="viewcode-block" id="parse_reveal_rule">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_reveal_rule">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_reveal_rule</span><span class="p">(</span>
+        <span class="n">rule_config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">rule_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">current_rule</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RevealRule</span><span class="p">],</span>
+        <span class="n">errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rule_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;trigger&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rule_config</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;REVEAL_RULE_ERROR_INVALID_JSON -- </span><span class="si">{key}</span><span class="s1">&#39;</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="n">rule_key</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">trigger</span> <span class="o">=</span> <span class="n">parse_choices</span><span class="p">(</span><span class="n">rule_config</span><span class="p">[</span><span class="s2">&quot;trigger&quot;</span><span class="p">],</span> <span class="p">{</span>
+        <span class="s2">&quot;immediate&quot;</span><span class="p">:</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">IMMEDIATE</span><span class="p">,</span>
+        <span class="s2">&quot;manual&quot;</span><span class="p">:</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">MANUAL</span><span class="p">,</span>
+        <span class="s2">&quot;time&quot;</span><span class="p">:</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">TIME</span><span class="p">,</span>
+        <span class="s2">&quot;deadline&quot;</span><span class="p">:</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE</span><span class="p">,</span>
+        <span class="s2">&quot;deadline_all&quot;</span><span class="p">:</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_ALL</span><span class="p">,</span>
+        <span class="s2">&quot;deadline_or_full_points&quot;</span><span class="p">:</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">DEADLINE_OR_FULL_POINTS</span><span class="p">,</span>
+        <span class="s2">&quot;completion&quot;</span><span class="p">:</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">COMPLETION</span><span class="p">,</span>
+    <span class="p">},</span> <span class="s2">&quot;trigger&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="n">rule</span> <span class="o">=</span> <span class="n">current_rule</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="p">:</span>
+        <span class="n">rule</span> <span class="o">=</span> <span class="n">RevealRule</span><span class="p">()</span>
+    <span class="n">rule</span><span class="o">.</span><span class="n">trigger</span> <span class="o">=</span> <span class="n">trigger</span>
+    <span class="k">if</span> <span class="s2">&quot;time&quot;</span> <span class="ow">in</span> <span class="n">rule_config</span><span class="p">:</span>
+        <span class="n">rule</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">rule_config</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;delay_minutes&quot;</span> <span class="ow">in</span> <span class="n">rule_config</span><span class="p">:</span>
+        <span class="n">rule</span><span class="o">.</span><span class="n">delay_minutes</span> <span class="o">=</span> <span class="n">parse_int</span><span class="p">(</span><span class="n">rule_config</span><span class="p">[</span><span class="s2">&quot;delay_minutes&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;show_zero_points_immediately&quot;</span> <span class="ow">in</span> <span class="n">rule_config</span><span class="p">:</span>
+        <span class="n">rule</span><span class="o">.</span><span class="n">show_zero_points_immediately</span> <span class="o">=</span> <span class="n">rule_config</span><span class="p">[</span><span class="s2">&quot;show_zero_points_immediately&quot;</span><span class="p">]</span>
+    <span class="n">rule</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">rule</span></div>
+
+
+
+<div class="viewcode-block" id="parse_model_solution_chapter">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.parse_model_solution_chapter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_model_solution_chapter</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">course_module</span><span class="p">:</span> <span class="n">CourseModule</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">module_key</span><span class="p">,</span> <span class="n">chapter_key</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">CourseChapter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">chapter_key</span><span class="p">,</span>
+            <span class="n">course_module__url</span><span class="o">=</span><span class="n">module_key</span><span class="p">,</span>
+            <span class="n">course_module__course_instance</span><span class="o">=</span><span class="n">course_module</span><span class="o">.</span><span class="n">course_instance</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">CourseChapter</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">):</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s1">&#39;ERROR_MODEL_SOLUTION_CHAPTER_NOT_FOUND -- </span><span class="si">{value}</span><span class="s1">, </span><span class="si">{module}</span><span class="s1">&#39;</span><span class="p">),</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">module</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">course_module</span><span class="p">),</span>
+        <span class="p">))</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="remove_newlines">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.remove_newlines">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_newlines</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="c1"># Replace all newlines with a space.</span>
+    <span class="c1"># \r\n is done first to avoid two consecutive spaces.</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span></div>
+
+
+
+<span class="n">ChangesGetter</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]</span>
+
+
+<div class="viewcode-block" id="get_config_changes">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.get_config_changes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_config_changes</span><span class="p">(</span>
+        <span class="n">old</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">new</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">recurser</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ChangesGetter</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">keep</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">keep_unchanged</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets changes between configs.</span>
+
+<span class="sd">    :param old: old config</span>
+<span class="sd">    :param new: new config</span>
+
+<span class="sd">    Keyword-only parameters:</span>
+<span class="sd">    :param keep: fields in &lt;new&gt; to add to output as-is (unless no changes were detected,</span>
+<span class="sd">    see the &lt;keep_unchanged&gt; param).</span>
+<span class="sd">    :param keep_unchanged: whether to add fields in &lt;keep&gt; to output even when they</span>
+<span class="sd">    have no changes. Fields in &lt;keep&gt; are normally not added to output</span>
+<span class="sd">    if there were no changes in the dict itself. E.g. comparison of {&quot;field&quot;: &quot;value&quot;} to</span>
+<span class="sd">    itself will return None no matter what is in &lt;keep&gt; if &lt;keep_unchanged&gt; is False. If</span>
+<span class="sd">    instead &lt;keep&gt; = &quot;field&quot; and &lt;keep_unchanged&gt; = True, the function returns</span>
+<span class="sd">    {&quot;field&quot;: &quot;value&quot;}.</span>
+
+<span class="sd">    Returns None if &lt;new&gt; == &lt;old&gt; (and &lt;keep_unchanged&gt; is False). Otherwise:</span>
+<span class="sd">    Finds the differences in dicts &lt;new&gt; and &lt;old&gt; where &lt;recurser&gt; is used to find differences</span>
+<span class="sd">    between dict values. If the values for a key differ, the value in &lt;new&gt; is added to output.</span>
+<span class="sd">    If the values are the same, the key is removed from the output.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">keep</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_unchanged</span> <span class="ow">and</span> <span class="n">old</span> <span class="o">==</span> <span class="n">new</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Keys to keep in output whether changed or not. This includes the ones</span>
+    <span class="c1"># in &lt;keep&gt;, and the keys that are in &lt;new&gt; but not in &lt;old&gt;</span>
+    <span class="n">kept</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">keep</span><span class="p">)</span>
+    <span class="c1"># Keys that need to be compared: those that are in both dicts,</span>
+    <span class="c1"># and are not in &lt;keep&gt;</span>
+    <span class="n">commonkeys_not_in_keep</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">&amp;</span> <span class="n">new</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="n">keep</span>
+
+    <span class="n">diff</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kept</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">commonkeys_not_in_keep</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">recurser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">new_val</span> <span class="o">=</span> <span class="n">recurser</span><span class="p">(</span><span class="n">old</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="c1"># Do not include the attribute if there were no changes</span>
+            <span class="k">if</span> <span class="n">new_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">diff</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_val</span>
+        <span class="k">elif</span> <span class="n">old</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="n">diff</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">diff</span></div>
+
+
+
+<span class="c1"># Gets changes between two {lobj key: lobj config} -dicts</span>
+<span class="n">get_lobject_changes</span><span class="p">:</span> <span class="n">ChangesGetter</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+    <span class="n">get_config_changes</span><span class="p">,</span>
+    <span class="n">recurser</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span>
+        <span class="c1"># We don&#39;t want to recurse any further to leave each field in the lobj intact.</span>
+        <span class="n">get_config_changes</span><span class="p">,</span>
+        <span class="n">keep</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">,</span> <span class="s2">&quot;target_category&quot;</span><span class="p">,</span> <span class="s2">&quot;target_url&quot;</span><span class="p">,</span> <span class="s2">&quot;max_submissions&quot;</span><span class="p">,</span> <span class="s2">&quot;lti&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="lobject_class">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.lobject_class">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">lobject_class</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">LearningObject</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="s2">&quot;lti1p3&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LTI1p3Exercise</span>
+    <span class="k">if</span> <span class="s2">&quot;lti&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LTIExercise</span>
+
+    <span class="k">if</span> <span class="s2">&quot;max_submissions&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">BaseExercise</span>
+
+    <span class="k">return</span> <span class="n">CourseChapter</span></div>
+
+
+
+<div class="viewcode-block" id="update_learning_objects">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.update_learning_objects">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_learning_objects</span><span class="p">(</span> <span class="c1"># pylint: disable=too-many-locals # noqa: MC0001</span>
+        <span class="n">category_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LearningObjectCategory</span><span class="p">],</span>
+        <span class="n">configs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">learning_objects</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LearningObject</span><span class="p">],</span>
+        <span class="n">errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configures learning objects.</span>
+
+<span class="sd">    :param category_map: maps category keys to LearningObjectCategory objects</span>
+<span class="sd">    :param configs: maps lobject keys to their configs</span>
+<span class="sd">    :param learning_objects: maps lobject keys to LearningObject objects</span>
+<span class="sd">    :param errors: list to append errors to</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">lobject</span> <span class="o">=</span> <span class="n">learning_objects</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># Select exercise class.</span>
+        <span class="n">lobject_cls</span> <span class="o">=</span> <span class="n">lobject_class</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">lobject_cls</span> <span class="o">==</span> <span class="n">LTIExercise</span><span class="p">:</span>
+            <span class="c1"># validate_lobjects checks that this exists</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">lti_service</span> <span class="o">=</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">menu_label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;lti&quot;</span><span class="p">]))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;context_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;resource_link_id&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="n">obj_key</span> <span class="o">=</span> <span class="s2">&quot;lti_&quot;</span> <span class="o">+</span> <span class="n">key</span>
+                <span class="k">if</span> <span class="n">obj_key</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">o</span><span class="p">[</span><span class="n">obj_key</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span>
+                <span class="s2">&quot;aplus_get_and_post&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;open_in_iframe&quot;</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">obj_key</span> <span class="o">=</span> <span class="s2">&quot;lti_&quot;</span> <span class="o">+</span> <span class="n">key</span>
+                <span class="k">if</span> <span class="n">obj_key</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="n">obj_key</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">lobject_cls</span> <span class="o">==</span> <span class="n">LTI1p3Exercise</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">lti_service</span> <span class="o">=</span> <span class="n">LTI1p3Service</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">menu_label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;lti1p3&quot;</span><span class="p">]))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;lti_custom&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                <span class="n">lobject</span><span class="o">.</span><span class="n">custom</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;lti_custom&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;lti_open_in_iframe&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                <span class="n">lobject</span><span class="o">.</span><span class="n">open_in_iframe</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s1">&#39;lti_open_in_iframe&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">lobject_cls</span> <span class="ow">in</span> <span class="p">(</span><span class="n">LTIExercise</span><span class="p">,</span> <span class="n">LTI1p3Exercise</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;allow_assistant_viewing&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;allow_assistant_grading&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;min_group_size&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;max_group_size&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;max_submissions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;max_points&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;points_to_pass&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">=</span> <span class="n">parse_int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;difficulty&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                <span class="n">lobject</span><span class="o">.</span><span class="n">difficulty</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s2">&quot;difficulty&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">config_key</span><span class="p">,</span> <span class="n">lobject_key</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;reveal_submission_feedback&quot;</span><span class="p">,</span> <span class="s2">&quot;submission_feedback_reveal_rule&quot;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;reveal_model_solutions&quot;</span><span class="p">,</span> <span class="s2">&quot;model_solutions_reveal_rule&quot;</span><span class="p">),</span>
+            <span class="p">]:</span>
+                <span class="n">rule_config</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config_key</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rule_config</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">rule</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">lobject_key</span><span class="p">)</span>
+                <span class="n">rule</span> <span class="o">=</span> <span class="n">parse_reveal_rule</span><span class="p">(</span><span class="n">rule_config</span><span class="p">,</span> <span class="n">config_key</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">lobject_key</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;grading_mode&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                <span class="n">grading_mode</span> <span class="o">=</span> <span class="n">parse_choices</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;grading_mode&quot;</span><span class="p">],</span> <span class="p">{</span>
+                    <span class="s2">&quot;best&quot;</span><span class="p">:</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">GRADING_MODE</span><span class="o">.</span><span class="n">BEST</span><span class="p">,</span>
+                    <span class="s2">&quot;last&quot;</span><span class="p">:</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">GRADING_MODE</span><span class="o">.</span><span class="n">LAST</span><span class="p">,</span>
+                <span class="p">},</span> <span class="s2">&quot;grading_mode&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="n">lobject</span><span class="o">.</span><span class="n">grading_mode</span> <span class="o">=</span> <span class="n">grading_mode</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If not explicitly specified, grading mode is determined by</span>
+                <span class="c1"># the submission feedback reveal rule.</span>
+                <span class="n">rule</span> <span class="o">=</span> <span class="n">lobject</span><span class="o">.</span><span class="n">submission_feedback_reveal_rule</span>
+                <span class="k">if</span> <span class="n">rule</span> <span class="ow">and</span> <span class="n">rule</span><span class="o">.</span><span class="n">trigger</span> <span class="o">!=</span> <span class="n">RevealRule</span><span class="o">.</span><span class="n">TRIGGER</span><span class="o">.</span><span class="n">IMMEDIATE</span><span class="p">:</span>
+                    <span class="n">lobject</span><span class="o">.</span><span class="n">grading_mode</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">GRADING_MODE</span><span class="o">.</span><span class="n">LAST</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lobject</span><span class="o">.</span><span class="n">grading_mode</span> <span class="o">=</span> <span class="n">BaseExercise</span><span class="o">.</span><span class="n">GRADING_MODE</span><span class="o">.</span><span class="n">BEST</span>
+
+        <span class="k">if</span> <span class="n">lobject_cls</span> <span class="o">==</span> <span class="n">CourseChapter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;generate_table_of_contents&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+                <span class="n">lobject</span><span class="o">.</span><span class="n">generate_table_of_contents</span> <span class="o">=</span> <span class="n">parse_bool</span><span class="p">(</span>
+                    <span class="n">o</span><span class="p">[</span><span class="s2">&quot;generate_table_of_contents&quot;</span><span class="p">])</span>
+
+        <span class="n">lobject</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">category_map</span><span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="s2">&quot;order&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">parse_int</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;order&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;url&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">service_url</span> <span class="o">=</span> <span class="n">format_localization</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;status&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;audience&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">words</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;internal&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;external&#39;</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;registered&#39;</span><span class="p">:</span><span class="mi">3</span> <span class="p">}</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">audience</span> <span class="o">=</span> <span class="n">words</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s1">&#39;audience&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;title&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">remove_newlines</span><span class="p">(</span><span class="n">format_localization</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">]))</span>
+        <span class="k">elif</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">remove_newlines</span><span class="p">(</span><span class="n">format_localization</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lobject</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;use_wide_column&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">use_wide_column</span> <span class="o">=</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;use_wide_column&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;exercise_info&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">exercise_info</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s2">&quot;exercise_info&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;model_answer&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">model_answers</span> <span class="o">=</span> <span class="n">format_localization</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;model_answer&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;exercise_template&quot;</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">lobject</span><span class="o">.</span><span class="n">templates</span> <span class="o">=</span> <span class="n">format_localization</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s2">&quot;exercise_template&quot;</span><span class="p">])</span>
+
+        <span class="n">lobject</span><span class="o">.</span><span class="n">full_clean</span><span class="p">()</span>
+        <span class="n">lobject</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="get_build_log">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.get_build_log">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_build_log</span><span class="p">(</span><span class="n">instance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request latest build log from the build log URL defined for instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">instance</span><span class="o">.</span><span class="n">build_log_url</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;BUILD_LOG_ERROR_URL_BLANK&#39;</span><span class="p">)}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permissions</span><span class="p">()</span>
+        <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">READ</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">aplus_get</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">build_log_url</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">format_lazy</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;BUILD_LOG_ERROR_REQUESTING_FAILED -- </span><span class="si">{error!s}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">format_lazy</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;BUILD_LOG_ERROR_PARSING_JSON -- </span><span class="si">{error!s}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;BUILD_LOG_ERROR_EMPTY_LOG&#39;</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="set_order_information">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.set_order_information">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_order_information</span><span class="p">(</span><span class="n">items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;order&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">o</span><span class="p">[</span><span class="s2">&quot;order&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">n</span></div>
+
+
+
+<div class="viewcode-block" id="validate_lobject">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.validate_lobject">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_lobject</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">category_key_to_name</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check that config is valid.</span>
+
+<span class="sd">    Only checks attributes that prevent saving.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;key&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LEARNING_OBJECT_ERROR_REQUIRES_KEY&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="s2">&quot;category&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;LEARNING_OBJECT_ERROR_REQUIRES_CATEGORY&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">category_key_to_name</span><span class="p">:</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">format_lazy</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LEARNING_OBJECT_ERROR_UNKNOWN_CATEGORY -- </span><span class="si">{category}</span><span class="s1">&#39;</span><span class="p">),</span>
+                <span class="n">category</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">lobject_cls</span> <span class="o">=</span> <span class="n">lobject_class</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">lobject_cls</span> <span class="ow">in</span> <span class="p">(</span><span class="n">LTIExercise</span><span class="p">,</span> <span class="n">LTI1p3Exercise</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lobject_cls</span> <span class="o">==</span> <span class="n">LTIExercise</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;lti&quot;</span><span class="p">]</span>
+            <span class="n">lti</span> <span class="o">=</span> <span class="n">LTIService</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">menu_label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">conf</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;lti1p3&quot;</span><span class="p">]</span>
+            <span class="n">lti</span> <span class="o">=</span> <span class="n">LTI1p3Service</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">menu_label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">conf</span><span class="p">))</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lti</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">format_lazy</span><span class="p">(</span>
+                    <span class="n">_</span><span class="p">(</span><span class="s1">&#39;LTI_ERROR_NO_CONFIGURATION_TO_SERVICE_USED_BY_EXERCISE -- </span><span class="si">{lti_label}</span><span class="s1">, </span><span class="si">{exercise_key}</span><span class="s1">&#39;</span><span class="p">),</span>
+                    <span class="n">lti_label</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">conf</span><span class="p">),</span>
+                    <span class="n">exercise_key</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># The learning object can not be saved without an LTI service</span>
+            <span class="c1"># since the foreign key is required.</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigParts">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.ConfigParts">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigParts</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains the course config split into separate fields for easier handling.</span>
+
+<span class="sd">    The version returned by ConfigParts.diff has a few specialties:</span>
+<span class="sd">    - categories, modules, and module_lobjects only contain the changed fields</span>
+<span class="sd">    and some supplemental fields that are required elsewhere. E.g. to identify</span>
+<span class="sd">    the lobject class type.</span>
+<span class="sd">    - *_names and *_keys fields contain whatever the &lt;new&gt; config contained. I.e. they</span>
+<span class="sd">    contain the set of all such keys. E.g. module_keys contains the keys of</span>
+<span class="sd">    all modules in the &lt;new&gt; config. They can be used to determined whether</span>
+<span class="sd">    a module, exercise, etc. still exists in the course config even if nothing</span>
+<span class="sd">    has changed (e.g. module config disappears from the modules field in the</span>
+<span class="sd">    .diff() result if it had no changes).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+
+    <span class="c1"># category name -&gt; (category key, category config)</span>
+    <span class="n">categories</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span>
+    <span class="n">category_names</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="c1"># category name -&gt; category key</span>
+    <span class="n">category_key_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+
+    <span class="n">modules</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">module_keys</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+    <span class="n">module_lobjects</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="n">module_lobject_keys</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+
+<div class="viewcode-block" id="ConfigParts.from_config">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.ConfigParts.from_config">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="n">categories_config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">category_key_to_name</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">category_key</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;categories&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">&quot;name&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_CATEGORY_REQUIRES_NAME&#39;</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="n">name</span> <span class="o">=</span> <span class="n">format_localization</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+            <span class="n">categories_config</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">category_key</span><span class="p">,</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">category_key_to_name</span><span class="p">[</span><span class="n">category_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="c1"># Set module order information</span>
+        <span class="n">set_order_information</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;modules&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_children</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="c1"># We need to remove any invalid configs because invalid configs</span>
+            <span class="c1"># aren&#39;t saved but change detection assumes they were saved</span>
+            <span class="c1"># Invalid configs aren&#39;t saved in cache with this</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="n">validate_lobject</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">category_key_to_name</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">set_order_information</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+            <span class="n">lobjects_config</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]):</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">children</span><span class="p">}</span>
+            <span class="n">config</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">lobjects_config</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+                <span class="n">lobjects_config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_children</span><span class="p">(</span><span class="n">child</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">lobjects_config</span><span class="p">,</span> <span class="n">n</span>
+
+        <span class="c1"># Get lobjects for each module, set lobject order information</span>
+        <span class="c1"># and make a key -&gt; module config mapping</span>
+        <span class="n">module_lobjects</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">modules_config</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">module_lobject_keys</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">nn</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;modules&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">if</span> <span class="s2">&quot;key&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_MODULE_REQUIRES_KEY&#39;</span><span class="p">))</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s2">&quot;numerate_ignoring_modules&quot;</span> <span class="ow">in</span> <span class="n">config</span> \
+                    <span class="ow">and</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;numerate_ignoring_modules&quot;</span><span class="p">])):</span>
+                <span class="n">nn</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">module_key</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">])</span>
+            <span class="n">module_lobjects</span><span class="p">[</span><span class="n">module_key</span><span class="p">],</span> <span class="n">nn</span> <span class="o">=</span> <span class="n">get_children</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">nn</span><span class="p">)</span>
+            <span class="n">modules_config</span><span class="p">[</span><span class="n">module_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span>
+            <span class="n">module_lobject_keys</span><span class="p">[</span><span class="n">module_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">module_lobjects</span><span class="p">[</span><span class="n">module_key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;categories&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">categories_config</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">modules_config</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">ConfigParts</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">,</span>
+            <span class="n">categories_config</span><span class="p">,</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">categories_config</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+            <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">key</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">categories_config</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+            <span class="n">modules_config</span><span class="p">,</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">modules_config</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+            <span class="n">module_lobjects</span><span class="p">,</span>
+            <span class="n">module_lobject_keys</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ConfigParts.diff">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.ConfigParts.diff">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">diff</span><span class="p">(</span><span class="n">old</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;ConfigParts&quot;</span><span class="p">],</span> <span class="n">new</span><span class="p">:</span> <span class="s2">&quot;ConfigParts&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ConfigParts&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a new ConfigParts object containing the differences between the old and new configs&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">old</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new</span>
+
+        <span class="c1"># Cannot be None due to keep_unchanged=True</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">get_config_changes</span><span class="p">(</span>
+            <span class="n">old</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+            <span class="n">keep</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;publish_url&quot;</span><span class="p">,</span> <span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="s2">&quot;build_log_url&quot;</span><span class="p">],</span>
+            <span class="n">keep_unchanged</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Get the changes between the configs</span>
+        <span class="n">categories_config</span> <span class="o">=</span> <span class="n">get_config_changes</span><span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">categories</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">categories_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">categories_config</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">modules_config</span> <span class="o">=</span> <span class="n">get_config_changes</span><span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">modules</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">modules_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">modules_config</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">module_lobjects</span> <span class="o">=</span> <span class="n">get_config_changes</span><span class="p">(</span><span class="n">old</span><span class="o">.</span><span class="n">module_lobjects</span><span class="p">,</span> <span class="n">new</span><span class="o">.</span><span class="n">module_lobjects</span><span class="p">,</span> <span class="n">recurser</span><span class="o">=</span><span class="n">get_lobject_changes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">module_lobjects</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">module_lobjects</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Fully include all lobjects whose type has changed as they need to be remade</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">old</span><span class="o">.</span><span class="n">module_keys</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">module_keys</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">lobject</span> <span class="ow">in</span> <span class="n">old</span><span class="o">.</span><span class="n">module_lobject_keys</span><span class="p">[</span><span class="n">module</span><span class="p">]</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">module_lobject_keys</span><span class="p">[</span><span class="n">module</span><span class="p">]):</span>
+                <span class="n">old_lobject</span> <span class="o">=</span> <span class="n">old</span><span class="o">.</span><span class="n">module_lobjects</span><span class="p">[</span><span class="n">module</span><span class="p">][</span><span class="n">lobject</span><span class="p">]</span>
+                <span class="n">new_lobject</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">module_lobjects</span><span class="p">[</span><span class="n">module</span><span class="p">][</span><span class="n">lobject</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">lobject_class</span><span class="p">(</span><span class="n">old_lobject</span><span class="p">)</span> <span class="o">!=</span> <span class="n">lobject_class</span><span class="p">(</span><span class="n">new_lobject</span><span class="p">):</span>
+                    <span class="n">module_lobjects</span><span class="p">[</span><span class="n">module</span><span class="p">][</span><span class="n">lobject</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_lobject</span>
+
+        <span class="k">return</span> <span class="n">ConfigParts</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">,</span>
+            <span class="n">categories_config</span><span class="p">,</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">category_names</span><span class="p">,</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">category_key_map</span><span class="p">,</span>
+            <span class="n">modules_config</span><span class="p">,</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">module_keys</span><span class="p">,</span>
+            <span class="n">module_lobjects</span><span class="p">,</span>
+            <span class="n">new</span><span class="o">.</span><span class="n">module_lobject_keys</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># pylint: disable-next=too-many-locals too-many-branches too-many-statements</span>
+<div class="viewcode-block" id="configure">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.configure">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span><span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">new_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span> <span class="c1"># noqa: MC0001</span>
+    <span class="n">new_config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">new_config</span><span class="p">)</span>
+
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="s2">&quot;categories&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_config</span><span class="p">[</span><span class="s2">&quot;categories&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_CATEGORIES_REQUIRED_OBJECT&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">errors</span>
+    <span class="k">if</span> <span class="s2">&quot;modules&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_config</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_config</span><span class="p">[</span><span class="s2">&quot;modules&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_MODULES_REQUIRED_ARRAY&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">errors</span>
+
+    <span class="c1"># Get the previous config (the one used in the last successful update)</span>
+    <span class="n">old_cparts</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_cached_config</span><span class="p">()</span>
+    <span class="n">new_cparts</span> <span class="o">=</span> <span class="n">ConfigParts</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">new_config</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="c1"># Get the changes between the new config and the previous config with some auxiliary information.</span>
+    <span class="c1"># See ConfigParts and ConfigParts.diff for more info</span>
+    <span class="n">cparts</span> <span class="o">=</span> <span class="n">ConfigParts</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">old_cparts</span><span class="p">,</span> <span class="n">new_cparts</span><span class="p">)</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="n">cparts</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="c1"># wrap everything in a transaction to make sure invalid configuration isn&#39;t saved</span>
+    <span class="k">with</span> <span class="n">transaction</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+        <span class="c1"># Configure course instance attributes.</span>
+        <span class="k">if</span> <span class="s2">&quot;start&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dt</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">starting_time</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="k">if</span> <span class="s2">&quot;end&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;end&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dt</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">ending_time</span> <span class="o">=</span> <span class="n">dt</span>
+        <span class="k">if</span> <span class="s2">&quot;enrollment_start&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">enrollment_starting_time</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;enrollment_start&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;enrollment_end&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">enrollment_ending_time</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;enrollment_end&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;lifesupport_time&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">lifesupport_time</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;lifesupport_time&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;archive_time&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">archive_time</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;archive_time&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;enrollment_audience&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">enroll_audience</span> <span class="o">=</span> <span class="n">parse_choices</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;enrollment_audience&quot;</span><span class="p">],</span> <span class="p">{</span>
+                    <span class="s1">&#39;internal&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">INTERNAL_USERS</span><span class="p">,</span>
+                    <span class="s1">&#39;external&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">EXTERNAL_USERS</span><span class="p">,</span>
+                    <span class="s1">&#39;all&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="o">.</span><span class="n">ALL_USERS</span><span class="p">,</span>
+                <span class="p">},</span> <span class="s2">&quot;enrollment_audience&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">enroll_audience</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">enrollment_audience</span> <span class="o">=</span> <span class="n">enroll_audience</span>
+        <span class="k">if</span> <span class="s2">&quot;view_content_to&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">view_content_to</span> <span class="o">=</span> <span class="n">parse_choices</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;view_content_to&quot;</span><span class="p">],</span> <span class="p">{</span>
+                    <span class="s1">&#39;enrolled&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLED</span><span class="p">,</span>
+                    <span class="s1">&#39;enrollment_audience&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">,</span>
+                    <span class="s1">&#39;all_registered&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">ALL_REGISTERED</span><span class="p">,</span>
+                    <span class="s1">&#39;public&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">,</span>
+                <span class="p">},</span> <span class="s2">&quot;view_content_to&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">view_content_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">view_content_to</span> <span class="o">=</span> <span class="n">view_content_to</span>
+        <span class="k">if</span> <span class="s2">&quot;index_mode&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">index_mode</span> <span class="o">=</span> <span class="n">parse_choices</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;index_mode&quot;</span><span class="p">],</span> <span class="p">{</span>
+                    <span class="s1">&#39;results&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">INDEX_TYPE</span><span class="o">.</span><span class="n">RESULTS</span><span class="p">,</span>
+                    <span class="s1">&#39;toc&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">INDEX_TYPE</span><span class="o">.</span><span class="n">TOC</span><span class="p">,</span>
+                    <span class="s1">&#39;last&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">INDEX_TYPE</span><span class="o">.</span><span class="n">LAST</span><span class="p">,</span>
+                    <span class="s1">&#39;experimental&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">INDEX_TYPE</span><span class="o">.</span><span class="n">EXPERIMENT</span><span class="p">,</span>
+                <span class="p">},</span> <span class="s2">&quot;index_mode&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">index_mode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">index_mode</span> <span class="o">=</span> <span class="n">index_mode</span>
+
+        <span class="n">numbering_choices</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;none&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">CONTENT_NUMBERING</span><span class="o">.</span><span class="n">NONE</span><span class="p">,</span>
+            <span class="s1">&#39;arabic&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">CONTENT_NUMBERING</span><span class="o">.</span><span class="n">ARABIC</span><span class="p">,</span>
+            <span class="s1">&#39;roman&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">CONTENT_NUMBERING</span><span class="o">.</span><span class="n">ROMAN</span><span class="p">,</span>
+            <span class="s1">&#39;hidden&#39;</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">CONTENT_NUMBERING</span><span class="o">.</span><span class="n">HIDDEN</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="s2">&quot;content_numbering&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">numbering</span> <span class="o">=</span> <span class="n">parse_choices</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;content_numbering&quot;</span><span class="p">],</span> <span class="n">numbering_choices</span><span class="p">,</span>
+                <span class="s2">&quot;content_numbering&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">numbering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">content_numbering</span> <span class="o">=</span> <span class="n">numbering</span>
+        <span class="k">if</span> <span class="s2">&quot;module_numbering&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">numbering</span> <span class="o">=</span> <span class="n">parse_choices</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;module_numbering&quot;</span><span class="p">],</span> <span class="n">numbering_choices</span><span class="p">,</span>
+                <span class="s2">&quot;module_numbering&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">numbering</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">module_numbering</span> <span class="o">=</span> <span class="n">numbering</span>
+        <span class="k">if</span> <span class="s2">&quot;course_description&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="c1"># Course index.yaml files have previously used the field &quot;description&quot;</span>
+            <span class="c1"># for a hidden description, so we use &quot;course_description&quot; for</span>
+            <span class="c1"># the visible description.</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;course_description&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;course_footer&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">footer</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;course_footer&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;points_goal_enabled&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">points_goal_enabled</span> <span class="o">=</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;points_goal_enabled&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;lang&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">langs</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;lang&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">langs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">langs</span> <span class="o">=</span> <span class="p">[</span><span class="n">lang</span> <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">langs</span> <span class="k">if</span> <span class="n">instance</span><span class="o">.</span><span class="n">is_valid_language</span><span class="p">(</span><span class="n">lang</span><span class="p">)]</span>
+                <span class="k">if</span> <span class="n">langs</span><span class="p">:</span>
+                    <span class="n">instance</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s2">&quot;|</span><span class="si">{}</span><span class="s2">|&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">langs</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">instance</span><span class="o">.</span><span class="n">is_valid_language</span><span class="p">(</span><span class="n">langs</span><span class="p">):</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">langs</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;contact&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">technical_error_emails</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;contact&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s2">&quot;head_urls&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">head_urls</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;head_urls&quot;</span><span class="p">]</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">head_urls</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">head_urls</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">head_urls</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">head_urls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;assistants&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;assistants&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_ASSISTANTS_AS_SID_ARRAY&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">assistants</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;assistants&quot;</span><span class="p">]:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">profile</span> <span class="o">=</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">get_by_student_id</span><span class="p">(</span><span class="n">student_id</span><span class="o">=</span><span class="n">sid</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">UserProfile</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">format_lazy</span><span class="p">(</span>
+                                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_ASSISTANT_NO_USER_WITH_SID -- </span><span class="si">{id}</span><span class="s1">&#39;</span><span class="p">),</span>
+                                <span class="nb">id</span><span class="o">=</span><span class="n">sid</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">assistants</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">set_assistants</span><span class="p">(</span><span class="n">assistants</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">build_log_url</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;build_log_url&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="s1">&#39;build_log_url&#39;</span> <span class="ow">in</span> <span class="n">config</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="c1"># configure_url excluded from validation because the default Django URL</span>
+        <span class="c1"># validation does not accept dotless domain names such as &quot;grader&quot;</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">full_clean</span><span class="p">(</span><span class="n">exclude</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;configure_url&#39;</span><span class="p">,</span> <span class="s1">&#39;build_log_url&#39;</span><span class="p">})</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">old_categories</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="c1"># Create new categories</span>
+        <span class="n">new_category_names</span> <span class="o">=</span> <span class="n">cparts</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">old_categories</span><span class="p">)</span>
+        <span class="n">new_categories</span> <span class="o">=</span> <span class="p">[</span><span class="n">LearningObjectCategory</span><span class="p">(</span><span class="n">course_instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">new_category_names</span><span class="p">]</span>
+
+        <span class="c1"># category key -&gt; LearningObjectCategory object</span>
+        <span class="n">category_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">cparts</span><span class="o">.</span><span class="n">category_key_map</span><span class="p">[</span><span class="n">category</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span> <span class="n">category</span>
+            <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">old_categories</span><span class="p">)</span> <span class="o">+</span> <span class="n">new_categories</span>
+            <span class="k">if</span> <span class="n">category</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">cparts</span><span class="o">.</span><span class="n">category_names</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Configure learning object categories.</span>
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">old_categories</span><span class="p">)</span> <span class="o">+</span> <span class="n">new_categories</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">category</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cparts</span><span class="o">.</span><span class="n">category_names</span><span class="p">:</span>
+                <span class="n">category</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span>
+                <span class="n">category</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Skip unchanged categories</span>
+            <span class="k">if</span> <span class="n">category</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cparts</span><span class="o">.</span><span class="n">categories</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">key</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">cparts</span><span class="o">.</span><span class="n">categories</span><span class="p">[</span><span class="n">category</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s2">&quot;status&quot;</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                <span class="n">category</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                <span class="n">category</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;points_to_pass&quot;</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">parse_int</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;points_to_pass&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">category</span><span class="o">.</span><span class="n">points_to_pass</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;confirm_the_level&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;accept_unofficial_submits&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">parse_bool</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="n">field</span><span class="p">]))</span>
+            <span class="n">category</span><span class="o">.</span><span class="n">full_clean</span><span class="p">()</span>
+            <span class="n">category</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="n">old_modules</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">course_modules</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+        <span class="c1"># Create new modules</span>
+        <span class="n">new_module_keys</span> <span class="o">=</span> <span class="n">cparts</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">url</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">old_modules</span><span class="p">)</span>
+        <span class="n">new_modules</span> <span class="o">=</span> <span class="p">[</span><span class="n">CourseModule</span><span class="p">(</span><span class="n">course_instance</span><span class="o">=</span><span class="n">instance</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">new_module_keys</span><span class="p">]</span>
+        <span class="c1"># bulk_create doesn&#39;t get generated primary keys, so we need to save them individually</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">new_modules</span><span class="p">:</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c1"># Update the learning objects within each of the new and old modules</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">old_modules</span><span class="p">)</span> <span class="o">+</span> <span class="n">new_modules</span><span class="p">:</span>
+            <span class="c1"># TODO: test if doing defer(None) only on the lobjects that</span>
+            <span class="c1"># will be modified is a significant improvement</span>
+            <span class="n">old_lobjects</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">learning_objects</span><span class="o">.</span><span class="n">defer</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">old_lobject_keys</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">url</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">old_lobjects</span><span class="p">}</span>
+            <span class="n">lobject_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="n">url</span><span class="p">:</span> <span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">old_lobjects</span><span class="p">}</span>
+
+            <span class="c1"># Keys of lobjects to be deleted/hidden (i.e. lobjects not present in new version)</span>
+            <span class="n">outdated_lobjects</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">lobject_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">old_lobject_keys</span> <span class="o">-</span> <span class="n">cparts</span><span class="o">.</span><span class="n">module_lobject_keys</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+            <span class="p">]</span>
+            <span class="c1"># Only update changed learning objects</span>
+            <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">url</span> <span class="ow">in</span> <span class="n">cparts</span><span class="o">.</span><span class="n">module_lobjects</span><span class="p">:</span>
+                <span class="n">lobjects_config</span> <span class="o">=</span> <span class="n">cparts</span><span class="o">.</span><span class="n">module_lobjects</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">url</span><span class="p">]</span>
+
+                <span class="c1"># Check and update exercise object types if they have changed</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">lobject_config</span> <span class="ow">in</span> <span class="n">lobjects_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="c1"># Select exercise class.</span>
+                    <span class="n">lobject_cls</span> <span class="o">=</span> <span class="n">lobject_class</span><span class="p">(</span><span class="n">lobject_config</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">old_lobject_keys</span><span class="p">:</span>
+                        <span class="n">lobject</span> <span class="o">=</span> <span class="n">lobject_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+                        <span class="c1"># We cannot use isinstance as LTIExercise inherits BaseExercise</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">lobject</span><span class="p">)</span> <span class="ow">is</span> <span class="n">lobject_cls</span><span class="p">:</span> <span class="c1"># pylint: disable=unidiomatic-typecheck</span>
+                            <span class="n">outdated_lobjects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lobject</span><span class="p">)</span>
+
+                            <span class="n">lobject</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">lobject</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;_old&quot;</span>
+                            <span class="n">lobject</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                            <span class="n">lobject_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">lobject_cls</span><span class="p">(</span><span class="n">course_module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">lobject_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">lobject_cls</span><span class="p">(</span><span class="n">course_module</span><span class="o">=</span><span class="n">module</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+                <span class="n">update_learning_objects</span><span class="p">(</span>
+                    <span class="n">category_map</span><span class="p">,</span>
+                    <span class="n">lobjects_config</span><span class="p">,</span>
+                    <span class="n">lobject_map</span><span class="p">,</span>
+                    <span class="n">errors</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="c1"># We can&#39;t set the children until they have been saved by update_learning_objects</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">lobject_config</span> <span class="ow">in</span> <span class="n">lobjects_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">lobject_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                        <span class="n">lobject_map</span><span class="p">[</span><span class="n">child_key</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">child_key</span> <span class="ow">in</span> <span class="n">lobject_config</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># Delete or hide learning objects that are not included in the module anymore</span>
+            <span class="k">for</span> <span class="n">lobject</span> <span class="ow">in</span> <span class="n">outdated_lobjects</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lobject</span><span class="p">,</span> <span class="n">BaseExercise</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="ow">not</span> <span class="n">lobject</span><span class="o">.</span><span class="n">submissions</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+                <span class="p">):</span>
+                    <span class="n">lobject</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lobject</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">LearningObject</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span>
+                    <span class="n">lobject</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="mi">9999</span>
+                    <span class="c1"># .parent may have been deleted: only save status and order</span>
+                    <span class="n">lobject</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">update_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;order&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Update the modules</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">old_modules</span><span class="p">)</span> <span class="o">+</span> <span class="n">new_modules</span><span class="p">:</span>
+            <span class="c1">#  Delete/hide any old modules not present in new version</span>
+            <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cparts</span><span class="o">.</span><span class="n">module_keys</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">module</span><span class="o">.</span><span class="n">learning_objects</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">CourseModule</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+                <span class="k">continue</span>
+
+            <span class="c1"># Skip unchanged modules</span>
+            <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cparts</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">m</span> <span class="o">=</span> <span class="n">cparts</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">url</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s2">&quot;order&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">parse_int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;order&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;title&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">format_localization</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="s2">&quot;name&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">format_localization</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">module</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>
+            <span class="k">if</span> <span class="s2">&quot;status&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s2">&quot;points_to_pass&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="n">parse_int</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;points_to_pass&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">points_to_pass</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">if</span> <span class="s2">&quot;introduction&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">introduction</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;introduction&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="s2">&quot;open&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dt</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">=</span> <span class="n">dt</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">starting_time</span>
+
+            <span class="k">if</span> <span class="s2">&quot;close&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dt</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span> <span class="o">=</span> <span class="n">dt</span>
+            <span class="k">elif</span> <span class="s2">&quot;duration&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">parse_duration</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">opening_time</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s2">&quot;duration&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dt</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span> <span class="o">=</span> <span class="n">dt</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">closing_time</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">ending_time</span>
+
+            <span class="k">if</span> <span class="s2">&quot;read-open&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">reading_opening_time</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;read-open&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">,</span> <span class="n">allow_null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;late_close&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">parse_date</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;late_close&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dt</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">late_submission_deadline</span> <span class="o">=</span> <span class="n">dt</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">late_submissions_allowed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="s2">&quot;late_duration&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">dt</span> <span class="o">=</span> <span class="n">parse_duration</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">closing_time</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s2">&quot;late_duration&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dt</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">late_submission_deadline</span> <span class="o">=</span> <span class="n">dt</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">late_submissions_allowed</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="s2">&quot;late_penalty&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">parse_float</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;late_penalty&quot;</span><span class="p">],</span> <span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">late_submission_penalty</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="k">if</span> <span class="s2">&quot;model_answer&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">model_answer</span> <span class="o">=</span> <span class="n">parse_model_solution_chapter</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;model_answer&quot;</span><span class="p">],</span> <span class="n">module</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;reveal_module_model_solution&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">module</span><span class="o">.</span><span class="n">model_solution_reveal_rule</span> <span class="o">=</span> <span class="n">parse_reveal_rule</span><span class="p">(</span>
+                    <span class="n">m</span><span class="p">[</span><span class="s2">&quot;reveal_module_model_solution&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;reveal_module_model_solution&quot;</span><span class="p">,</span>
+                    <span class="n">module</span><span class="o">.</span><span class="n">model_solution_reveal_rule</span><span class="p">,</span>
+                    <span class="n">errors</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">module</span><span class="o">.</span><span class="n">full_clean</span><span class="p">()</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+        <span class="c1"># Clean up obsolete categories.</span>
+        <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">instance</span><span class="o">.</span><span class="n">categories</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="n">LearningObjectCategory</span><span class="o">.</span><span class="n">STATUS</span><span class="o">.</span><span class="n">HIDDEN</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">category</span><span class="o">.</span><span class="n">learning_objects</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">category</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">&quot;publish_url&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">publish_errors</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permissions</span><span class="p">()</span>
+                <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">READ</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">WRITE</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">aplus_get</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;publish_url&quot;</span><span class="p">],</span> <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ConnectionError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">publish_errors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                    <span class="n">publish_errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_lazy</span><span class="p">(</span>
+                        <span class="n">_</span><span class="p">(</span><span class="s2">&quot;PUBLISH_RESPONSE_NON_200 -- </span><span class="si">{status_code}</span><span class="s2">&quot;</span><span class="p">),</span>
+                        <span class="n">status_code</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span>
+                    <span class="p">)]</span>
+
+                <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">publish_errors</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">publish_errors</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_lazy</span><span class="p">(</span>
+                            <span class="n">_</span><span class="p">(</span><span class="s2">&quot;PUBLISH_ERROR_JSON_PARSER_FAILED -- </span><span class="si">{e}</span><span class="s2">, </span><span class="si">{text}</span><span class="s2">&quot;</span><span class="p">),</span>
+                            <span class="n">e</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+                            <span class="n">text</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">text</span>
+                        <span class="p">)]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">publish_errors</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                            <span class="n">success</span> <span class="o">=</span> <span class="n">publish_errors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;success&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                            <span class="n">publish_errors</span> <span class="o">=</span> <span class="n">publish_errors</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">publish_errors</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="n">publish_errors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">publish_errors</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">publish_errors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">publish_errors</span><span class="p">)]</span>
+
+            <span class="k">if</span> <span class="n">publish_errors</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">format_lazy</span><span class="p">(</span>
+                        <span class="n">_</span><span class="p">(</span><span class="s2">&quot;PUBLISHED_WITH_ERRORS -- </span><span class="si">{publish_url}</span><span class="s2">&quot;</span><span class="p">),</span>
+                        <span class="n">publish_url</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;publish_url&#39;</span><span class="p">]</span>
+                    <span class="p">))</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">publish_errors</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">transaction</span><span class="o">.</span><span class="n">set_rollback</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">errors</span>
+
+    <span class="c1"># We only save the config in cache if the update was successful (i.e. changes were committed to database)</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">set_cached_config</span><span class="p">(</span><span class="n">new_cparts</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">errors</span></div>
+
+
+
+<div class="viewcode-block" id="configure_from_url">
+<a class="viewcode-back" href="../../../edit_course.operations.html#edit_course.operations.configure.configure_from_url">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">configure_from_url</span><span class="p">(</span><span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configures course content by trusted remote URL.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_URL_REQUIRED&#39;</span><span class="p">)]</span>
+
+    <span class="c1"># save the url before fetching config. The JWT system requires this to be</span>
+    <span class="c1"># set, so that A+ knows which service to trust to have access to the course</span>
+    <span class="c1"># instance. The aplus config url might need access to the course instance.</span>
+    <span class="c1"># The other service might also need to have access to the course instance</span>
+    <span class="c1"># before it can be configured from the url.</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">configure_url</span> <span class="o">=</span> <span class="n">url</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">permissions</span> <span class="o">=</span> <span class="n">Permissions</span><span class="p">()</span>
+        <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">READ</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">permissions</span><span class="o">.</span><span class="n">instances</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">WRITE</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">instance</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">aplus_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[</span><span class="n">format_lazy</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_REQUEST_FAILED -- </span><span class="si">{error!s}</span><span class="s1">&#39;</span><span class="p">),</span>
+            <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+        <span class="p">)]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[</span><span class="n">format_lazy</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">(</span><span class="s1">&#39;COURSE_CONFIG_ERROR_JSON_PARSER_FAILED -- </span><span class="si">{error!s}</span><span class="s1">&#39;</span><span class="p">),</span>
+            <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">,</span>
+        <span class="p">)]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;COURSE_CONFIG_ERROR_INVALID_JSON&quot;</span><span class="p">)]</span>
+
+    <span class="n">errors</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;errors&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">errors</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;COURSE_CONFIG_ERROR_SERVICE_FAILED_TO_EXPORT&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">errors</span>
+
+    <span class="n">status</span><span class="p">,</span> <span class="n">configure_errors</span> <span class="o">=</span> <span class="n">configure</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">status</span><span class="p">,</span> <span class="n">errors</span> <span class="o">+</span> <span class="n">configure_errors</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

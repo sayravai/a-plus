@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>course.templatetags.course &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=3011ec97"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">course.templatetags.course</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for course.templatetags.course</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.safestring</span><span class="w"> </span><span class="kn">import</span> <span class="n">mark_safe</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_language</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">course.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CourseInstance</span><span class="p">,</span> <span class="n">UserTagging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">exercise.cache.points</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExercisePoints</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lib.localization_syntax</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_localized</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">userprofile.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserProfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..cache.menu</span><span class="w"> </span><span class="kn">import</span> <span class="n">CachedTopMenu</span>
+
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_topmenu</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s1">&#39;topmenu&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;topmenu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CachedTopMenu</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="k">if</span> <span class="n">request</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;topmenu&#39;</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_deadline_extended_exercise_open</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+    <span class="n">personal_deadline</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">personal_deadline</span>
+    <span class="k">return</span> <span class="n">personal_deadline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">&lt;=</span> <span class="n">now</span> <span class="o">&lt;=</span> <span class="n">personal_deadline</span>
+
+
+<div class="viewcode-block" id="course_menu">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.course_menu">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">inclusion_tag</span><span class="p">(</span><span class="s2">&quot;course/_course_dropdown_menu.html&quot;</span><span class="p">,</span> <span class="n">takes_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">course_menu</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="n">_prepare_topmenu</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span> <span class="s2">&quot;instances&quot;</span><span class="p">:</span> <span class="n">menu</span><span class="o">.</span><span class="n">courses</span><span class="p">()</span> <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="group_select">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.group_select">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">inclusion_tag</span><span class="p">(</span><span class="s1">&#39;course/_group_select.html&#39;</span><span class="p">,</span> <span class="n">takes_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">group_select</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;instance&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">instance</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;groups&#39;</span><span class="p">:</span> <span class="p">[]</span> <span class="p">}</span>
+    <span class="n">menu</span> <span class="o">=</span> <span class="n">_prepare_topmenu</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+    <span class="n">groups</span><span class="p">,</span> <span class="n">selected</span> <span class="o">=</span> <span class="n">menu</span><span class="o">.</span><span class="n">groups</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;instance&#39;</span><span class="p">:</span> <span class="n">instance</span><span class="p">,</span>
+        <span class="s1">&#39;groups&#39;</span><span class="p">:</span> <span class="n">groups</span><span class="p">,</span>
+        <span class="s1">&#39;selected&#39;</span><span class="p">:</span> <span class="n">selected</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="escape_slashes">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.escape_slashes">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">escape_slashes</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;\/&#39;</span><span class="p">)</span> <span class="c1"># noqa: W605</span></div>
+
+
+<div class="viewcode-block" id="parse_localization">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.parse_localization">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_localization</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pick_localized</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">get_language</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="list_languages">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.list_languages">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_languages</span><span class="p">(</span><span class="n">langs</span><span class="p">):</span>
+    <span class="n">listed</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">langs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">listed</span></div>
+
+
+
+<div class="viewcode-block" id="is_visible_to">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.is_visible_to">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_visible_to</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_visible_to</span><span class="p">(</span><span class="n">user</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="len_listed">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.len_listed">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">len_listed</span><span class="p">(</span><span class="n">entries</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">([</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">is_listed</span><span class="p">()])</span></div>
+
+
+
+<div class="viewcode-block" id="exercises_open">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.exercises_open">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exercises_open</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">&lt;=</span> <span class="n">now</span> <span class="o">&lt;=</span> <span class="n">entry</span><span class="o">.</span><span class="n">closing_time</span></div>
+
+
+
+<div class="viewcode-block" id="deadline_extended_exercise_open">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.deadline_extended_exercise_open">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">deadline_extended_exercise_open</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">_deadline_extended_exercise_open</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="deadline_extended_exercises_open">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.deadline_extended_exercises_open">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">deadline_extended_exercises_open</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">_deadline_extended_exercise_open</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">flatted</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">ExercisePoints</span><span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="exercises_submittable">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.exercises_submittable">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exercises_submittable</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">late_allowed</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">&lt;=</span> <span class="n">now</span> <span class="o">&lt;=</span> <span class="n">entry</span><span class="o">.</span><span class="n">late_time</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">&lt;=</span> <span class="n">now</span> <span class="o">&lt;=</span> <span class="n">entry</span><span class="o">.</span><span class="n">closing_time</span></div>
+
+
+
+<div class="viewcode-block" id="has_opened">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.has_opened">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">has_opened</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">entry</span><span class="o">.</span><span class="n">opening_time</span> <span class="o">&lt;=</span> <span class="n">now</span></div>
+
+
+
+<div class="viewcode-block" id="url">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.url">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">url</span><span class="p">(</span><span class="n">model_object</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">model_object</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_object</span><span class="o">.</span><span class="n">get_display_url</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="names">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.names">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">names</span><span class="p">(</span><span class="n">profiles</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">profiles</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="profiles">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.profiles">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">inclusion_tag</span><span class="p">(</span><span class="s2">&quot;course/_profiles.html&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">profiles</span><span class="p">(</span>
+        <span class="n">profiles</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">],</span> <span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">[</span><span class="n">UserProfile</span><span class="p">]],</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="n">CourseInstance</span><span class="p">,</span>
+        <span class="n">is_teacher</span><span class="p">:</span> <span class="nb">bool</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">UserProfile</span><span class="p">):</span>
+        <span class="n">profiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">profiles</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">profiles</span><span class="p">,</span> <span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+        <span class="c1"># Avoid re-fetching the queryset</span>
+        <span class="n">profiles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">profiles</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;instance&#39;</span><span class="p">:</span> <span class="n">instance</span><span class="p">,</span>
+        <span class="s1">&#39;profiles&#39;</span><span class="p">:</span> <span class="n">profiles</span><span class="p">,</span>
+        <span class="s1">&#39;is_teacher&#39;</span><span class="p">:</span> <span class="n">is_teacher</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="tags">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.tags">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tags</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">instance</span><span class="p">):</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">UserTagging</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_all</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">instance</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tag</span><span class="o">.</span><span class="n">html_label</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="is_external_menu_url">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.is_external_menu_url">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_external_menu_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="ow">and</span> <span class="s1">&#39;://&#39;</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="enrollment_audience">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.enrollment_audience">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">enrollment_audience</span><span class="p">(</span><span class="n">enrollment_audience_val</span><span class="p">):</span>
+    <span class="c1"># convert enrollment audience Enum value to the string description</span>
+    <span class="k">return</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">ENROLLMENT_AUDIENCE</span><span class="p">[</span><span class="n">enrollment_audience_val</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="view_content_to">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.view_content_to">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">view_content_to</span><span class="p">(</span><span class="n">view_content_to_val</span><span class="p">):</span>
+    <span class="c1"># convert &quot;view content to&quot; Enum value to the string description</span>
+    <span class="k">return</span> <span class="n">CourseInstance</span><span class="o">.</span><span class="n">VIEW_ACCESS</span><span class="p">[</span><span class="n">view_content_to_val</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="is_banned_student">
+<a class="viewcode-back" href="../../../course.templatetags.html#course.templatetags.course.is_banned_student">[docs]</a>
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_banned_student</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">course_instance</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">course_instance</span><span class="o">.</span><span class="n">is_banned</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">user</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

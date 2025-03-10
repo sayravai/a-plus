@@ -1,0 +1,1277 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>userprofile package &mdash; A+ 1.28 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3011ec97"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            A+
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">userprofile package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-userprofile.admin">userprofile.admin module</a><ul>
+<li><a class="reference internal" href="#userprofile.admin.UserProfileAdmin"><code class="docutils literal notranslate"><span class="pre">UserProfileAdmin</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.admin.UserProfileAdmin.get_user"><code class="docutils literal notranslate"><span class="pre">UserProfileAdmin.get_user()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.admin.UserProfileAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">UserProfileAdmin.list_display</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.admin.UserProfileAdmin.list_display_links"><code class="docutils literal notranslate"><span class="pre">UserProfileAdmin.list_display_links</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.admin.UserProfileAdmin.media"><code class="docutils literal notranslate"><span class="pre">UserProfileAdmin.media</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.admin.UserProfileAdmin.raw_id_fields"><code class="docutils literal notranslate"><span class="pre">UserProfileAdmin.raw_id_fields</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.admin.UserProfileAdmin.search_fields"><code class="docutils literal notranslate"><span class="pre">UserProfileAdmin.search_fields</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.models">userprofile.models module</a><ul>
+<li><a class="reference internal" href="#userprofile.models.GraderUser"><code class="docutils literal notranslate"><span class="pre">GraderUser</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.models.GraderUser.is_anonymous"><code class="docutils literal notranslate"><span class="pre">GraderUser.is_anonymous</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.GraderUser.is_authenticated"><code class="docutils literal notranslate"><span class="pre">GraderUser.is_authenticated</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.GraderUser.userprofile"><code class="docutils literal notranslate"><span class="pre">GraderUser.userprofile</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.models.LTIServiceUser"><code class="docutils literal notranslate"><span class="pre">LTIServiceUser</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile"><code class="docutils literal notranslate"><span class="pre">UserProfile</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">UserProfile.DoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">UserProfile.MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.api_token"><code class="docutils literal notranslate"><span class="pre">UserProfile.api_token</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.deadlineruledeviation_set"><code class="docutils literal notranslate"><span class="pre">UserProfile.deadlineruledeviation_set</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.enrollment_set"><code class="docutils literal notranslate"><span class="pre">UserProfile.enrollment_set</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.get_by_email"><code class="docutils literal notranslate"><span class="pre">UserProfile.get_by_email()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.get_by_request"><code class="docutils literal notranslate"><span class="pre">UserProfile.get_by_request()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.get_by_student_id"><code class="docutils literal notranslate"><span class="pre">UserProfile.get_by_student_id()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.get_url"><code class="docutils literal notranslate"><span class="pre">UserProfile.get_url()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.graded_submissions"><code class="docutils literal notranslate"><span class="pre">UserProfile.graded_submissions</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.groups"><code class="docutils literal notranslate"><span class="pre">UserProfile.groups</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.id"><code class="docutils literal notranslate"><span class="pre">UserProfile.id</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.is_external"><code class="docutils literal notranslate"><span class="pre">UserProfile.is_external</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.language"><code class="docutils literal notranslate"><span class="pre">UserProfile.language</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.learningobjectdisplay_set"><code class="docutils literal notranslate"><span class="pre">UserProfile.learningobjectdisplay_set</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.maxsubmissionsruledeviation_set"><code class="docutils literal notranslate"><span class="pre">UserProfile.maxsubmissionsruledeviation_set</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.name_with_student_id"><code class="docutils literal notranslate"><span class="pre">UserProfile.name_with_student_id</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.objects"><code class="docutils literal notranslate"><span class="pre">UserProfile.objects</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.organization"><code class="docutils literal notranslate"><span class="pre">UserProfile.organization</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.received_notifications"><code class="docutils literal notranslate"><span class="pre">UserProfile.received_notifications</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.regenerate_api_token"><code class="docutils literal notranslate"><span class="pre">UserProfile.regenerate_api_token()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.sent_notifications"><code class="docutils literal notranslate"><span class="pre">UserProfile.sent_notifications</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.shortname"><code class="docutils literal notranslate"><span class="pre">UserProfile.shortname</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.student_id"><code class="docutils literal notranslate"><span class="pre">UserProfile.student_id</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.studentdiploma_set"><code class="docutils literal notranslate"><span class="pre">UserProfile.studentdiploma_set</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.studentmodulegoal_set"><code class="docutils literal notranslate"><span class="pre">UserProfile.studentmodulegoal_set</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.submission_drafts"><code class="docutils literal notranslate"><span class="pre">UserProfile.submission_drafts</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.submissions"><code class="docutils literal notranslate"><span class="pre">UserProfile.submissions</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.taggings"><code class="docutils literal notranslate"><span class="pre">UserProfile.taggings</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.user"><code class="docutils literal notranslate"><span class="pre">UserProfile.user</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfile.user_id"><code class="docutils literal notranslate"><span class="pre">UserProfile.user_id</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.models.UserProfileManager"><code class="docutils literal notranslate"><span class="pre">UserProfileManager</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.models.UserProfileManager.get_queryset"><code class="docutils literal notranslate"><span class="pre">UserProfileManager.get_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.models.UserProfileManager.prefetch_tags"><code class="docutils literal notranslate"><span class="pre">UserProfileManager.prefetch_tags()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.models.UserProfileQuerySet"><code class="docutils literal notranslate"><span class="pre">UserProfileQuerySet</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.models.UserProfileQuerySet.prefetch_tags"><code class="docutils literal notranslate"><span class="pre">UserProfileQuerySet.prefetch_tags()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.models.create_user_profile"><code class="docutils literal notranslate"><span class="pre">create_user_profile()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.permissions">userprofile.permissions module</a><ul>
+<li><a class="reference internal" href="#userprofile.permissions.GraderUserCanOnlyRead"><code class="docutils literal notranslate"><span class="pre">GraderUserCanOnlyRead</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.permissions.GraderUserCanOnlyRead.has_permission"><code class="docutils literal notranslate"><span class="pre">GraderUserCanOnlyRead.has_permission()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.permissions.IsAdminOrUserObjIsSelf"><code class="docutils literal notranslate"><span class="pre">IsAdminOrUserObjIsSelf</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.permissions.IsAdminOrUserObjIsSelf.filter_queryset"><code class="docutils literal notranslate"><span class="pre">IsAdminOrUserObjIsSelf.filter_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.permissions.IsAdminOrUserObjIsSelf.has_object_permission"><code class="docutils literal notranslate"><span class="pre">IsAdminOrUserObjIsSelf.has_object_permission()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.permissions.IsAdminOrUserObjIsSelf.is_super"><code class="docutils literal notranslate"><span class="pre">IsAdminOrUserObjIsSelf.is_super()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.permissions.IsLTIServiceUser"><code class="docutils literal notranslate"><span class="pre">IsLTIServiceUser</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.permissions.IsLTIServiceUser.has_permission"><code class="docutils literal notranslate"><span class="pre">IsLTIServiceUser.has_permission()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.permissions.IsTeacherOrAdminOrSelf"><code class="docutils literal notranslate"><span class="pre">IsTeacherOrAdminOrSelf</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.permissions.IsTeacherOrAdminOrSelf.is_super"><code class="docutils literal notranslate"><span class="pre">IsTeacherOrAdminOrSelf.is_super()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.pseudonymize">userprofile.pseudonymize module</a><ul>
+<li><a class="reference internal" href="#userprofile.pseudonymize.format_user"><code class="docutils literal notranslate"><span class="pre">format_user()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.pseudonymize.pseudonymize"><code class="docutils literal notranslate"><span class="pre">pseudonymize()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.sitemaps">userprofile.sitemaps module</a><ul>
+<li><a class="reference internal" href="#userprofile.sitemaps.UserProfileStaticViewSitemap"><code class="docutils literal notranslate"><span class="pre">UserProfileStaticViewSitemap</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.changefreq"><code class="docutils literal notranslate"><span class="pre">UserProfileStaticViewSitemap.changefreq</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.items"><code class="docutils literal notranslate"><span class="pre">UserProfileStaticViewSitemap.items()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.location"><code class="docutils literal notranslate"><span class="pre">UserProfileStaticViewSitemap.location()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.priority"><code class="docutils literal notranslate"><span class="pre">UserProfileStaticViewSitemap.priority</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.tests">userprofile.tests module</a><ul>
+<li><a class="reference internal" href="#userprofile.tests.UserProfileTest"><code class="docutils literal notranslate"><span class="pre">UserProfileTest</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.tests.UserProfileTest.test_user_id_not_equal_profile_id"><code class="docutils literal notranslate"><span class="pre">UserProfileTest.test_user_id_not_equal_profile_id()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.tests.UserProfileTest.test_userprofile_get_by_student_id"><code class="docutils literal notranslate"><span class="pre">UserProfileTest.test_userprofile_get_by_student_id()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.tests.UserProfileTest.test_userprofile_shortname"><code class="docutils literal notranslate"><span class="pre">UserProfileTest.test_userprofile_shortname()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.tests.UserProfileTest.test_userprofile_unicode_string"><code class="docutils literal notranslate"><span class="pre">UserProfileTest.test_userprofile_unicode_string()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.tests.UserProfileTestCase"><code class="docutils literal notranslate"><span class="pre">UserProfileTestCase</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.tests.UserProfileTestCase.setUpTestData"><code class="docutils literal notranslate"><span class="pre">UserProfileTestCase.setUpTestData()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.urls">userprofile.urls module</a></li>
+<li><a class="reference internal" href="#module-userprofile.viewbase">userprofile.viewbase module</a><ul>
+<li><a class="reference internal" href="#userprofile.viewbase.UserProfileMixin"><code class="docutils literal notranslate"><span class="pre">UserProfileMixin</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.viewbase.UserProfileMixin.access_mode"><code class="docutils literal notranslate"><span class="pre">UserProfileMixin.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.viewbase.UserProfileMixin.get_resource_objects"><code class="docutils literal notranslate"><span class="pre">UserProfileMixin.get_resource_objects()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.viewbase.UserProfileMixin.login_redirect"><code class="docutils literal notranslate"><span class="pre">UserProfileMixin.login_redirect</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.viewbase.UserProfileView"><code class="docutils literal notranslate"><span class="pre">UserProfileView</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile.views">userprofile.views module</a><ul>
+<li><a class="reference internal" href="#userprofile.views.AccessibilityStatementView"><code class="docutils literal notranslate"><span class="pre">AccessibilityStatementView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.AccessibilityStatementView.access_mode"><code class="docutils literal notranslate"><span class="pre">AccessibilityStatementView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.AccessibilityStatementView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">AccessibilityStatementView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.AccessibilityStatementView.template_name"><code class="docutils literal notranslate"><span class="pre">AccessibilityStatementView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.AplusLoginView"><code class="docutils literal notranslate"><span class="pre">AplusLoginView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.AplusLoginView.extra_context"><code class="docutils literal notranslate"><span class="pre">AplusLoginView.extra_context</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.AplusLoginView.get_context_data"><code class="docutils literal notranslate"><span class="pre">AplusLoginView.get_context_data()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.AplusLoginView.redirect_authenticated_user"><code class="docutils literal notranslate"><span class="pre">AplusLoginView.redirect_authenticated_user</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.AplusLoginView.template_name"><code class="docutils literal notranslate"><span class="pre">AplusLoginView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.AplusLogoutView"><code class="docutils literal notranslate"><span class="pre">AplusLogoutView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.AplusLogoutView.get_context_data"><code class="docutils literal notranslate"><span class="pre">AplusLogoutView.get_context_data()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.AplusLogoutView.template_name"><code class="docutils literal notranslate"><span class="pre">AplusLogoutView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.CookieNoticeView"><code class="docutils literal notranslate"><span class="pre">CookieNoticeView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.CookieNoticeView.access_mode"><code class="docutils literal notranslate"><span class="pre">CookieNoticeView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.CookieNoticeView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">CookieNoticeView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.CookieNoticeView.template_name"><code class="docutils literal notranslate"><span class="pre">CookieNoticeView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.PrivacyNoticeView"><code class="docutils literal notranslate"><span class="pre">PrivacyNoticeView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.PrivacyNoticeView.access_mode"><code class="docutils literal notranslate"><span class="pre">PrivacyNoticeView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.PrivacyNoticeView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">PrivacyNoticeView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.PrivacyNoticeView.template_name"><code class="docutils literal notranslate"><span class="pre">PrivacyNoticeView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.ProfileView"><code class="docutils literal notranslate"><span class="pre">ProfileView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.ProfileView.extra_context"><code class="docutils literal notranslate"><span class="pre">ProfileView.extra_context</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.ProfileView.get_context_data"><code class="docutils literal notranslate"><span class="pre">ProfileView.get_context_data()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.ProfileView.template_name"><code class="docutils literal notranslate"><span class="pre">ProfileView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.PseudonymizeView"><code class="docutils literal notranslate"><span class="pre">PseudonymizeView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.PseudonymizeView.get"><code class="docutils literal notranslate"><span class="pre">PseudonymizeView.get()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.SupportView"><code class="docutils literal notranslate"><span class="pre">SupportView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.SupportView.access_mode"><code class="docutils literal notranslate"><span class="pre">SupportView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.SupportView.extra_context"><code class="docutils literal notranslate"><span class="pre">SupportView.extra_context</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.SupportView.get_common_objects"><code class="docutils literal notranslate"><span class="pre">SupportView.get_common_objects()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.SupportView.template_name"><code class="docutils literal notranslate"><span class="pre">SupportView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.TeacherListView"><code class="docutils literal notranslate"><span class="pre">TeacherListView</span></code></a><ul>
+<li><a class="reference internal" href="#userprofile.views.TeacherListView.access_mode"><code class="docutils literal notranslate"><span class="pre">TeacherListView.access_mode</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.TeacherListView.entries"><code class="docutils literal notranslate"><span class="pre">TeacherListView.entries()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.TeacherListView.entry"><code class="docutils literal notranslate"><span class="pre">TeacherListView.entry()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.TeacherListView.get_context_data"><code class="docutils literal notranslate"><span class="pre">TeacherListView.get_context_data()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.TeacherListView.post"><code class="docutils literal notranslate"><span class="pre">TeacherListView.post()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.TeacherListView.template_name"><code class="docutils literal notranslate"><span class="pre">TeacherListView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#userprofile.views.regenerate_access_token"><code class="docutils literal notranslate"><span class="pre">regenerate_access_token()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.set_user_language"><code class="docutils literal notranslate"><span class="pre">set_user_language()</span></code></a></li>
+<li><a class="reference internal" href="#userprofile.views.try_get_template"><code class="docutils literal notranslate"><span class="pre">try_get_template()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-userprofile">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">A+</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">userprofile package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/userprofile.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="userprofile-package">
+<h1>userprofile package<a class="headerlink" href="#userprofile-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="userprofile.api.html">userprofile.api package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.api.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.api.html#module-userprofile.api.full_serializers">userprofile.api.full_serializers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.api.html#userprofile.api.full_serializers.UserSerializer"><code class="docutils literal notranslate"><span class="pre">UserSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.full_serializers.UserSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">UserSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.full_serializers.UserSerializer.get_assistant_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_assistant_courses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.full_serializers.UserSerializer.get_enrolled_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_enrolled_courses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.full_serializers.UserSerializer.get_staff_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_staff_courses()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.full_serializers.UserSerializer.get_teacher_courses"><code class="docutils literal notranslate"><span class="pre">UserSerializer.get_teacher_courses()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.api.html#module-userprofile.api.serializers">userprofile.api.serializers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.api.html#userprofile.api.serializers.UserBriefSerializer"><code class="docutils literal notranslate"><span class="pre">UserBriefSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.serializers.UserBriefSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">UserBriefSerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.api.html#userprofile.api.serializers.UserListField"><code class="docutils literal notranslate"><span class="pre">UserListField</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.api.html#module-userprofile.api.tests">userprofile.api.tests module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.api.html#userprofile.api.tests.UserProfileAPITest"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.tests.UserProfileAPITest.test_field_values_filter"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest.test_field_values_filter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.tests.UserProfileAPITest.test_get_userdetail"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest.test_get_userdetail()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.tests.UserProfileAPITest.test_get_userlist"><code class="docutils literal notranslate"><span class="pre">UserProfileAPITest.test_get_userlist()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.api.html#module-userprofile.api.views">userprofile.api.views module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.MeDetail"><code class="docutils literal notranslate"><span class="pre">MeDetail</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.MeDetail.get"><code class="docutils literal notranslate"><span class="pre">MeDetail.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet"><code class="docutils literal notranslate"><span class="pre">UserViewSet</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.basename"><code class="docutils literal notranslate"><span class="pre">UserViewSet.basename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.description"><code class="docutils literal notranslate"><span class="pre">UserViewSet.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.detail"><code class="docutils literal notranslate"><span class="pre">UserViewSet.detail</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.field_values_map"><code class="docutils literal notranslate"><span class="pre">UserViewSet.field_values_map</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.filter_backends"><code class="docutils literal notranslate"><span class="pre">UserViewSet.filter_backends</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.listserializer_class"><code class="docutils literal notranslate"><span class="pre">UserViewSet.listserializer_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.lookup_field"><code class="docutils literal notranslate"><span class="pre">UserViewSet.lookup_field</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.lookup_url_kwarg"><code class="docutils literal notranslate"><span class="pre">UserViewSet.lookup_url_kwarg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.lookup_value_regex"><code class="docutils literal notranslate"><span class="pre">UserViewSet.lookup_value_regex</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.name"><code class="docutils literal notranslate"><span class="pre">UserViewSet.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.permission_classes"><code class="docutils literal notranslate"><span class="pre">UserViewSet.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.queryset"><code class="docutils literal notranslate"><span class="pre">UserViewSet.queryset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.search_fields"><code class="docutils literal notranslate"><span class="pre">UserViewSet.search_fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.serializer_class"><code class="docutils literal notranslate"><span class="pre">UserViewSet.serializer_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.api.html#userprofile.api.views.UserViewSet.suffix"><code class="docutils literal notranslate"><span class="pre">UserViewSet.suffix</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.api.html#module-userprofile.api">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="userprofile.management.html">userprofile.management package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.management.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.management.commands.html">userprofile.management.commands package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.management.commands.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.management.commands.html#module-userprofile.management.commands.count_active_users">userprofile.management.commands.count_active_users module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.management.commands.html#module-userprofile.management.commands.delete_users">userprofile.management.commands.delete_users module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.management.commands.html#module-userprofile.management.commands.set_superuser">userprofile.management.commands.set_superuser module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.management.commands.html#module-userprofile.management.commands">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.management.html#module-userprofile.management">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="userprofile.migrations.html">userprofile.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#module-userprofile.migrations.0001_initial">userprofile.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#module-userprofile.migrations.0002_auto_20150427_1717">userprofile.migrations.0002_auto_20150427_1717 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0002_auto_20150427_1717.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0002_auto_20150427_1717.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0002_auto_20150427_1717.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#module-userprofile.migrations.0003_auto_20160728_1139">userprofile.migrations.0003_auto_20160728_1139 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0003_auto_20160728_1139.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0003_auto_20160728_1139.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0003_auto_20160728_1139.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#module-userprofile.migrations.0004_auto_20200721_1422">userprofile.migrations.0004_auto_20200721_1422 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0004_auto_20200721_1422.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0004_auto_20200721_1422.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0004_auto_20200721_1422.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#module-userprofile.migrations.0005_userprofile_organization">userprofile.migrations.0005_userprofile_organization module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0005_userprofile_organization.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0005_userprofile_organization.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0005_userprofile_organization.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0005_userprofile_organization.set_organization"><code class="docutils literal notranslate"><span class="pre">set_organization()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#module-userprofile.migrations.0006_auto_20210812_1536">userprofile.migrations.0006_auto_20210812_1536 module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0006_auto_20210812_1536.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0006_auto_20210812_1536.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="userprofile.migrations.html#userprofile.migrations.0006_auto_20210812_1536.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="userprofile.migrations.html#module-userprofile.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-userprofile.admin">
+<span id="userprofile-admin-module"></span><h2>userprofile.admin module<a class="headerlink" href="#module-userprofile.admin" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.admin.UserProfileAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.admin.</span></span><span class="sig-name descname"><span class="pre">UserProfileAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/admin.html#UserProfileAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.admin.UserProfileAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.admin.UserProfileAdmin.get_user">
+<span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/admin.html#UserProfileAdmin.get_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.admin.UserProfileAdmin.get_user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.admin.UserProfileAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'get_user',</span> <span class="pre">'student_id',</span> <span class="pre">'organization')</span></em><a class="headerlink" href="#userprofile.admin.UserProfileAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.admin.UserProfileAdmin.list_display_links">
+<span class="sig-name descname"><span class="pre">list_display_links</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('id',</span> <span class="pre">'get_user',</span> <span class="pre">'student_id')</span></em><a class="headerlink" href="#userprofile.admin.UserProfileAdmin.list_display_links" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="userprofile.admin.UserProfileAdmin.media">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#userprofile.admin.UserProfileAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.admin.UserProfileAdmin.raw_id_fields">
+<span class="sig-name descname"><span class="pre">raw_id_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('user',)</span></em><a class="headerlink" href="#userprofile.admin.UserProfileAdmin.raw_id_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.admin.UserProfileAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('user__first_name',</span> <span class="pre">'user__last_name',</span> <span class="pre">'user__username',</span> <span class="pre">'user__email',</span> <span class="pre">'student_id',</span> <span class="pre">'organization')</span></em><a class="headerlink" href="#userprofile.admin.UserProfileAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-userprofile.models">
+<span id="userprofile-models-module"></span><h2>userprofile.models module<a class="headerlink" href="#module-userprofile.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.models.GraderUser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.models.</span></span><span class="sig-name descname"><span class="pre">GraderUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="authorization.html#authorization.object_permissions.ObjectPermissions" title="authorization.object_permissions.ObjectPermissions"><span class="pre">ObjectPermissions</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#GraderUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.GraderUser" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AnonymousUser</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="userprofile.models.GraderUser.is_anonymous">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_anonymous</span></span><a class="headerlink" href="#userprofile.models.GraderUser.is_anonymous" title="Link to this definition"></a></dt>
+<dd><p>GraderUser is anonymous, but not AnonymousUser</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="userprofile.models.GraderUser.is_authenticated">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_authenticated</span></span><a class="headerlink" href="#userprofile.models.GraderUser.is_authenticated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="userprofile.models.GraderUser.userprofile">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">userprofile</span></span><a class="headerlink" href="#userprofile.models.GraderUser.userprofile" title="Link to this definition"></a></dt>
+<dd><p>Compatibilty with User.userprofile</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.models.LTIServiceUser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.models.</span></span><span class="sig-name descname"><span class="pre">LTIServiceUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.html#exercise.submission_models.Submission" title="exercise.submission_models.Submission"><span class="pre">Submission</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exercise</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="exercise.html#exercise.exercise_models.BaseExercise" title="exercise.exercise_models.BaseExercise"><span class="pre">BaseExercise</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lti_service</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="external_services.html#external_services.models.LTIService" title="external_services.models.LTIService"><span class="pre">LTIService</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#LTIServiceUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.LTIServiceUser" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.models.GraderUser" title="userprofile.models.GraderUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraderUser</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.models.</span></span><span class="sig-name descname"><span class="pre">UserProfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfile" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>Additional user information and methods.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#userprofile.models.UserProfile.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#userprofile.models.UserProfile.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.api_token">
+<span class="sig-name descname"><span class="pre">api_token</span></span><a class="headerlink" href="#userprofile.models.UserProfile.api_token" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.deadlineruledeviation_set">
+<span class="sig-name descname"><span class="pre">deadlineruledeviation_set</span></span><a class="headerlink" href="#userprofile.models.UserProfile.deadlineruledeviation_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.enrollment_set">
+<span class="sig-name descname"><span class="pre">enrollment_set</span></span><a class="headerlink" href="#userprofile.models.UserProfile.enrollment_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.get_by_email">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_email</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">email</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfile.get_by_email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfile.get_by_email" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.get_by_request">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfile.get_by_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfile.get_by_request" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.get_by_student_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_student_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">student_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">org</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'aalto.fi'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfile.get_by_student_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfile.get_by_student_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.get_url">
+<span class="sig-name descname"><span class="pre">get_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfile.get_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfile.get_url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.graded_submissions">
+<span class="sig-name descname"><span class="pre">graded_submissions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">RelatedManager</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Submission'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#userprofile.models.UserProfile.graded_submissions" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#userprofile.models.UserProfile.groups" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">models.AutoField</span></em><a class="headerlink" href="#userprofile.models.UserProfile.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.is_external">
+<span class="sig-name descname"><span class="pre">is_external</span></span><a class="headerlink" href="#userprofile.models.UserProfile.is_external" title="Link to this definition"></a></dt>
+<dd><p>Is this an external rather than internal account.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.language">
+<span class="sig-name descname"><span class="pre">language</span></span><a class="headerlink" href="#userprofile.models.UserProfile.language" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.learningobjectdisplay_set">
+<span class="sig-name descname"><span class="pre">learningobjectdisplay_set</span></span><a class="headerlink" href="#userprofile.models.UserProfile.learningobjectdisplay_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.maxsubmissionsruledeviation_set">
+<span class="sig-name descname"><span class="pre">maxsubmissionsruledeviation_set</span></span><a class="headerlink" href="#userprofile.models.UserProfile.maxsubmissionsruledeviation_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.name_with_student_id">
+<span class="sig-name descname"><span class="pre">name_with_student_id</span></span><a class="headerlink" href="#userprofile.models.UserProfile.name_with_student_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;userprofile.models.UserProfileManager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#userprofile.models.UserProfile.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.organization">
+<span class="sig-name descname"><span class="pre">organization</span></span><a class="headerlink" href="#userprofile.models.UserProfile.organization" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.received_notifications">
+<span class="sig-name descname"><span class="pre">received_notifications</span></span><a class="headerlink" href="#userprofile.models.UserProfile.received_notifications" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.regenerate_api_token">
+<span class="sig-name descname"><span class="pre">regenerate_api_token</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfile.regenerate_api_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfile.regenerate_api_token" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.sent_notifications">
+<span class="sig-name descname"><span class="pre">sent_notifications</span></span><a class="headerlink" href="#userprofile.models.UserProfile.sent_notifications" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.shortname">
+<span class="sig-name descname"><span class="pre">shortname</span></span><a class="headerlink" href="#userprofile.models.UserProfile.shortname" title="Link to this definition"></a></dt>
+<dd><p>A short version of the user’s name in form “John D.”</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.student_id">
+<span class="sig-name descname"><span class="pre">student_id</span></span><a class="headerlink" href="#userprofile.models.UserProfile.student_id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.studentdiploma_set">
+<span class="sig-name descname"><span class="pre">studentdiploma_set</span></span><a class="headerlink" href="#userprofile.models.UserProfile.studentdiploma_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.studentmodulegoal_set">
+<span class="sig-name descname"><span class="pre">studentmodulegoal_set</span></span><a class="headerlink" href="#userprofile.models.UserProfile.studentmodulegoal_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.submission_drafts">
+<span class="sig-name descname"><span class="pre">submission_drafts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">RelatedManager</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'SubmissionDraft'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#userprofile.models.UserProfile.submission_drafts" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.submissions">
+<span class="sig-name descname"><span class="pre">submissions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">RelatedManager</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'Submission'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#userprofile.models.UserProfile.submissions" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.taggings">
+<span class="sig-name descname"><span class="pre">taggings</span></span><a class="headerlink" href="#userprofile.models.UserProfile.taggings" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.user">
+<span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#userprofile.models.UserProfile.user" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the forward side of a one-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Restaurant.place</span></code> is a <code class="docutils literal notranslate"><span class="pre">ForwardOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.models.UserProfile.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#userprofile.models.UserProfile.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.models.UserProfileManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.models.</span></span><span class="sig-name descname"><span class="pre">UserProfileManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfileManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfileManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Manager</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfileManager.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfileManager.get_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfileManager.get_queryset" title="Link to this definition"></a></dt>
+<dd><p>Return a new QuerySet object. Subclasses can override this method to
+customize the behavior of the Manager.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfileManager.prefetch_tags">
+<span class="sig-name descname"><span class="pre">prefetch_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'instance_taggings'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#userprofile.models.UserProfileQuerySet" title="userprofile.models.UserProfileQuerySet"><span class="pre">UserProfileQuerySet</span></a></span></span><a class="reference internal" href="_modules/userprofile/models.html#UserProfileManager.prefetch_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfileManager.prefetch_tags" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.models.UserProfileQuerySet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.models.</span></span><span class="sig-name descname"><span class="pre">UserProfileQuerySet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#UserProfileQuerySet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfileQuerySet" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.models.UserProfileQuerySet.prefetch_tags">
+<span class="sig-name descname"><span class="pre">prefetch_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_attr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'instance_taggings'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#userprofile.models.UserProfileQuerySet" title="userprofile.models.UserProfileQuerySet"><span class="pre">UserProfileQuerySet</span></a></span></span><a class="reference internal" href="_modules/userprofile/models.html#UserProfileQuerySet.prefetch_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.UserProfileQuerySet.prefetch_tags" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userprofile.models.create_user_profile">
+<span class="sig-prename descclassname"><span class="pre">userprofile.models.</span></span><span class="sig-name descname"><span class="pre">create_user_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/models.html#create_user_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.models.create_user_profile" title="Link to this definition"></a></dt>
+<dd><p>This function automatically creates an user profile for all new User models. The profiles
+are used for extending the User models with domain specific attributes and behavior.</p>
+<p>&#64;param sender: the signal that invoked the function
+&#64;param instance: the User object that was just created
+&#64;param created: a boolean whether the object was created and not just updated</p>
+</dd></dl>
+
+</section>
+<section id="module-userprofile.permissions">
+<span id="userprofile-permissions-module"></span><h2>userprofile.permissions module<a class="headerlink" href="#module-userprofile.permissions" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.permissions.GraderUserCanOnlyRead">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.permissions.</span></span><span class="sig-name descname"><span class="pre">GraderUserCanOnlyRead</span></span><a class="reference internal" href="_modules/userprofile/permissions.html#GraderUserCanOnlyRead"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.GraderUserCanOnlyRead" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.permissions.GraderUserCanOnlyRead.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/permissions.html#GraderUserCanOnlyRead.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.GraderUserCanOnlyRead.has_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.permissions.IsAdminOrUserObjIsSelf">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.permissions.</span></span><span class="sig-name descname"><span class="pre">IsAdminOrUserObjIsSelf</span></span><a class="reference internal" href="_modules/userprofile/permissions.html#IsAdminOrUserObjIsSelf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsAdminOrUserObjIsSelf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code>, <a class="reference internal" href="authorization.html#authorization.permissions.FilterBackend" title="authorization.permissions.FilterBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilterBackend</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.permissions.IsAdminOrUserObjIsSelf.filter_queryset">
+<span class="sig-name descname"><span class="pre">filter_queryset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">queryset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/permissions.html#IsAdminOrUserObjIsSelf.filter_queryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsAdminOrUserObjIsSelf.filter_queryset" title="Link to this definition"></a></dt>
+<dd><p>Return a filtered queryset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.permissions.IsAdminOrUserObjIsSelf.has_object_permission">
+<span class="sig-name descname"><span class="pre">has_object_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/permissions.html#IsAdminOrUserObjIsSelf.has_object_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsAdminOrUserObjIsSelf.has_object_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.permissions.IsAdminOrUserObjIsSelf.is_super">
+<span class="sig-name descname"><span class="pre">is_super</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/permissions.html#IsAdminOrUserObjIsSelf.is_super"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsAdminOrUserObjIsSelf.is_super" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.permissions.IsLTIServiceUser">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.permissions.</span></span><span class="sig-name descname"><span class="pre">IsLTIServiceUser</span></span><a class="reference internal" href="_modules/userprofile/permissions.html#IsLTIServiceUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsLTIServiceUser" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.permissions.IsLTIServiceUser.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/permissions.html#IsLTIServiceUser.has_permission"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsLTIServiceUser.has_permission" title="Link to this definition"></a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.permissions.IsTeacherOrAdminOrSelf">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.permissions.</span></span><span class="sig-name descname"><span class="pre">IsTeacherOrAdminOrSelf</span></span><a class="reference internal" href="_modules/userprofile/permissions.html#IsTeacherOrAdminOrSelf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsTeacherOrAdminOrSelf" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.permissions.IsAdminOrUserObjIsSelf" title="userprofile.permissions.IsAdminOrUserObjIsSelf"><code class="xref py py-class docutils literal notranslate"><span class="pre">IsAdminOrUserObjIsSelf</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.permissions.IsTeacherOrAdminOrSelf.is_super">
+<span class="sig-name descname"><span class="pre">is_super</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/permissions.html#IsTeacherOrAdminOrSelf.is_super"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.permissions.IsTeacherOrAdminOrSelf.is_super" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-userprofile.pseudonymize">
+<span id="userprofile-pseudonymize-module"></span><h2>userprofile.pseudonymize module<a class="headerlink" href="#module-userprofile.pseudonymize" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="userprofile.pseudonymize.format_user">
+<span class="sig-prename descclassname"><span class="pre">userprofile.pseudonymize.</span></span><span class="sig-name descname"><span class="pre">format_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">User</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pseudonymized</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_profile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#userprofile.models.UserProfile" title="userprofile.models.UserProfile"><span class="pre">UserProfile</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/pseudonymize.html#format_user"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.pseudonymize.format_user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userprofile.pseudonymize.pseudonymize">
+<span class="sig-prename descclassname"><span class="pre">userprofile.pseudonymize.</span></span><span class="sig-name descname"><span class="pre">pseudonymize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/pseudonymize.html#pseudonymize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.pseudonymize.pseudonymize" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-userprofile.sitemaps">
+<span id="userprofile-sitemaps-module"></span><h2>userprofile.sitemaps module<a class="headerlink" href="#module-userprofile.sitemaps" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.sitemaps.UserProfileStaticViewSitemap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.sitemaps.</span></span><span class="sig-name descname"><span class="pre">UserProfileStaticViewSitemap</span></span><a class="reference internal" href="_modules/userprofile/sitemaps.html#UserProfileStaticViewSitemap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.sitemaps.UserProfileStaticViewSitemap" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.sitemaps.UserProfileStaticViewSitemap.changefreq">
+<span class="sig-name descname"><span class="pre">changefreq</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'yearly'</span></em><a class="headerlink" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.changefreq" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.sitemaps.UserProfileStaticViewSitemap.items">
+<span class="sig-name descname"><span class="pre">items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/sitemaps.html#UserProfileStaticViewSitemap.items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.items" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.sitemaps.UserProfileStaticViewSitemap.location">
+<span class="sig-name descname"><span class="pre">location</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/sitemaps.html#UserProfileStaticViewSitemap.location"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.location" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.sitemaps.UserProfileStaticViewSitemap.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.1</span></em><a class="headerlink" href="#userprofile.sitemaps.UserProfileStaticViewSitemap.priority" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-userprofile.tests">
+<span id="userprofile-tests-module"></span><h2>userprofile.tests module<a class="headerlink" href="#module-userprofile.tests" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.tests.UserProfileTest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.tests.</span></span><span class="sig-name descname"><span class="pre">UserProfileTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/tests.html#UserProfileTest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.tests.UserProfileTest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.tests.UserProfileTestCase" title="userprofile.tests.UserProfileTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileTestCase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.tests.UserProfileTest.test_user_id_not_equal_profile_id">
+<span class="sig-name descname"><span class="pre">test_user_id_not_equal_profile_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/tests.html#UserProfileTest.test_user_id_not_equal_profile_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.tests.UserProfileTest.test_user_id_not_equal_profile_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.tests.UserProfileTest.test_userprofile_get_by_student_id">
+<span class="sig-name descname"><span class="pre">test_userprofile_get_by_student_id</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/tests.html#UserProfileTest.test_userprofile_get_by_student_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.tests.UserProfileTest.test_userprofile_get_by_student_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.tests.UserProfileTest.test_userprofile_shortname">
+<span class="sig-name descname"><span class="pre">test_userprofile_shortname</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/tests.html#UserProfileTest.test_userprofile_shortname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.tests.UserProfileTest.test_userprofile_shortname" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.tests.UserProfileTest.test_userprofile_unicode_string">
+<span class="sig-name descname"><span class="pre">test_userprofile_unicode_string</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/tests.html#UserProfileTest.test_userprofile_unicode_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.tests.UserProfileTest.test_userprofile_unicode_string" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.tests.UserProfileTestCase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.tests.</span></span><span class="sig-name descname"><span class="pre">UserProfileTestCase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/tests.html#UserProfileTestCase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.tests.UserProfileTestCase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.tests.UserProfileTestCase.setUpTestData">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpTestData</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/tests.html#UserProfileTestCase.setUpTestData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.tests.UserProfileTestCase.setUpTestData" title="Link to this definition"></a></dt>
+<dd><p>Load initial data for the TestCase.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-userprofile.urls">
+<span id="userprofile-urls-module"></span><h2>userprofile.urls module<a class="headerlink" href="#module-userprofile.urls" title="Link to this heading"></a></h2>
+</section>
+<section id="module-userprofile.viewbase">
+<span id="userprofile-viewbase-module"></span><h2>userprofile.viewbase module<a class="headerlink" href="#module-userprofile.viewbase" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.viewbase.UserProfileMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.viewbase.</span></span><span class="sig-name descname"><span class="pre">UserProfileMixin</span></span><a class="reference internal" href="_modules/userprofile/viewbase.html#UserProfileMixin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.viewbase.UserProfileMixin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.viewbase.BaseMixin" title="lib.viewbase.BaseMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseMixin</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.viewbase.UserProfileMixin.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#userprofile.viewbase.UserProfileMixin.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.viewbase.UserProfileMixin.get_resource_objects">
+<span class="sig-name descname"><span class="pre">get_resource_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/viewbase.html#UserProfileMixin.get_resource_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.viewbase.UserProfileMixin.get_resource_objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.viewbase.UserProfileMixin.login_redirect">
+<span class="sig-name descname"><span class="pre">login_redirect</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#userprofile.viewbase.UserProfileMixin.login_redirect" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.viewbase.UserProfileView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.viewbase.</span></span><span class="sig-name descname"><span class="pre">UserProfileView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/viewbase.html#UserProfileView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.viewbase.UserProfileView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.viewbase.UserProfileMixin" title="userprofile.viewbase.UserProfileMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileMixin</span></code></a>, <a class="reference internal" href="lib.html#lib.viewbase.BaseTemplateView" title="lib.viewbase.BaseTemplateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseTemplateView</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-userprofile.views">
+<span id="userprofile-views-module"></span><h2>userprofile.views module<a class="headerlink" href="#module-userprofile.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.AccessibilityStatementView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">AccessibilityStatementView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#AccessibilityStatementView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.AccessibilityStatementView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.viewbase.UserProfileView" title="userprofile.viewbase.UserProfileView"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.AccessibilityStatementView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#userprofile.views.AccessibilityStatementView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.AccessibilityStatementView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#AccessibilityStatementView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.AccessibilityStatementView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.AccessibilityStatementView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/accessibility.html'</span></em><a class="headerlink" href="#userprofile.views.AccessibilityStatementView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.AplusLoginView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">AplusLoginView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#AplusLoginView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.AplusLoginView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LoginView</span></code></p>
+<p>This login view class extends the default Django login class and
+overrides some of the default settings. Namely, the template and its context.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.AplusLoginView.extra_context">
+<span class="sig-name descname"><span class="pre">extra_context</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'haka_login':</span> <span class="pre">False,</span> <span class="pre">'mooc_login':</span> <span class="pre">False,</span> <span class="pre">'shibboleth_login':</span> <span class="pre">False}</span></em><a class="headerlink" href="#userprofile.views.AplusLoginView.extra_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.AplusLoginView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#AplusLoginView.get_context_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.AplusLoginView.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Insert the form into the context dict.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.AplusLoginView.redirect_authenticated_user">
+<span class="sig-name descname"><span class="pre">redirect_authenticated_user</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#userprofile.views.AplusLoginView.redirect_authenticated_user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.AplusLoginView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/login.html'</span></em><a class="headerlink" href="#userprofile.views.AplusLoginView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.AplusLogoutView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">AplusLogoutView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#AplusLogoutView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.AplusLogoutView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LogoutView</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.AplusLogoutView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#AplusLogoutView.get_context_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.AplusLogoutView.get_context_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.AplusLogoutView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/logout.html'</span></em><a class="headerlink" href="#userprofile.views.AplusLogoutView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.CookieNoticeView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">CookieNoticeView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#CookieNoticeView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.CookieNoticeView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.viewbase.UserProfileView" title="userprofile.viewbase.UserProfileView"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.CookieNoticeView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#userprofile.views.CookieNoticeView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.CookieNoticeView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#CookieNoticeView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.CookieNoticeView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.CookieNoticeView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/cookies.html'</span></em><a class="headerlink" href="#userprofile.views.CookieNoticeView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.PrivacyNoticeView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">PrivacyNoticeView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#PrivacyNoticeView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.PrivacyNoticeView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.viewbase.UserProfileView" title="userprofile.viewbase.UserProfileView"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.PrivacyNoticeView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#userprofile.views.PrivacyNoticeView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.PrivacyNoticeView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#PrivacyNoticeView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.PrivacyNoticeView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.PrivacyNoticeView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/privacy.html'</span></em><a class="headerlink" href="#userprofile.views.PrivacyNoticeView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.ProfileView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">ProfileView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#ProfileView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.ProfileView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.viewbase.UserProfileView" title="userprofile.viewbase.UserProfileView"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.ProfileView.extra_context">
+<span class="sig-name descname"><span class="pre">extra_context</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'brand_name':</span> <span class="pre">'A+'}</span></em><a class="headerlink" href="#userprofile.views.ProfileView.extra_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.ProfileView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#ProfileView.get_context_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.ProfileView.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Add member variables recorded with .note() to context_data</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.ProfileView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/profile.html'</span></em><a class="headerlink" href="#userprofile.views.ProfileView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.PseudonymizeView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">PseudonymizeView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#PseudonymizeView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.PseudonymizeView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="lib.html#lib.viewbase.BaseView" title="lib.viewbase.BaseView"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseView</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.PseudonymizeView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HttpRequest</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">HttpResponse</span></span></span><a class="reference internal" href="_modules/userprofile/views.html#PseudonymizeView.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.PseudonymizeView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.SupportView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">SupportView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#SupportView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.SupportView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.viewbase.UserProfileView" title="userprofile.viewbase.UserProfileView"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.SupportView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#userprofile.views.SupportView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.SupportView.extra_context">
+<span class="sig-name descname"><span class="pre">extra_context</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'brand_institution_name':</span> <span class="pre">'Aalto</span> <span class="pre">University',</span> <span class="pre">'brand_name':</span> <span class="pre">'A+',</span> <span class="pre">'brand_name_long':</span> <span class="pre">'Aplus'}</span></em><a class="headerlink" href="#userprofile.views.SupportView.extra_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.SupportView.get_common_objects">
+<span class="sig-name descname"><span class="pre">get_common_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#SupportView.get_common_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.SupportView.get_common_objects" title="Link to this definition"></a></dt>
+<dd><p>Once access is verified further objects may be created that
+are common for different HTTP methods, e.g. get and post.
+Use self.note to announce attributes of further interest.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.SupportView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/support.html'</span></em><a class="headerlink" href="#userprofile.views.SupportView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="userprofile.views.TeacherListView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">TeacherListView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#TeacherListView"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.TeacherListView" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#userprofile.viewbase.UserProfileView" title="userprofile.viewbase.UserProfileView"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserProfileView</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.TeacherListView.access_mode">
+<span class="sig-name descname"><span class="pre">access_mode</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#userprofile.views.TeacherListView.access_mode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.TeacherListView.entries">
+<span class="sig-name descname"><span class="pre">entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HttpRequest</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/userprofile/views.html#TeacherListView.entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.TeacherListView.entries" title="Link to this definition"></a></dt>
+<dd><p>Returns a list of entries generated by entry_generator based on
+instances from the date range in the request</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.TeacherListView.entry">
+<span class="sig-name descname"><span class="pre">entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">teacher</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#userprofile.models.UserProfile" title="userprofile.models.UserProfile"><span class="pre">UserProfile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="course.html#course.models.CourseInstance" title="course.models.CourseInstance"><span class="pre">CourseInstance</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/userprofile/views.html#TeacherListView.entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.TeacherListView.entry" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.TeacherListView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/userprofile/views.html#TeacherListView.get_context_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.TeacherListView.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Add member variables recorded with .note() to context_data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="userprofile.views.TeacherListView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">HttpRequest</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">HttpResponse</span></span></span><a class="reference internal" href="_modules/userprofile/views.html#TeacherListView.post"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.TeacherListView.post" title="Link to this definition"></a></dt>
+<dd><p>Returns the teacher list as csv or the emails as a comma separated list</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="userprofile.views.TeacherListView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'userprofile/teachers.html'</span></em><a class="headerlink" href="#userprofile.views.TeacherListView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userprofile.views.regenerate_access_token">
+<span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">regenerate_access_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#regenerate_access_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.regenerate_access_token" title="Link to this definition"></a></dt>
+<dd><p>Regenerates the API access token.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userprofile.views.set_user_language">
+<span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">set_user_language</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#set_user_language"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.set_user_language" title="Link to this definition"></a></dt>
+<dd><p>Overrides set_language function from django.views.i18n.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="userprofile.views.try_get_template">
+<span class="sig-prename descclassname"><span class="pre">userprofile.views.</span></span><span class="sig-name descname"><span class="pre">try_get_template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/userprofile/views.html#try_get_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#userprofile.views.try_get_template" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-userprofile">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-userprofile" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, A+ development team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
