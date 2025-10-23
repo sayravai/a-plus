@@ -9,6 +9,120 @@
 {% block breadcrumblist %}
 {{ block.super }}
 <li class="active">{% translate "PARTICIPANTS" %}</li>
+<!-- DataTables plugin with Bootstrap 5 styling and Buttons/export support -->
+<link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/b-3.2.1/b-html5-3.2.1/datatables.min.css" rel="stylesheet">
+<style>
+	/*
+ * Navigation
+ */
+
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:hover,
+.nav-tabs>li.active>a:focus {
+	background-color: #A9A9A9 !important;
+}
+
+/*
+ * Table
+ */
+
+ #table-participants-div {
+	 max-height: calc(100vh - 12em);
+	 max-width: 100vw;
+	 margin-top: 6px;
+	 overflow: auto; /* internal scroll so header can stick and pagination remains in view */
+ }
+
+#table-participants {
+	margin-top: 0 !important; /* To overwrite DataTable styling and improve scrolling; replaced with div margin */
+}
+
+#table-heading th {
+	min-width: 6em;
+	width: 15vw;
+	max-width: calc(12em + 26px);
+	/*background-color: white;*/
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	top: 0;
+	z-index: 2;
+}
+
+#table-heading th.student-id {
+	max-width: calc(8em + 26px);
+}
+
+#table-heading th.select-box,
+#table-heading th.actions-container {
+	min-width: 2em;
+}
+
+#table-heading th.select-box {
+	max-width:2em;
+}
+
+#table-heading .form-control { /* Search bars in heading cells */
+	min-width: 6em;
+	width: min(12em, 14vw);
+}
+
+#table-heading th.student-id .form-control,
+#table-heading th.total .form-control {
+	max-width: 8em;
+}
+
+#table-heading th.student-id, #table-heading th.student-id input
+{
+	max-width: 6em;
+}
+
+#table-heading th.stick-on-scroll:not(.indicator-heading) {
+    left: 0;
+    z-index: 3;
+}
+
+#table-heading th.stick-on-scroll.indicator-heading {
+	left: 0;
+}
+
+tbody td.stick-on-scroll {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+#table-heading th.stick-on-scroll:nth-child(2),
+tbody td.stick-on-scroll:nth-child(2) {
+	left: 6em;
+}
+
+table#table-points thead td div.ratio {
+	text-align: right;
+	font-style: italic;
+	font-weight: normal;
+}
+table#table-points thead td div.ratio::after {
+	content: "%";
+}
+
+.student-id,
+.student-name,
+#table-heading th.indicator-heading {
+    font-weight: bold;
+}
+
+div.dt-note {
+    padding-top: 8px;
+    white-space: nowrap;
+	text-align: right;
+}
+
+span.colortag.label-xs {
+	font-size: 0.75em; /* Bootstrap default badge font size for .badge-xs */
+}
+
+</style>
 {% endblock %}
 
 {% block columns %}
@@ -25,7 +139,16 @@
 	<p class="filter-users">
 		<small class="text-body-secondary">{% trans "FILTER_USERS_BY_TAG" %}:</small>
 		{% for tag in tags %}
-		<button class="btn btn-sm filter-tag" style="background-color:{{ tag.color }};color:{{ tag.font_color }};" data-tagslug="{{ tag.slug }}">
+		<button
+			class="btn btn-sm filter-tag"
+			style="background-color:{{ tag.color }};color:{{ tag.font_color }};"
+			data-tagslug="{{ tag.slug }}"
+			data-tagid="{{ tag.id }}"
+			data-tagname="{{ tag.name }}"
+			data-font-white="{{ tag.font_white|yesno:'1,0' }}"
+			data-color="{{ tag.color }}"
+			data-font-color="{{ tag.font_color }}"
+		>
 			<i class="bi-square" aria-hidden="true"></i>
 			{{ tag.name }}
 		</button>
@@ -50,30 +173,75 @@
 		{% trans "BANNED_STUDENTS" %} <strong id="banned-participants-number"></strong>).
 		{% if is_teacher %}
 		{% translate "OF_WHICH_SELECTED" %} <strong id="selected-number">0</strong>
+		<button type="button" id="add-tag-selected" class="aplus-button--primary aplus-button--sm ms-2" disabled>
+			<i class="bi-tag" aria-hidden="true"></i>
+			{% translate "ADD_TAG" %}
+		</button>
 		{% endif %}
 	</p>
 
-	<table class="table table-sm filtered-table ordered-table">
-		<thead>
-			<tr>
-				{% if is_teacher %}
-				<th data-filter-type="none" data-order-disable="true">
-					<input type="checkbox" id="students-select-all" name="students" value="all" >
-				</th>
-				{% endif %}
-				<th>{% trans "STUDENT_ID" %}</th>
-				<th>{% trans "LAST_NAME" %}</th>
-				<th>{% trans "FIRST_NAME" %}</th>
-				<th>{% trans "EMAIL" %}</th>
-				<th data-filter-type="none" data-order-disable="true">{% trans "STATUS" %}</th>
-				<th data-filter-type="none" data-order-disable="true">{% trans "TAGS" %}</th>
-				<th data-filter-type="none" data-order-disable="true"></th>
-			</tr>
-		</thead>
-		<tbody id="participants">
-		</tbody>
-	</table>
+	<div id="participants-table-container" class="table-responsive">
+		<table id="table-participants" class="table table-sm">
+			<thead id="table-heading"></thead>
+			<tbody id="participants">
+			</tbody>
+		</table>
+	</div>
 
+</div>
+
+<!-- Add Tag modal -->
+<div
+	class="modal"
+	id="tag-add-modal"
+	tabindex="-1"
+	role="dialog"
+	aria-labelledby="tag-add-modal-label"
+>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="tag-add-modal-label">
+					{% translate "ADD_TAG" %}
+				</h4>
+				<button
+					type="button"
+					class="btn-close"
+					data-bs-dismiss="modal"
+					aria-label="close"
+				>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label for="tag-add-select" class="form-label">{% translate "SELECT_TAG" %}</label>
+					<select id="tag-add-select" class="form-select">
+						<!-- options populated by JS from filter buttons -->
+					</select>
+				</div>
+				<div class="text-body-secondary">
+					<span id="tag-add-target-count">0</span>
+					{% translate "USERS_SELECTED" %}
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button
+					type="button"
+					class="aplus-button--secondary aplus-button--md"
+					data-bs-dismiss="modal"
+				>
+					{% translate "CANCEL" %}
+				</button>
+				<button
+					type="button"
+					class="aplus-button--primary aplus-button--md"
+					id="tag-add-confirm"
+				>
+					{% translate "ADD" %}
+				</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <div
@@ -138,6 +306,8 @@
 {% block scripts %}
 {{ block.super }}
 {% if is_teacher %}
+<script src="https://cdn.datatables.net/v/bs5/dt-2.2.1/b-3.2.1/b-html5-3.2.1/datatables.min.js"></script>
+
 <script src="{% static 'django_colortag.js' %}"></script>
 <script src="{% static 'add_tagging_dropdown.js' %}"></script>
 <script src="{% static 'js/buttons_popover.js' %}"></script>
@@ -145,7 +315,7 @@
 {% endif %}
 
 <script src="{% static 'js/participants.js' %}"></script>
-<script src="{% static 'course/usertagdropdown.js' %}"></script>
+<!--<script src="{% static 'course/usertagdropdown.js' %}"></script>-->
 <script>
 $(function () {
 	const participants = {{ participants|escape_slashes|safe }};
