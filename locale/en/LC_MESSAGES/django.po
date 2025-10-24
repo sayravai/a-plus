@@ -3019,6 +3019,7 @@ msgid "ADD_NEW_USER_TAG"
 msgstr "Add new user tag"
 
 #: edit_course/templates/edit_course/usertag_add.html
+#: course/templates/course/staff/participants.html
 msgid "ADD_STUDENT_TAG"
 msgstr "Add student tag"
 

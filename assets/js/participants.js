@@ -1,12 +1,38 @@
 function participants_list(participants, api_url, is_teacher, enrollment_statuses) {
   participants.sort(function(a, b) { return a.id.localeCompare(b.id); });
 
+  // Initialize tooltips for filter buttons using tag descriptions (if present)
+  function initFilterButtonDescriptions() {
+    if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) return;
+    $('.filter-users button.filter-tag').each(function(){
+      const $btn = $(this);
+      const desc = $btn.attr('data-description');
+      // Dispose any leftover popovers/tooltips and clear related attributes
+      try { const pop = bootstrap.Popover && bootstrap.Popover.getInstance(this); if (pop) pop.dispose(); } catch (e) {}
+      try { const tip = bootstrap.Tooltip && bootstrap.Tooltip.getInstance(this); if (tip) tip.dispose(); } catch (e) {}
+      $btn.removeAttr('data-bs-title data-bs-content data-bs-toggle');
+      if (!desc || !desc.trim()) return;
+      // Set title attribute and init tooltip
+      $btn.attr('title', desc);
+      try {
+        new bootstrap.Tooltip(this, {
+          title: desc,
+          trigger: 'hover focus',
+          placement: 'top',
+          container: 'body'
+        });
+      } catch (e) { /* ignore */ }
+    });
+  }
+
   // Helper: read all available tags from filter buttons present in the page
   function getAllPageTags() {
     return $('.filter-users button.filter-tag').map(function(){
       const $b = $(this);
+      let id = parseInt($b.attr('data-tagid'), 10);
+      if (isNaN(id)) id = null; // hardcoded tags have no numeric id
       return {
-        id: parseInt($b.attr('data-tagid'), 10),
+        id: id,
         slug: $b.attr('data-tagslug'),
         name: $b.attr('data-tagname') || $b.text().trim(),
         color: $b.attr('data-color'),
@@ -18,7 +44,10 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
 
   // Helper: open Add Tag modal for provided user IDs
   function openAddTagModal(userIds, preselectSlug) {
-    const allTags = getAllPageTags();
+    // Exclude hardcoded tags (no numeric id) from selectable options
+    const allTags = getAllPageTags().filter(function(t){
+      return t.id !== null && t.id !== undefined;
+    });
     // Compute tags already present in ALL selected users to avoid duplicates
     const selectedParticipants = participants.filter(function(p){ return userIds.indexOf(p.user_id) !== -1; });
     let commonSlugs = null;
@@ -48,6 +77,9 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       const $firstEnabled = $select.find('option:not([disabled])').first();
       if ($firstEnabled.length) $select.val($firstEnabled.val());
     }
+    // Disable confirm if nothing can be selected
+    const hasAvailable = $select.find('option:not([disabled])').length > 0;
+    $('#tag-add-confirm').prop('disabled', !hasAvailable);
     $('#tag-add-target-count').text(userIds.length);
     // Store target users on confirm button
     $('#tag-add-confirm').data('targetUserIds', userIds);
@@ -55,27 +87,207 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
     modal.show();
   }
 
-  // Helper: perform API POST to add tag to list of users
+  // Cached tag metadata maps (built from filter buttons present in the page)
+  let _tagMapById = null;
+  let _tagMapBySlug = null;
+  function getTagMapById() {
+    if (_tagMapById) return _tagMapById;
+    _tagMapById = {};
+    _tagMapBySlug = {};
+    getAllPageTags().forEach(function(t){
+      if (t.id !== null && t.id !== undefined) _tagMapById[t.id] = t; // skip hardcoded tags with no numeric id
+      if (t.slug) _tagMapBySlug[t.slug] = t;
+    });
+    return _tagMapById;
+  }
+  function getTagMapBySlug() {
+    if (_tagMapBySlug) return _tagMapBySlug;
+    getTagMapById();
+    return _tagMapBySlug;
+  }
+
+  function upsertTagMeta(tag) {
+    if (!_tagMapById || !_tagMapBySlug) {
+      getTagMapById();
+    }
+    if (tag) {
+      if (typeof tag.id === 'number' && !isNaN(tag.id)) {
+        _tagMapById[tag.id] = tag;
+      }
+      if (tag.slug) {
+        _tagMapBySlug[tag.slug] = tag;
+      }
+    }
+  }
+
+  function renderTagLabel(tag) {
+    try {
+      if (typeof django_colortag_label === 'function') {
+        return django_colortag_label(tag, { element: 'span', label: true })[0].outerHTML;
+      }
+    } catch (e) { /* fall through */ }
+    // Fallback plain pill
+    const style = (tag.color ? 'background-color:' + tag.color + ';' : '') + (tag.font_white ? 'color:#fff;' : '');
+    const idAttr = (typeof tag.id === 'number' && !isNaN(tag.id)) ? String(tag.id) : '';
+    const slugAttr = tag.slug || '';
+    const isHardcoded = (slugAttr === 'user-internal' || slugAttr === 'user-external');
+    const removableAttr = isHardcoded ? 'false' : 'true';
+    return '<span class="colortag badge rounded-pill" data-tagslug="' + slugAttr + '" data-tagid="' + idAttr + '" data-tag-removable="' + removableAttr + '" style="' + style + '">' + (tag.name || tag.slug || tag.id) + '</span>';
+  }
+
+  // Build a union of tag slugs present among provided user ids
+  function collectTagSlugsForUsers(userIds) {
+    const slugs = new Set();
+    participants.forEach(function(p){
+      if (userIds.indexOf(p.user_id) !== -1 && Array.isArray(p.tag_slugs)) {
+        p.tag_slugs.forEach(function(s){
+          if (s !== 'user-internal' && s !== 'user-external') slugs.add(s);
+        });
+      }
+    });
+    return Array.from(slugs);
+  }
+
+  // Helper: open Remove Tag modal for provided user IDs
+  function openRemoveTagModal(userIds) {
+    const bySlug = getTagMapBySlug();
+    const slugs = collectTagSlugsForUsers(userIds);
+    const $select = $('#tag-remove-select');
+    $select.empty();
+    slugs.forEach(function(slug){
+      const meta = bySlug[slug] || { slug: slug, name: slug };
+      const $opt = $('<option/>').attr({ value: slug }).text(meta.name || slug);
+      $select.append($opt);
+    });
+    // If none are available, disable confirm
+    const hasAny = $select.find('option').length > 0;
+    $('#tag-remove-confirm').prop('disabled', !hasAny).data('targetUserIds', userIds);
+    $('#tag-remove-target-count').text(userIds.length);
+    const modal = new bootstrap.Modal('#tag-remove-modal', {});
+    modal.show();
+  }
+
+  function renderTagsCell(row) {
+    // Merge from both tag_ids and tag_slugs. If either array is present, prefer client rendering
+    // and do NOT fallback to legacy pre-rendered HTML even if result is empty (ensures removals show).
+    const byId = getTagMapById();
+    const bySlug = getTagMapBySlug();
+    const bySlugRendered = {};
+    let labels = [];
+    if (Array.isArray(row.tag_ids) && row.tag_ids.length) {
+      row.tag_ids.forEach(function(id){ const t = byId[id]; if (t && t.slug && !bySlugRendered[t.slug]) { labels.push(renderTagLabel(t)); bySlugRendered[t.slug] = true; } });
+    }
+    if (Array.isArray(row.tag_slugs) && row.tag_slugs.length) {
+      row.tag_slugs.forEach(function(slug){ const t = bySlug[slug]; if (t && !bySlugRendered[slug]) { labels.push(renderTagLabel(t)); bySlugRendered[slug] = true; } });
+    }
+    // If no arrays are present at all, fallback to legacy HTML once
+    if (!Array.isArray(row.tag_ids) && !Array.isArray(row.tag_slugs) && typeof row.tags === 'string') {
+      return row.tags; // legacy pre-rendered HTML
+    }
+    return labels.join(' ');
+  }
+
+  // Helper: perform API POST to add tag to list of users (bulk with fallback)
   function postAddTaggings(userIds, tagSlug, doneCb) {
+    const apiBase = api_url.endsWith('/') ? api_url : (api_url + '/');
     // Chunk into batches of 10 like deletions do
     const chunks = [];
     for (let i = 0; i < userIds.length; i += 10) chunks.push(userIds.slice(i, i + 10));
     let pending = chunks.length;
-    if (pending === 0) { if (doneCb) doneCb(); return; }
-    chunks.forEach(function(chunk){
-      // Fire individual POSTs per user to keep parity with existing add_tagging implementation
-      const requests = chunk.map(function(uid){
+    const successes = new Set();
+    if (pending === 0) { if (doneCb) doneCb([]); return; }
+
+    function finishOne() {
+      pending -= 1;
+      if (pending === 0 && doneCb) doneCb(Array.from(successes));
+    }
+
+    function fallbackPerUser(chunk) {
+      const reqs = chunk.map(function(uid){
         return $.ajax({
           type: 'POST',
-          url: (api_url.endsWith('/') ? api_url : (api_url + '/')) + 'taggings/',
+          url: apiBase + 'taggings/',
           data: JSON.stringify({ user: { id: uid }, tag: { slug: tagSlug } }),
           contentType: 'application/json; charset=utf-8',
           dataType: 'json',
-        });
+        }).done(function(){ successes.add(uid); });
       });
-      $.when.apply($, requests).always(function(){
-        pending -= 1;
-        if (pending === 0 && doneCb) doneCb();
+      $.when.apply($, reqs).always(finishOne);
+    }
+
+    chunks.forEach(function(chunk){
+      // Try bulk first
+      $.ajax({
+        type: 'POST',
+        url: apiBase + 'taggings/',
+        data: JSON.stringify({ tag: { slug: tagSlug }, user_ids: chunk }),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+      }).done(function(resp){
+        // Determine successful IDs from response; fall back to entire chunk
+        let okIds = chunk.slice();
+        try {
+          if (resp && Array.isArray(resp.errors) && resp.errors.length) {
+            const failed = new Set();
+            resp.errors.forEach(function(e){
+              const uid = (e && e.user && (e.user.id || e.user.user_id)) || null;
+              if (uid != null) failed.add(parseInt(uid, 10));
+            });
+            okIds = chunk.filter(function(id){ return !failed.has(id); });
+          } else if (resp && Array.isArray(resp.results) && resp.created !== undefined) {
+            // Optionally trust results length if provided
+            // Keep okIds as-is; server partials should have been listed in errors
+          }
+        } catch (e) { /* ignore, use chunk */ }
+        okIds.forEach(function(id){ successes.add(id); });
+        finishOne();
+      }).fail(function(){
+        // Fallback to per-user requests if bulk fails (e.g., old API)
+        fallbackPerUser(chunk);
+      });
+    });
+  }
+
+  // Helper: perform API DELETE to remove tag from list of users (bulk with fallback)
+  function deleteTaggings(userIds, tagSlug, doneCb) {
+    const apiBase = api_url.endsWith('/') ? api_url : (api_url + '/');
+    const chunks = [];
+    for (let i = 0; i < userIds.length; i += 10) chunks.push(userIds.slice(i, i + 10));
+    let pending = chunks.length;
+    if (pending === 0) { if (doneCb) doneCb([]); return; }
+    const successes = new Set();
+    function finishOne() {
+      pending -= 1;
+      if (pending === 0 && doneCb) doneCb(Array.from(successes));
+    }
+    function fallbackQuery(chunk) {
+      const qs = 'tag_slug=' + encodeURIComponent(tagSlug) + '&' + chunk.map(function(id){ return 'user_id=' + encodeURIComponent(id); }).join('&');
+      $.ajax({ type: 'DELETE', url: apiBase + 'taggings/?' + qs })
+        .done(function(){
+          // Legacy endpoint returns 204 with no content on success
+          chunk.forEach(function(id){ successes.add(id); });
+        })
+        .always(function(){ finishOne(); });
+    }
+    chunks.forEach(function(chunk){
+      $.ajax({
+        type: 'DELETE',
+        url: apiBase + 'taggings/?summary=1',
+        data: JSON.stringify({ tag_slug: tagSlug, user_ids: chunk }),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json'
+      }).done(function(resp, _statusText, xhr){
+        // Prefer server-provided summary when present
+        if (xhr && xhr.status === 200 && resp && Array.isArray(resp.deleted_user_ids)) {
+          resp.deleted_user_ids.forEach(function(id){ successes.add(parseInt(id, 10)); });
+        } else {
+          // Assume all chunk succeeded (legacy 204 or 200 without body)
+          chunk.forEach(function(id){ successes.add(id); });
+        }
+        finishOne();
+      }).fail(function(){
+        // Fallback to query param legacy
+        fallbackQuery(chunk);
       });
     });
   }
@@ -91,18 +303,136 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       color: tagBtn.attr('data-color'),
       font_white: tagBtn.attr('data-font-white') === '1'
     };
+    // Ensure our metadata cache contains the tag (in case it was missing or stale)
+    upsertTagMeta(tag);
+    // Update data and refresh UI
+  const slugToId = (typeof tag.id === 'number' && !isNaN(tag.id)) ? tag.id : null; // may be null for hardcoded tags
+    const $dtTable = $('#table-participants');
+    const hasDT = $dtTable.length && $.fn.dataTable && $.fn.dataTable.isDataTable($dtTable);
+    let dt = null;
+    if (hasDT) dt = $dtTable.DataTable();
+    
     userIds.forEach(function(uid){
       const p = participants.find(function(pp){ return pp.user_id === uid; });
       if (!p) return;
       if (!p.tag_slugs) p.tag_slugs = [];
       if (p.tag_slugs.indexOf(tagSlug) === -1) p.tag_slugs.push(tagSlug);
-      // Append label to corresponding container
-      const $container = $('[data-user-id="' + uid + '"]').find('.usertags-container');
-      if ($container.length && typeof django_colortag_label === 'function') {
-        const $label = django_colortag_label(tag, { element: 'span', label: true });
-        $container.append(' ').append($label);
+      if (slugToId !== null) {
+        if (!Array.isArray(p.tag_ids)) p.tag_ids = [];
+        if (p.tag_ids.indexOf(slugToId) === -1) p.tag_ids.push(slugToId);
+      }
+      if (hasDT) {
+        try {
+          const rowApi = dt.row('#participant-' + uid);
+          if (rowApi && rowApi.data) {
+            rowApi.data(p).invalidate();
+            // Also update the current DOM immediately as a safety net
+            const node = rowApi.node();
+            if (node) {
+              $(node).find('td.usertags-container .colortag[data-tagslug="' + tagSlug + '"]').remove();
+            }
+          }
+        } catch (e) { /* ignore */ }
+      } else {
+        // Manual table path: append into DOM as before
+        const $container = $('[data-user-id="' + uid + '"]').find('.usertags-container');
+        if ($container.length && typeof django_colortag_label === 'function') {
+          const $label = django_colortag_label(tag, { element: 'span', label: true });
+          $container.append(' ').append($label);
+          // Ensure popover is wired for the newly added label
+          if (typeof add_colortag_buttons === 'function') {
+            add_colortag_buttons(
+              api_url,
+              document.getElementById('participants'),
+              participants
+            );
+          }
+        }
       }
     });
+    if (hasDT) {
+      // Force immediate redraw, then a microtask revalidation to ensure tags cell updates
+      dt.draw(false);
+      setTimeout(function(){
+        try {
+          // Re-invalidate all affected rows' tag cells
+          userIds.forEach(function(uid){
+            const rowApi = dt.row('#participant-' + uid);
+            if (rowApi && rowApi.data) rowApi.invalidate();
+          });
+          dt.draw(false);
+        } catch (e) { /* ignore */ }
+      }, 0);
+      // Ensure popovers are wired for the newly rendered labels
+      if (typeof add_colortag_buttons === 'function') {
+        add_colortag_buttons(
+          api_url,
+          document.getElementById('table-participants'),
+          participants
+        );
+      }
+    }
+  }
+
+  // Helper: after successful delete, update local state and DOM labels
+  function applyRemovedTag(userIds, tagSlug) {
+    const bySlug = getTagMapBySlug();
+    const tagMeta = bySlug[tagSlug];
+    const tagId = tagMeta && typeof tagMeta.id === 'number' && !isNaN(tagMeta.id) ? tagMeta.id : null;
+    const byId = getTagMapById();
+    const $dtTable = $('#table-participants');
+    const hasDT = $dtTable.length && $.fn.dataTable && $.fn.dataTable.isDataTable($dtTable);
+    let dt = null;
+    if (hasDT) dt = $dtTable.DataTable();
+
+    userIds.forEach(function(uid){
+      const p = participants.find(function(pp){ return pp.user_id === uid; });
+      if (!p) return;
+      // Ensure arrays exist so renderTagsCell uses client rendering, not legacy HTML fallback
+      if (!Array.isArray(p.tag_slugs)) p.tag_slugs = [];
+      if (!Array.isArray(p.tag_ids)) p.tag_ids = [];
+      if (Array.isArray(p.tag_slugs)) {
+        const idx = p.tag_slugs.indexOf(tagSlug);
+        if (idx > -1) p.tag_slugs.splice(idx, 1);
+      }
+      if (tagId !== null && Array.isArray(p.tag_ids)) {
+        // Remove exact id if known
+        const idIdx = p.tag_ids.indexOf(tagId);
+        if (idIdx > -1) p.tag_ids.splice(idIdx, 1);
+        // Additionally, remove any id whose slug resolves to tagSlug (safety)
+        p.tag_ids = p.tag_ids.filter(function(id){
+          const meta = byId[id];
+          return !(meta && meta.slug === tagSlug);
+        });
+      } else if (Array.isArray(p.tag_ids)) {
+        // No known numeric id; remove any id that maps to this slug
+        p.tag_ids = p.tag_ids.filter(function(id){
+          const meta = byId[id];
+          return !(meta && meta.slug === tagSlug);
+        });
+      }
+      if (hasDT) {
+        try {
+          const rowApi = dt.row('#participant-' + uid);
+          if (rowApi && rowApi.data) {
+            rowApi.data(p).invalidate();
+            const node = rowApi.node();
+            if (node) {
+              const $cont = $(node).find('td.usertags-container');
+              if ($cont.length && $cont.find('.colortag[data-tagslug="' + tagSlug + '"]').length === 0) {
+                const html = renderTagLabel(tag);
+                $cont.append($cont.text().trim() ? ' ' : '').append(html);
+              }
+            }
+          }
+        } catch (e) { /* ignore */ }
+      } else {
+        const $container = $('[data-user-id="' + uid + '"]').find('.usertags-container');
+        $container.find('.colortag[data-tagslug="' + tagSlug + '"]').remove();
+      }
+    });
+    if (hasDT) dt.draw(false);
+    try { $(document).trigger('aplus:tags-changed', { type: 'remove', tag_slug: tagSlug, user_ids: userIds }); } catch (e) {}
   }
 
   // Confirm remove/ban participant (works for both DataTables and manual table paths)
@@ -167,6 +497,14 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
 
   // If DataTables table is present, use it instead of manual DOM building
   if ($('#table-participants').length) {
+                // Initialize popover for the newly added label in manual table
+                if (typeof add_colortag_buttons === 'function') {
+                  add_colortag_buttons(
+                    api_url,
+                    document.getElementById('participants'),
+                    participants
+                  );
+                }
     const $table = $('#table-participants');
 
     // Keep selection across pages using a Set of user_ids
@@ -196,7 +534,7 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       { data: 'first_name', className: "col-2", render: function(d, t, row){ return renderLink(row.first_name, row.link); } },
       { data: null, className: "col-2", render: function(d, t, row){ return renderMail(row.email, row.username); } },
       { data: 'enrollment_status', className: "col-1", render: function(d){ return enrollment_statuses[d] || d; } },
-      { data: 'tags', className: "student-id col-3", orderable: false, searchable: false }
+      { data: null, className: "user-tags col-3", orderable: false, searchable: false, render: function(d, t, row){ return renderTagsCell(row); } }
     );
     if (is_teacher) {
       columns.push({ data: null, orderable: false, searchable: false, defaultContent: '', className: 'col-1 actions-container' });
@@ -335,26 +673,64 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
         if (!isNaN(colIdx)) dt.column(colIdx).search(val).draw(false);
       }, 200);
       $table.on('input.aplusDTsearch change.aplusDTsearch', 'thead#table-heading input[type="text"]', function(){ doSearch(this); });
+      // Prevent header click-to-sort when interacting with filter controls
+      $table.on('click.aplusDTstop mousedown.aplusDTstop mouseup.aplusDTstop dblclick.aplusDTstop keydown.aplusDTstop',
+        'thead#table-heading input, thead#table-heading select',
+        function(e){ e.stopPropagation(); }
+      );
+      // Also add native capturing listeners to intercept before DataTables gets the event
+      const theadEl = $table.find('thead#table-heading').get(0);
+      if (theadEl && theadEl.addEventListener) {
+        const stopIfFilterCtrl = function(e){
+          const t = e.target;
+          if (t && (t.closest && t.closest('input, select, textarea'))) {
+            if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+            e.stopPropagation();
+          }
+        };
+        ['click','mousedown','mouseup','dblclick','keydown','pointerdown','touchstart'].forEach(function(ev){
+          theadEl.addEventListener(ev, stopIfFilterCtrl, true);
+        });
+      }
     })();
+
+    // Cache current filter selections to avoid heavy DOM queries per row
+    let currentFilterTags = [];
+    let currentFilterStatuses = [];
+    function recomputeFilters() {
+      currentFilterTags = $('.filter-users button.filter-tag').filter(function(){
+        return $(this).find('i').hasClass('bi-check-square');
+      }).map(function(){ return $(this).attr('data-tagslug'); }).get();
+      currentFilterStatuses = $('.filter-users button.filter-status').filter(function(){
+        return $(this).find('i').hasClass('bi-check-square');
+      }).map(function(){ return $(this).attr('data-status'); }).get();
+    }
+    // Initialize once
+    recomputeFilters();
 
     // Custom filtering based on tag/status buttons
     const filterFn = function(settings, _data, dataIndex) {
       if (settings.nTable !== $table.get(0)) return true; // only for our table
       const rowData = dt.row(dataIndex).data();
-      const filterTags = $.makeArray($('.filter-users button.filter-tag:has(.bi-check-square)'))
-        .map(function (elem) { return $(elem).attr('data-tagslug'); });
-      const filterStatuses = $.makeArray($('.filter-users button.filter-status:has(.bi-check-square)'))
-        .map(function (elem) { return $(elem).attr('data-status'); });
+      // Normalize tags to slugs for filtering: merge existing slugs with those derived from tag_ids
+      if (Array.isArray(rowData.tag_ids)) {
+        const byId = getTagMapById();
+        const derived = rowData.tag_ids.map(function(id){ return byId[id] ? byId[id].slug : null; }).filter(Boolean);
+        const existing = Array.isArray(rowData.tag_slugs) ? rowData.tag_slugs.slice() : [];
+        // Merge unique
+        const set = new Set(existing.concat(derived));
+        rowData.tag_slugs = Array.from(set);
+      }
       // Tag intersection: all selected tags must be in row's tag_slugs
-      const intersectTags = rowData.tag_slugs.filter(function (tag) { return filterTags.indexOf(tag) >= 0; });
-      const tagsOk = intersectTags.length === filterTags.length;
-      const statusOk = (filterStatuses.length === 0) || (filterStatuses.indexOf(rowData.enrollment_status) >= 0);
+      const intersectTags = (rowData.tag_slugs || []).filter(function (tag) { return currentFilterTags.indexOf(tag) >= 0; });
+      const tagsOk = intersectTags.length === currentFilterTags.length;
+      const statusOk = (currentFilterStatuses.length === 0) || (currentFilterStatuses.indexOf(rowData.enrollment_status) >= 0);
       return tagsOk && statusOk;
     };
-    // Register once
-    if (!$.fn.dataTable._aplusFiltersAdded) {
+    // Register once per table instance
+    if (!$table.data('aplusFilterRegistered')) {
       $.fn.dataTable.ext.search.push(filterFn);
-      $.fn.dataTable._aplusFiltersAdded = true;
+      $table.data('aplusFilterRegistered', true);
     }
 
     // Hook up filter buttons
@@ -366,8 +742,22 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       } else {
         icon.removeClass('bi-check-square').addClass('bi-square');
       }
-      dt.draw();
+      // Recompute active filters once per click
+      recomputeFilters();
+      // Redraw once after toggling, throttle multiple rapid clicks
+      if (dt._aplusRedrawTimer) clearTimeout(dt._aplusRedrawTimer);
+      dt._aplusRedrawTimer = setTimeout(function(){ dt.draw(false); }, 0);
+      // Hide tooltip if open
+      try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+          const tip = bootstrap.Tooltip.getInstance(this);
+          if (tip) tip.hide();
+        }
+      } catch (e) { /* ignore */ }
     });
+
+    // Initialize description popovers for filter buttons
+    initFilterButtonDescriptions();
 
     // Selection behavior (teacher only)
     if (is_teacher) {
@@ -393,6 +783,7 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
         // Show selected among filtered
         $('#selected-number').text(selectedFiltered);
         $('#add-tag-selected').prop('disabled', selectedFiltered === 0);
+        $('#remove-tag-selected').prop('disabled', selectedFiltered === 0);
       }
 
       // Toggle per-row checkbox updates selection store
@@ -430,12 +821,23 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
     }
 
     // After translations are ready, add tag popovers/buttons and actions
-    $(document).on('aplus:translation-ready', function () {
+    $(document).off('aplus:translation-ready.aplusTags').on('aplus:translation-ready.aplusTags', function () {
       add_colortag_buttons(
         api_url,
         document.getElementById('table-participants'),
         participants
       );
+        // Reinitialize popovers on every DT redraw to cover newly rendered labels
+        if (dt && typeof dt.on === 'function' && !dt._aplusTagDrawHandler) {
+          dt.on('draw.aplusTagPopovers', function(){
+            add_colortag_buttons(
+              api_url,
+              document.getElementById('table-participants'),
+              participants
+            );
+          });
+          dt._aplusTagDrawHandler = true;
+        }
       if (is_teacher) {
         // Populate actions column on draw
         const renderActionBtn = function(label, icon, onClick, extraClasses){
@@ -470,7 +872,7 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
               const $btn = $('<button type="button" />')
                 .addClass('add-tag-inline aplus-button--primary aplus-button--xs ms-1')
                 .append($('<i/>').addClass('bi-tag').attr('aria-hidden', true))
-                .append(' ' + _('Add tag'))
+                .append(' ' + _('Add new tagging'))
                 .on('click', function(){ openAddTagModal([row.user_id]); });
               $tagsCell.append(' ').append($btn);
             }
@@ -489,7 +891,25 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
           }
           if (ids.length) openAddTagModal(ids);
         });
+        // Global "Remove tag from selected" button
+        const $globalRmBtn = $('#remove-tag-selected');
+        $globalRmBtn.off('click.aplusRmSel').on('click.aplusRmSel', function(){
+          const ids = [];
+          const filtered = dt.rows({ search: 'applied', page: 'all' }).data();
+          for (let i = 0; i < filtered.length; i++) {
+            const uid = filtered[i].user_id;
+            if (selectedIds.has(uid)) ids.push(uid);
+          }
+          if (ids.length) openRemoveTagModal(ids);
+        });
       }
+    });
+
+    // When tags change (e.g., removed via popover), refresh the table filtering
+    $(document).off('aplus:tags-changed.aplusDT').on('aplus:tags-changed.aplusDT', function(){
+      // Redraw to apply current filter state
+      if (dt._aplusRedrawTimer) clearTimeout(dt._aplusRedrawTimer);
+      dt._aplusRedrawTimer = setTimeout(function(){ dt.draw(false); }, 0);
     });
 
     // Confirm in modal: perform POST and update UI
@@ -497,10 +917,24 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       const userIds = $(this).data('targetUserIds') || [];
       const tagSlug = $('#tag-add-select').val();
       if (!tagSlug || !userIds.length) return;
-      postAddTaggings(userIds, tagSlug, function(){
-        applyAddedTag(userIds, tagSlug);
+      postAddTaggings(userIds, tagSlug, function(successIds){
+        if (Array.isArray(successIds) && successIds.length) {
+          applyAddedTag(successIds, tagSlug);
+        }
         // Close modal
         const m = bootstrap.Modal.getInstance(document.getElementById('tag-add-modal'));
+        if (m) m.hide();
+      });
+    });
+
+    // Confirm in modal: perform DELETE and update UI (DataTables path)
+    $('#tag-remove-confirm').off('click.aplusRmConfirmDT').on('click.aplusRmConfirmDT', function(){
+      const userIds = $(this).data('targetUserIds') || [];
+      const tagSlug = $('#tag-remove-select').val();
+      if (!tagSlug || !userIds.length) return;
+      deleteTaggings(userIds, tagSlug, function(successIds){
+        if (Array.isArray(successIds) && successIds.length) applyRemovedTag(successIds, tagSlug);
+        const m = bootstrap.Modal.getInstance(document.getElementById('tag-remove-modal'));
         if (m) m.hide();
       });
     });
@@ -646,7 +1080,7 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       deferredRowActions.push(function() {
         // Add Tag button
         actionsColumn.append(
-          get_row_action(_('Add tag'), 'tag', function(){ openAddTagModal([participant.user_id]); })
+          get_row_action(_('Add new tagging'), 'tag', function(){ openAddTagModal([participant.user_id]); })
             .removeClass('aplus-button--danger').addClass('aplus-button--primary')
         ).append(' ');
         actionsColumn.append(
@@ -678,6 +1112,7 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       $all_box.prop('indeterminate', at_least_one_checked && !all_checked);
       $('#selected-number').text($checked_boxes.length);
       $('#add-tag-selected').prop('disabled', $checked_boxes.length === 0);
+      $('#remove-tag-selected').prop('disabled', $checked_boxes.length === 0);
       return false;
     }
 
@@ -712,9 +1147,26 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
         ids = get_participants().find('input:checkbox:checked').map(function(){ return parseInt(this.value, 10); }).get();
       }
       if (!ids.length) return;
-      postAddTaggings(ids, tagSlug, function(){
-        applyAddedTag(ids, tagSlug);
+      postAddTaggings(ids, tagSlug, function(successIds){
+        if (Array.isArray(successIds) && successIds.length) {
+          applyAddedTag(successIds, tagSlug);
+        }
         const m = bootstrap.Modal.getInstance(document.getElementById('tag-add-modal'));
+        if (m) m.hide();
+      });
+    });
+    // Confirm in modal: perform DELETE and update UI (manual table)
+    $('#tag-remove-confirm').off('click.aplusRmConfirm').on('click.aplusRmConfirm', function(){
+      const userIds = $(this).data('targetUserIds') || [];
+      let ids = userIds;
+      if (!ids.length) {
+        ids = get_participants().find('input:checkbox:checked').map(function(){ return parseInt(this.value, 10); }).get();
+      }
+      const tagSlug = $('#tag-remove-select').val();
+      if (!tagSlug || !ids.length) return;
+      deleteTaggings(ids, tagSlug, function(successIds){
+        if (Array.isArray(successIds) && successIds.length) applyRemovedTag(successIds, tagSlug);
+        const m = bootstrap.Modal.getInstance(document.getElementById('tag-remove-modal'));
         if (m) m.hide();
       });
     });
@@ -729,12 +1181,27 @@ function participants_list(participants, api_url, is_teacher, enrollment_statuse
       icon.removeClass('bi-check-square').addClass('bi-square');
     }
     refresh_filters();
+    // Hide tooltip if open
+    try {
+      if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        const tip = bootstrap.Tooltip.getInstance(this);
+        if (tip) tip.hide();
+      }
+    } catch (e) { /* ignore */ }
   });
+
+  // Initialize description popovers for filter buttons (manual table path)
+  initFilterButtonDescriptions();
 
   // Global "Add tag to selected" button handler (manual table)
   $('#add-tag-selected').off('click.aplusAddSel').on('click.aplusAddSel', function(){
     const ids = get_participants().find('input:checkbox:checked').map(function(){ return parseInt(this.value, 10); }).get();
     if (ids.length) openAddTagModal(ids);
+  });
+  // Global "Remove tag from selected" button handler (manual table)
+  $('#remove-tag-selected').off('click.aplusRmSel').on('click.aplusRmSel', function(){
+    const ids = get_participants().find('input:checkbox:checked').map(function(){ return parseInt(this.value, 10); }).get();
+    if (ids.length) openRemoveTagModal(ids);
   });
 
   refresh_filters();
