@@ -12,22 +12,12 @@
 <!-- DataTables plugin with Bootstrap 5 styling and Buttons/export support -->
 <link href="https://cdn.datatables.net/v/bs5/dt-2.2.1/b-3.2.1/b-html5-3.2.1/datatables.min.css" rel="stylesheet">
 <style>
-	/*
- * Navigation
- */
-
-.nav-tabs>li.active>a,
-.nav-tabs>li.active>a:hover,
-.nav-tabs>li.active>a:focus {
-	background-color: #A9A9A9 !important;
-}
-
 /*
  * Table
  */
 
  #table-participants-div {
-	 max-height: calc(100vh - 12em);
+	 max-height: calc(100vh - 18em);
 	 max-width: 100vw;
 	 margin-top: 6px;
 	 overflow: auto; /* internal scroll so header can stick and pagination remains in view */
@@ -37,93 +27,12 @@
 	margin-top: 0 !important; /* To overwrite DataTable styling and improve scrolling; replaced with div margin */
 }
 
-#table-heading th {
-	min-width: 6em;
-	width: 15vw;
-	max-width: calc(12em + 26px);
-	/*background-color: white;*/
-	position: -webkit-sticky; /* Safari */
-	position: sticky;
-	top: 0;
-	z-index: 2;
-}
-
-#table-heading th.student-id {
-	max-width: calc(8em + 26px);
-}
-
-#table-heading th.select-box,
-#table-heading th.actions-container {
-	min-width: 2em;
-}
-
-#table-heading th.select-box {
-	max-width:2em;
-}
-
-#table-heading .form-control { /* Search bars in heading cells */
-	min-width: 6em;
-	width: min(12em, 14vw);
-}
-
-#table-heading th.student-id .form-control,
-#table-heading th.total .form-control {
-	max-width: 8em;
-}
-
-#table-heading th.student-id, #table-heading th.student-id input
-{
-	max-width: 6em;
-}
-
-#table-heading th.user-tags {
-	min-width: 10em;
-}
-
-#table-heading th.stick-on-scroll:not(.indicator-heading) {
-    left: 0;
-    z-index: 3;
-}
-
-#table-heading th.stick-on-scroll.indicator-heading {
-	left: 0;
-}
-
-tbody td.stick-on-scroll {
-    position: -webkit-sticky; /* Safari */
-    position: sticky;
-    left: 0;
-    z-index: 1;
-}
-
-#table-heading th.stick-on-scroll:nth-child(2),
-tbody td.stick-on-scroll:nth-child(2) {
-	left: 6em;
-}
-
-table#table-points thead td div.ratio {
-	text-align: right;
-	font-style: italic;
-	font-weight: normal;
-}
-table#table-points thead td div.ratio::after {
-	content: "%";
-}
-
-.student-id,
-.student-name,
-#table-heading th.indicator-heading {
-    font-weight: bold;
-}
-
-div.dt-note {
-    padding-top: 8px;
-    white-space: nowrap;
-	text-align: right;
-}
-
 span.colortag.label-xs {
 	font-size: 0.75em; /* Bootstrap default badge font size for .badge-xs */
+}
+
+button.filter-tag {
+	font-weight: bold;
 }
 
 </style>
@@ -132,16 +41,16 @@ span.colortag.label-xs {
 {% block columns %}
 <div class="col-md-12">
 
-	{% if is_teacher %}
 	<p>
+		{% if is_teacher %}
 		<a class="aplus-button--default aplus-button--sm" role="button" href="{{ instance|url:'enroll-students' }}">
 			<i class="bi-person-fill" aria-hidden="true"></i>
 			{% translate "ENROLL_STUDENTS" %}
 		</a>
+		{% endif %}
 	</p>
-	{% endif %}
 	<p class="filter-users">
-		<small class="text-body-secondary">{% trans "FILTER_USERS_BY_TAG" %}:</small>
+		<small class="text-body-secondary d-block">{% trans "FILTER_USERS_BY_TAG" %}:</small>
 		{% for tag in tags %}
 		<button
 			class="btn btn-sm filter-tag"
@@ -159,7 +68,7 @@ span.colortag.label-xs {
 		</button>
 		{% endfor %}
 		<br>
-		<small class="text-body-secondary">{% trans "FILTER_USERS_BY_STATUS" %}:</small>
+		<small class="text-body-secondary d-block mt-3">{% trans "FILTER_USERS_BY_STATUS" %}:</small>
 		{% for status_code, status_label in enrollment_statuses.items %}
 		<button class="btn aplus-button--xs aplus-button--secondary filter-status" data-status="{{ status_code }}">
 			{% if status_code == 'ACTIVE' %}
@@ -167,23 +76,19 @@ span.colortag.label-xs {
 			{% else %}
 			<i class="bi-square" aria-hidden="true"></i>
 			{% endif %}
-			{{ status_label }}
+			{{ status_label }} (<strong id="status-{{ status_code }}-count">0</strong>)
 		</button>
 		{% endfor %}
 	</p>
 
 	<p>
-		{% trans "NUMBER_OF_ENROLLED_STUDENTS" %} <strong id="active-participants-number"></strong>
-		({% trans "PENDING_STUDENTS" %} <strong id="pending-participants-number"></strong>,
-		{% trans "REMOVED_STUDENTS" %} <strong id="removed-participants-number"></strong>,
-		{% trans "BANNED_STUDENTS" %} <strong id="banned-participants-number"></strong>).
 		{% if is_teacher %}
 		{% translate "OF_WHICH_SELECTED" %} <strong id="selected-number">0</strong>
-		<button type="button" id="add-tag-selected" class="aplus-button--primary aplus-button--sm ms-2" disabled>
+		<button type="button" id="add-tag-selected" class="aplus-button--secondary aplus-button--xs ms-2" disabled>
 			<i class="bi-tag" aria-hidden="true"></i>
 			{% translate "ADD_STUDENT_TAG" %}
 		</button>
-		<button type="button" id="remove-tag-selected" class="aplus-button--danger aplus-button--sm ms-1" disabled title="{% translate 'REMOVE_STUDENT_TAG' %}">
+		<button type="button" id="remove-tag-selected" class="aplus-button--danger aplus-button--xs ms-1" disabled title="{% translate 'REMOVE_STUDENT_TAG' %}">
 			<i class="bi-tag" aria-hidden="true"></i>
 			{% translate "REMOVE_STUDENT_TAG" %}
 		</button>
@@ -244,7 +149,7 @@ span.colortag.label-xs {
 				</button>
 				<button
 					type="button"
-					class="aplus-button--primary aplus-button--md"
+					class="aplus-button--secondary aplus-button--md"
 					id="tag-add-confirm"
 				>
 					{% translate "ADD_STUDENT_TAG" %}
