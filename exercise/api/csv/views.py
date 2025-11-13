@@ -9,6 +9,8 @@ from django.db.models import (
     Q,
 )
 from django.db.models.aggregates import Count
+from django.db.models import Subquery, Value, Case, When
+from django.db.models.functions import Coalesce
 from django.db.models.query import QuerySet
 from rest_framework import viewsets
 from rest_framework.request import Request
@@ -24,7 +26,7 @@ from lib.api.constants import REGEX_INT_ME
 from course.api.mixins import CourseResourceMixin
 from course.permissions import IsCourseAdminOrUserObjIsSelf
 from exercise.exercise_models import BaseExercise
-from exercise.submission_models import SubmissionQuerySet
+from exercise.submission_models import SubmissionQuerySet, ExerciseUserPoints
 from userprofile.models import UserProfile
 
 from ...cache.points import CachedPoints, ExercisePoints
@@ -451,6 +453,110 @@ class CourseBestResultsDataViewSet(CourseResultsDataViewSet):
     and the LAST mode is ignored.
     """
     point_annotator = "annotate_best_submitter_points"
+
+    # Override to use precomputed stats from ExerciseUserPoints for speed
+    # pylint: disable=too-many-arguments
+    def get_submissions_query(
+            self,
+            ids: List[int],
+            profiles: QuerySet[UserProfile],
+            exclude_list: List[str], # Submission.STATUS
+            revealed_ids: Iterable[int],
+            show_unofficial: bool,
+            show_unconfirmed: bool,
+            ) -> SubmissionQuerySet:
+        # Start from the same base as the parent, to preserve the unconfirmed-exclusion logic
+        query = (
+            Submission.objects
+            .filter(exercise__in=ids, submitters__in=profiles)
+            .exclude(status__in=(exclude_list))
+        )
+
+        if not show_unconfirmed:
+            # Select mandatory sibling exercises
+            need_to_confirm = (
+                BaseExercise.objects
+                .annotate(
+                    # ExpressionWrapper is needed due to https://code.djangoproject.com/ticket/31714
+                    outer_parent_id=ExpressionWrapper(
+                        OuterRef("exercise__parent_id"),
+                        output_field=IntegerField(),
+                    )
+                )
+                .filter(
+                    Q(parent_id=F("outer_parent_id"))
+                    # Exercises directly under a module have NULL parents
+                    | Q(parent_id=None, outer_parent_id=None),
+                )
+                .filter(
+                    course_module__course_instance=self.instance,
+                    category__confirm_the_level=True,
+                    course_module_id=OuterRef("exercise__course_module_id"),
+                )
+            )
+            # Select submissions that pass mandatory sibling exercises
+            confirmed = (
+                Submission.objects
+                .annotate(
+                    # ExpressionWrapper is needed due to https://code.djangoproject.com/ticket/31714
+                    outer_parent_id=ExpressionWrapper(
+                        OuterRef("exercise__parent_id"),
+                        output_field=IntegerField(),
+                    )
+                )
+                .filter(
+                    Q(exercise__parent_id=F("outer_parent_id"))
+                    # Exercises directly under a module have NULL parents
+                    | Q(exercise__parent_id=None, outer_parent_id=None),
+                )
+                .filter(
+                    submitters=OuterRef("submitters"),
+                    exercise__category__confirm_the_level=True,
+                    exercise__course_module_id=OuterRef("exercise__course_module_id"),
+                )
+                .passes()
+            )
+            # Exclude unconfirmed submissions
+            query = query.filter(
+                ~Exists(need_to_confirm) | Exists(confirmed)
+            )
+
+        query = (
+            query
+            .values('submitters__user_id', 'exercise_id')
+            .annotate(count=Count('id'))
+        )
+
+        # Join precomputed stats via Subquery
+        stats = ExerciseUserPoints.objects.filter(
+            exercise_id=OuterRef('exercise_id'),
+            submitter_id=OuterRef('submitters__user_id'),
+        )
+
+        forced_sq = Subquery(stats.values('forced_points')[:1])
+        off_best_sq = Subquery(stats.values('official_best_grade')[:1])
+        all_best_sq = Subquery(stats.values('all_best_grade')[:1])
+
+        # Base total expression: forced if present, otherwise best (official/all)
+        base_total = Coalesce(
+            forced_sq,
+            all_best_sq if show_unofficial else off_best_sq,
+            Value(0),
+        )
+
+        # Apply reveal mask if provided
+        if revealed_ids is not None:
+            if revealed_ids:
+                total_expr = Case(
+                    When(~Q(exercise_id__in=revealed_ids), then=Value(0)),
+                    default=base_total,
+                )
+            else:
+                total_expr = Value(0)
+        else:
+            total_expr = base_total
+
+        return query.annotate(total=total_expr).order_by()
 
 
 def int_or_none(value):
