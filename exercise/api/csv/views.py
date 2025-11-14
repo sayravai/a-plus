@@ -28,6 +28,7 @@ from course.permissions import IsCourseAdminOrUserObjIsSelf
 from exercise.exercise_models import BaseExercise
 from exercise.submission_models import SubmissionQuerySet, ExerciseUserPoints
 from userprofile.models import UserProfile
+from course.models import Enrollment
 
 from ...cache.points import CachedPoints, ExercisePoints
 from ...models import Submission
@@ -129,9 +130,12 @@ class CourseSubmissionDataViewSet(NestedViewSetMixin,
         points = CachedPoints(self.instance, profile.user, self.is_course_staff)
         ids = points.submission_ids(**search_args)
         revealed_ids = get_revealed_exercise_ids(search_args, points)
-        queryset = Submission.objects.filter(
-            id__in=ids
-        ).prefetch_related('exercise', 'notifications', 'files')
+        queryset = (
+            Submission.objects
+            .filter(id__in=ids, submitters__user_id=profile.user_id)
+            .prefetch_related('exercise', 'notifications', 'files')
+            .distinct()
+        )
         return self.serialize_submissions(request, queryset, revealed_ids)
 
     def serialize_submissions(
@@ -314,7 +318,9 @@ class CourseResultsDataViewSet(NestedViewSetMixin,
 
     def get_queryset(self):
         if self.action == 'list':
+            self._enrollment_scope = 'students'
             return self.instance.students
+        self._enrollment_scope = 'active_all'
         return self.instance.course_staff_and_students
 
     def get_search_args(self, request):
@@ -331,7 +337,8 @@ class CourseResultsDataViewSet(NestedViewSetMixin,
         return self.serialize_profiles(request, profiles)
     # pylint: disable-next=arguments-differ unused-argument
     def retrieve(self, request, version=None, course_id=None, user_id=None):
-        return self.serialize_profiles(request, [self.get_object()])
+        # Pass queryset, not list, to avoid subquery duplication concerns
+        return self.serialize_profiles(request, UserProfile.objects.filter(pk=self.get_object().pk))
 
     # pylint: disable-next=too-many-arguments
     def get_submissions_query(
@@ -343,11 +350,23 @@ class CourseResultsDataViewSet(NestedViewSetMixin,
             show_unofficial: bool,
             show_unconfirmed: bool,
             ) -> SubmissionQuerySet:
-        query = (
-            Submission.objects
-            .filter(exercise__in=ids, submitters__in=profiles)
-            .exclude(status__in=(exclude_list))
-        )
+        # Build base query: apply course-instance + active status filters directly.
+        query = Submission.objects.filter(exercise__in=ids).exclude(status__in=exclude_list)
+        # If profiles only include students, add role filter; otherwise include all active roles.
+        if profiles.exists() and profiles.filter(enrollment__role=Enrollment.ENROLLMENT_ROLE.STUDENT).count() == profiles.count():
+            query = query.filter(
+                submitters__enrollment__course_instance=self.instance,
+                submitters__enrollment__status=Enrollment.ENROLLMENT_STATUS.ACTIVE,
+                submitters__enrollment__role=Enrollment.ENROLLMENT_ROLE.STUDENT,
+            )
+        else:
+            query = query.filter(
+                submitters__enrollment__course_instance=self.instance,
+                submitters__enrollment__status=Enrollment.ENROLLMENT_STATUS.ACTIVE,
+            )
+        if profiles.count() == 1:
+            # Narrow further to single profile; use user_profile FK field path
+            query = query.filter(submitters__user_profile__id=profiles.first().id)
 
         if not show_unconfirmed:
             # Select mandatory sibling exercises
@@ -465,12 +484,20 @@ class CourseBestResultsDataViewSet(CourseResultsDataViewSet):
             show_unofficial: bool,
             show_unconfirmed: bool,
             ) -> SubmissionQuerySet:
-        # Start from the same base as the parent, to preserve the unconfirmed-exclusion logic
-        query = (
-            Submission.objects
-            .filter(exercise__in=ids, submitters__in=profiles)
-            .exclude(status__in=(exclude_list))
-        )
+        query = Submission.objects.filter(exercise__in=ids).exclude(status__in=exclude_list)
+        if profiles.exists() and profiles.filter(enrollment__role=Enrollment.ENROLLMENT_ROLE.STUDENT).count() == profiles.count():
+            query = query.filter(
+                submitters__enrollment__course_instance=self.instance,
+                submitters__enrollment__status=Enrollment.ENROLLMENT_STATUS.ACTIVE,
+                submitters__enrollment__role=Enrollment.ENROLLMENT_ROLE.STUDENT,
+            )
+        else:
+            query = query.filter(
+                submitters__enrollment__course_instance=self.instance,
+                submitters__enrollment__status=Enrollment.ENROLLMENT_STATUS.ACTIVE,
+            )
+        if profiles.count() == 1:
+            query = query.filter(submitters__user_profile__id=profiles.first().id)
 
         if not show_unconfirmed:
             # Select mandatory sibling exercises
