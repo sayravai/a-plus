@@ -1344,6 +1344,16 @@
                 }
             }
 
+            if (!window.jQuery) {
+                console.error('jQuery not loaded before DataTables initialization.');
+            } else if (!$.fn.DataTable && window.DataTable) {
+                console.warn('jQuery loaded but DataTables jQuery plugin missing; falling back.');
+                // Optional fallback (lets you proceed without refactor):
+                $.fn.DataTable = function(opts){ return new DataTable(this[0], opts); };
+            } else if (!$.fn.DataTable) {
+                console.error('DataTables plugin not present.');
+            }
+
             /**
              * Initialize the DataTables plugin for the main table
              */
