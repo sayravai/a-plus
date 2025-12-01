@@ -31,6 +31,11 @@
     let _exercises;
 
     /**
+     * Stores the raw points data from backend (with both official and unofficial data)
+     */
+    let _rawPointsData = null;
+
+    /**
      * Stores the usertags data loaded via ajax call
      */
     let _usertags = [];
@@ -48,6 +53,12 @@
      * { exercise_id(int): difficulty_level(str) }
      */
     let _reverseDifficulties = {};
+
+    /**
+     * Stores confirmation requirements for exercises
+     * { exercise_id(int): {requires_confirmation: bool, parent_id: int|null, module_id: int} }
+     */
+    let _confirmationMap = {};
 
     /**
      * Difficulty levels present in the user-filtered data
@@ -1119,7 +1130,120 @@
 
 
     /**
-     * Loads new data on page load, and when "Show only official points" checkbox clicked
+     * Recalculates points data from cached raw data based on show_unofficial and show_unconfirmed flags.
+     * Transforms nested format to flat format for DataTables.
+     * @param {Array} rawDataArray - Array of student objects with nested format
+     * @param {boolean} show_unofficial - Whether to include unofficial points
+     * @param {boolean} show_unconfirmed - Whether to include unconfirmed points
+     * @returns {Array} Array of student objects in flat format for DataTables
+     */
+    function recalculatePointsData(rawDataArray, show_unofficial, show_unconfirmed) {
+        // Create a deep copy to avoid modifying the cached data
+        const recalculatedData = JSON.parse(JSON.stringify(rawDataArray));
+        
+        recalculatedData.forEach(function(points) {
+            // Convert new nested format to flat format
+            // New format: { exercises: { "22": {c: 3, t: 10, uc: 1, ut: 5} }, totals: {c: 12, t: 117} }
+            // Old format: { "22 Count": 3, "22 Total": 10, Count: 12, Total: 117 }
+            
+            if(points.exercises !== undefined) {
+                // Convert exercises object to flat format
+                // Use unofficial (all) counts if show_unofficial is true, otherwise use official counts
+                for(let exId in points.exercises) {
+                    const ex = points.exercises[exId];
+                    if (show_unofficial) {
+                        // Use official + unofficial (all counts)
+                        points[exId + ' Count'] = (ex.c || 0) + (ex.uc || 0);
+                        points[exId + ' Total'] = (ex.t || 0) + (ex.ut || 0);
+                    } else {
+                        // Use only official counts
+                        points[exId + ' Count'] = ex.c || 0;
+                        points[exId + ' Total'] = ex.t || 0;
+                    }
+                }
+                
+                // Convert totals object to flat format
+                if(points.totals !== undefined) {
+                    if (show_unofficial) {
+                        points['Count'] = (points.totals.c || 0) + (points.totals.uc || 0);
+                        points['Total'] = (points.totals.t || 0) + (points.totals.ut || 0);
+                    } else {
+                        points['Count'] = points.totals.c || 0;
+                        points['Total'] = points.totals.t || 0;
+                    }
+                }
+            }
+            
+            // Calculate module and difficulty totals
+            if(points['Count'] !== undefined) {
+                let studentTotalPoints = 0;
+                for(let diff in _difficulties) {
+                    points[diff] = 0;
+                }
+                for(let moduleIdx in _exercises) {
+                    let moduleSubmissions = 0;
+                    let moduleTotalPoints = 0;
+                    const moduleId = _exercises[moduleIdx].id;
+                    if(_exercises[moduleIdx].exercises.length > 0) {
+                        for(let exerciseIdx in _exercises[moduleIdx].exercises) {
+                            const exId = _exercises[moduleIdx].exercises[exerciseIdx].id;
+
+                            if(points[exId + ' Count'] === undefined) {
+                                points[exId + ' Count'] = 0;
+                                points[exId + ' Total'] = 0;
+                            } else {
+                                if(points[exId + ' Total'] === undefined) {
+                                    points[exId + ' Total'] = 0;
+                                }
+                                moduleSubmissions += points[exId + ' Count'];
+                                moduleTotalPoints += points[exId + ' Total'];
+                                if(_reverseDifficulties[exId] !== undefined) {
+                                    points[_reverseDifficulties[exId]] += points[exId + ' Total'];
+                                }
+                            }
+                        }
+                    }
+                    points['m' + moduleId + ' Count'] = moduleSubmissions;
+                    points['m' + moduleId + ' Total'] = moduleTotalPoints;
+                    studentTotalPoints += moduleTotalPoints;
+                }
+            }
+            
+            // Apply confirmation logic if show_unconfirmed is false
+            if (!show_unconfirmed) {
+                // Find all mandatory exercises (requires_confirmation = true)
+                const mandatoryExercises = Object.keys(_confirmationMap).filter(
+                    exId => _confirmationMap[exId].requires_confirmation
+                );
+                
+                // For each mandatory exercise, check if student has passed it
+                mandatoryExercises.forEach(function(mandatoryExId) {
+                    const mandatoryInfo = _confirmationMap[mandatoryExId];
+                    const studentPoints = points[mandatoryExId + ' Total'] || 0;
+                    
+                    // If student has 0 points on mandatory exercise, zero out all siblings
+                    if (studentPoints === 0) {
+                        // Find all siblings (exercises with same parent_id and module_id)
+                        Object.keys(_confirmationMap).forEach(function(exId) {
+                            const exInfo = _confirmationMap[exId];
+                            if (exInfo.parent_id === mandatoryInfo.parent_id && 
+                                exInfo.module_id === mandatoryInfo.module_id) {
+                                // Zero out this sibling exercise
+                                points[exId + ' Count'] = 0;
+                                points[exId + ' Total'] = 0;
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        
+        return recalculatedData;
+    }
+
+    /**
+     * Loads new data on page load, and when checkboxes are toggled.
+     * For unofficial points, we use cached data instead of refetching from backend.
      * @param {*} show_unofficial
      */
     function loadStudentData(show_unofficial, show_unconfirmed, ignore_last_grading_mode) {
@@ -1133,7 +1257,55 @@
             ignore_last_grading_mode = $('#ignore-last-mode-checkbox').prop('checked');
         }
 
-        // Destroy old data table if it exists
+        // Disable all checkboxes during processing to prevent multiple clicks
+        $('input.unofficial-checkbox').prop('disabled', true);
+        $('input.unconfirmed-checkbox').prop('disabled', true);
+        $('input.withsubs-checkbox').prop('disabled', true);
+        $('#ignore-last-mode-checkbox').prop('disabled', true);
+        
+        // Use setTimeout to allow the browser to update the DOM (disable checkbox) before heavy processing
+        setTimeout(function() {
+            // If we have cached data and table already exists, just update the data in place
+            if(_rawPointsData !== null && dtApi !== undefined) {
+                // Recalculate points from cached data with new show_unofficial and show_unconfirmed settings
+                const updatedData = recalculatePointsData(_rawPointsData, show_unofficial, show_unconfirmed);
+                
+                // Update DataTable data without destroying it
+                dtApi.clear();
+                dtApi.rows.add(updatedData);
+                // Draw first to update the table data, then recalculate summaries
+                dtApi.draw(false); // false = stay on current page
+                
+                // Now recalculate summaries and totals based on new data
+                recalculateTable();
+                
+                // Re-enable checkboxes
+                $('input.unofficial-checkbox').prop('disabled', false);
+                $('input.unconfirmed-checkbox').prop('disabled', false);
+                $('.withsubs-checkbox').prop('disabled', false);
+                $('#ignore-last-mode-checkbox').prop('disabled', false);
+                return;
+            }
+            
+            // If we have cached data but no table yet (shouldn't happen), do full render
+            if(_rawPointsData !== null) {
+                // Destroy old data table if it exists
+                if(dtApi !== undefined) {
+                    dtApi.destroy();
+                    moduleSelectRef.multiselect('destroy');
+                    exerciseSelectRef.multiselect('destroy');
+                    moduleSelectRef.find('option').remove();
+                    exerciseSelectRef.find('option').remove();
+                    pointsTableRef.find('tr').remove();
+                    $('.filter-users button').off('click');
+                    $('#difficulty-exercises').tab('show');
+                }
+                // Process cached data with new show_unofficial setting
+                processAndRenderData(_exercises, _rawPointsData, _usertags, show_unofficial, show_unconfirmed);
+                return;
+            }
+        
+        // Destroy old data table if it exists before fetching new data
         // Also multiselects and event handlers that will be recreated
         if(dtApi !== undefined) {
             dtApi.destroy();
@@ -1145,16 +1317,43 @@
             $('.filter-users button').off('click');
             $('#difficulty-exercises').tab('show');
         }
+        
         let pUrl = pointsBestUrl;
         if (!ignore_last_grading_mode) pUrl = pointsUrl;
-        if (show_unofficial) pUrl = pUrl + "&show_unofficial=true";
-        if (show_unconfirmed) pUrl = pUrl + "&show_unconfirmed=true";
+        // Always fetch all data (official + unofficial + unconfirmed) from backend
+        // We'll filter on the frontend based on show_unofficial and show_unconfirmed checkboxes
+        pUrl = pUrl + "&show_unconfirmed=true";
         $.when(
             $.ajax(exercisesUrl),
             $.ajax(pUrl),
             $.ajax(usertagsUrl)
         ).done(function(exerciseJson, pointsJson, userTags) {
-            userTags[0].results.forEach(function(entry) {
+            // Cache the raw data for future use
+            _rawPointsData = pointsJson[0];
+            processAndRenderData(exerciseJson[0].results, pointsJson[0], userTags[0].results, show_unofficial, show_unconfirmed);
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error("Loading student data failed.");
+            console.error(errorThrown);
+        });
+        }, 0); // End of setTimeout - allows DOM update before processing
+    }
+    
+    /**
+     * Process and render the data table with the given parameters
+     */
+    function processAndRenderData(exercises, pointsData, userTagsData, show_unofficial, show_unconfirmed) {
+        const exerciseJson = [{results: exercises}];
+        const pointsJson = [pointsData];
+        // userTagsData is either an array of results (from AJAX) or already processed _usertags object (from cache)
+        const userTagsArray = Array.isArray(userTagsData) ? userTagsData : [];
+        
+        // Reset global objects that accumulate data on each render
+        _difficulties = {};
+        _reverseDifficulties = {};
+        
+        // Only process user tags if we have an array (first load from AJAX)
+        if (userTagsArray.length > 0) {
+            userTagsArray.forEach(function(entry) {
                 if(entry.id === null) {
                     // TODO: usertags are rendered in an Aalto-specific way as there's no API to return them?
                     _usertags[entry.name.toLowerCase()] = {color: entry.color, font_color: entry.font_color, name: entry.name, slug: entry.slug};
@@ -1163,6 +1362,7 @@
                 }
                 // Just save the bare minimum for rendering at this point
             });
+        }
 
             /**
              * Builds HTML link to user profile for a table row, to be used as
@@ -1242,6 +1442,12 @@
                         } else {
                             _difficulties[exercise.difficulty] = [exercise.id];
                         }
+                        // Store confirmation requirements for this exercise
+                        _confirmationMap[exercise.id] = {
+                            requires_confirmation: exercise.requires_confirmation || false,
+                            parent_id: exercise.parent_id || null,
+                            module_id: module.id
+                        };
                     })
                  }
             });
@@ -1263,8 +1469,40 @@
             }
 
             // Augment the raw points received from the API by
-            // adding colums for modules/_difficulties and filling in missing zeroes
+            // converting nested format to flat format and adding columns for modules/difficulties
             pointsJson[0].forEach(function(points, index) {
+                // Convert new nested format to flat format for backward compatibility
+                // New format: { exercises: { "22": {c: 3, t: 10, uc: 1, ut: 5} }, totals: {c: 12, t: 117} }
+                // Old format: { "22 Count": 3, "22 Total": 10, Count: 12, Total: 117 }
+                
+                if(points.exercises !== undefined) {
+                    // Convert exercises object to flat format
+                    // Use unofficial (all) counts if show_unofficial is true, otherwise use official counts
+                    for(let exId in points.exercises) {
+                        const ex = points.exercises[exId];
+                        if (show_unofficial) {
+                            // Use official + unofficial (all counts)
+                            points[exId + ' Count'] = (ex.c || 0) + (ex.uc || 0);
+                            points[exId + ' Total'] = (ex.t || 0) + (ex.ut || 0);
+                        } else {
+                            // Use only official counts
+                            points[exId + ' Count'] = ex.c || 0;
+                            points[exId + ' Total'] = ex.t || 0;
+                        }
+                    }
+                    
+                    // Convert totals object to flat format
+                    if(points.totals !== undefined) {
+                        if (show_unofficial) {
+                            points['Count'] = (points.totals.c || 0) + (points.totals.uc || 0);
+                            points['Total'] = (points.totals.t || 0) + (points.totals.ut || 0);
+                        } else {
+                            points['Count'] = points.totals.c || 0;
+                            points['Total'] = points.totals.t || 0;
+                        }
+                    }
+                }
+                
                 // Only fill in row if student has submissions, otherwise defaults to 0 by definition
                 if(points['Count'] !== undefined) {
                     //let studentTotalSubmissions = 0;
@@ -1541,20 +1779,24 @@
             /**
              * Show only students with submissions checkbox is handled by
              * dynamically creating/removing this DataTables search filter.
-             * Note: if the same method is applied for more functionality in the future,
-             * we need to make sure to pop the correct plugin from the array each time.
+             * We store a reference to the specific filter function so we can remove
+             * exactly the right one, not just the last item in the array.
              */
+            var onlySubsFilter = function( settings, searchData ) {
+                var subs = parseInt( searchData[15] ) || 0; // Number of submissions of student (column 15)
+                return subs > 0;
+            };
+            
             $('.withsubs-checkbox').change(function() {
                 if($(this).prop('checked')) {
-                    // DataTables search filter, returns true if student has submissions
-                    $.fn.dataTable.ext.search.push(
-                        function( settings, searchData ) {
-                            var subs = parseInt( searchData[5] ) || 0; // Number of submissions of student
-                            return subs > 0;
-                        }
-                    );
+                    // Add the "only students with submissions" filter
+                    $.fn.dataTable.ext.search.push(onlySubsFilter);
                 } else {
-                    $.fn.dataTable.ext.search.pop();
+                    // Remove the specific filter by reference
+                    var index = $.fn.dataTable.ext.search.indexOf(onlySubsFilter);
+                    if (index > -1) {
+                        $.fn.dataTable.ext.search.splice(index, 1);
+                    }
                 }
                 // Make a dummy search with empty string so the newly added plugin is applied
                 dtVar.search('');
@@ -1574,12 +1816,13 @@
                 }
                 searchForSelectedTags();
             });
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            console.error("Loading student data failed.");
-            console.error(errorThrown);
-        });
-    };
+            
+            // Re-enable all checkboxes after table is ready
+            $('input.unofficial-checkbox').prop('disabled', false);
+            $('input.unconfirmed-checkbox').prop('disabled', false);
+            $('input.withsubs-checkbox').prop('disabled', false);
+            $('#ignore-last-mode-checkbox').prop('disabled', false);
+        }
 
     // Event listener for AND/OR tag operator
     $('input.tags-operator').change(function(){
@@ -1587,12 +1830,34 @@
     });
 
     /**
-     * To toggle whether only official points are displayed, we need to refetch the
-     * data from backend. This is because the frontend logic is already very complex.
+     * To toggle unofficial points, we recalculate from cached data.
+     * For unconfirmed and grading mode changes, we refetch from backend.
      */
-    $('input.unconfirmed-checkbox').change(() => loadStudentData());
-    $('input.unofficial-checkbox').change(() => loadStudentData());
-    $('#ignore-last-mode-checkbox').change(() => loadStudentData());
+    $('input.unofficial-checkbox').change(() => {
+        if (_rawPointsData !== null) {
+            // Recalculate from cached data
+            const show_unofficial = $('input.unofficial-checkbox').prop('checked');
+            const show_unconfirmed = $('input.unconfirmed-checkbox').prop('checked');
+            loadStudentData(show_unofficial, show_unconfirmed, $('#ignore-last-mode-checkbox').prop('checked'));
+        } else {
+            loadStudentData();
+        }
+    });
+    $('input.unconfirmed-checkbox').change(() => {
+        if (_rawPointsData !== null) {
+            // Recalculate from cached data - frontend handles unconfirmed filtering
+            const show_unofficial = $('input.unofficial-checkbox').prop('checked');
+            const show_unconfirmed = $('input.unconfirmed-checkbox').prop('checked');
+            loadStudentData(show_unofficial, show_unconfirmed, $('#ignore-last-mode-checkbox').prop('checked'));
+        } else {
+            loadStudentData();
+        }
+    });
+    $('#ignore-last-mode-checkbox').change(() => {
+        // Need to refetch for grading mode changes
+        _rawPointsData = null;
+        loadStudentData();
+    });
     $(document).on("aplus:translation-ready", () => loadStudentData());
 
 })(jQuery, document, window);

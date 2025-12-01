@@ -435,51 +435,40 @@ class CourseResultsDataViewSet(NestedViewSetMixin,
         ids = [e.id for e in exercises]
         points = CachedPoints(self.instance, request.user, self.is_course_staff)
         revealed_ids = get_revealed_exercise_ids(search_args, points)
-        exclude_list = [Submission.STATUS.ERROR, Submission.STATUS.REJECTED]
-        show_unofficial = request.GET.get('show_unofficial') == 'true'
-        if not show_unofficial:
-            exclude_list.append(Submission.STATUS.UNOFFICIAL)
-        show_unconfirmed = request.GET.get('show_unconfirmed') == 'true'
-        aggr = self.get_submissions_query(ids, profiles, exclude_list, revealed_ids, show_unofficial, show_unconfirmed)
+        # Skip slow submission query - fetch directly from ExerciseUserPoints cache table
+        user_ids = list(profiles.values_list('user_id', flat=True))
 
-        # Convert to list and bulk fetch points
-        aggr_list = list(aggr)
-        if aggr_list:
-            # Get unique exercise IDs and user IDs
-            exercise_ids = set(row['exercise_id'] for row in aggr_list)
-            user_ids = set(row['submitters__user_id'] for row in aggr_list)
+        points_qs = ExerciseUserPoints.objects.filter(
+            exercise_id__in=ids,
+            submitter__user_id__in=user_ids
+        ).select_related('submitter')
 
-            # Fetch all ExerciseUserPoints for these exercises and users
-            # This is much faster than 2,500+ OR conditions
-            points_dict = {
-                (p.exercise_id, p.submitter_id): p
-                for p in ExerciseUserPoints.objects.filter(
-                    exercise_id__in=exercise_ids,
-                    submitter_id__in=user_ids
-                )
-            }
-
-            # Attach total points in Python
-            for row in aggr_list:
-                key = (row['exercise_id'], row['submitters__user_id'])
-                stats = points_dict.get(key)
-                if stats:
-                    if revealed_ids is not None and row['exercise_id'] not in revealed_ids:
-                        row['total'] = 0
-                    else:
-                        # Use point_annotator logic: 'best' ignores grading mode
-                        if self.point_annotator == 'annotate_best_submitter_points':
-                            row['total'] = stats.forced_points or (
-                                stats.all_best_grade if show_unofficial else stats.official_best_grade
-                            ) or 0
-                        else:
-                            # annotate_submitter_points respects grading mode (BEST vs LAST)
-                            # For now use same logic; extend if LAST mode needed
-                            row['total'] = stats.forced_points or (
-                                stats.all_best_grade if show_unofficial else stats.official_best_grade
-                            ) or 0
+        # Build aggregate list directly from cache table
+        aggr_list = []
+        for stats in points_qs:
+            # Apply revealed mask
+            if revealed_ids is not None and stats.exercise_id not in revealed_ids:
+                official_total = 0
+                all_total = 0
+            else:
+                # Use point_annotator logic for official (confirmed) points
+                if self.point_annotator == 'annotate_best_submitter_points':
+                    official_total = stats.forced_points or stats.official_best_grade or 0
+                    all_total = stats.forced_points or stats.all_best_grade or 0
                 else:
-                    row['total'] = 0
+                    # annotate_submitter_points respects grading mode
+                    official_total = stats.forced_points or stats.official_best_grade or 0
+                    all_total = stats.forced_points or stats.all_best_grade or 0
+
+            # Build compact nested format with omitted zeros
+            aggr_list.append({
+                'submitters__user_id': stats.submitter.user_id,
+                'exercise_id': stats.exercise_id,
+                'official_count': stats.official_count,
+                'all_count': stats.all_count,
+                'official_total': official_total,
+                'all_total': all_total,
+            })
 
         data,fields = aggregate_points(
             profiles,
