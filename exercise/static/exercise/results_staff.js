@@ -1135,35 +1135,46 @@
 
 
     /**
-     * Recalculates points data from cached raw data based on show_unofficial and show_unconfirmed flags.
+     * Recalculates points data from cached raw data based on show_unofficial, show_unconfirmed, and ignore_last_grading_mode flags.
      * Transforms nested format to flat format for DataTables.
      * @param {Array} rawDataArray - Array of student objects with nested format
      * @param {boolean} show_unofficial - Whether to include unofficial points
      * @param {boolean} show_unconfirmed - Whether to include unconfirmed points
+     * @param {boolean} ignore_last_grading_mode - Whether to use best grades (true) or last grades (false)
      * @returns {Array} Array of student objects in flat format for DataTables
      */
-    function recalculatePointsData(rawDataArray, show_unofficial, show_unconfirmed) {
+    function recalculatePointsData(rawDataArray, show_unofficial, show_unconfirmed, ignore_last_grading_mode) {
         // Create a deep copy to avoid modifying the cached data
         const recalculatedData = JSON.parse(JSON.stringify(rawDataArray));
         
         recalculatedData.forEach(function(points) {
             // Convert new nested format to flat format
-            // New format: { exercises: { "22": {c: 3, t: 10, uc: 1, ut: 5} }, totals: {c: 12, t: 117} }
+            // New format: { exercises: { "22": {c: 3, tb: 10, tl: 8, uc: 1, utb: 5, utl: 3} }, totals: {c: 12, tb: 117, tl: 100} }
             // Old format: { "22 Count": 3, "22 Total": 10, Count: 12, Total: 117 }
             
             if(points.exercises !== undefined) {
                 // Convert exercises object to flat format
-                // Use unofficial (all) counts if show_unofficial is true, otherwise use official counts
+                // Choose between best (tb/utb) and last (tl/utl) grades based on ignore_last_grading_mode
                 for(let exId in points.exercises) {
                     const ex = points.exercises[exId];
                     if (show_unofficial) {
                         // Use official + unofficial (all counts)
                         points[exId + ' Count'] = (ex.c || 0) + (ex.uc || 0);
-                        points[exId + ' Total'] = (ex.t || 0) + (ex.ut || 0);
+                        // Use best or last grade based on grading mode
+                        if (ignore_last_grading_mode) {
+                            points[exId + ' Total'] = (ex.tb || 0) + (ex.utb || 0);
+                        } else {
+                            points[exId + ' Total'] = (ex.tl || 0) + (ex.utl || 0);
+                        }
                     } else {
                         // Use only official counts
                         points[exId + ' Count'] = ex.c || 0;
-                        points[exId + ' Total'] = ex.t || 0;
+                        // Use best or last grade based on grading mode
+                        if (ignore_last_grading_mode) {
+                            points[exId + ' Total'] = ex.tb || 0;
+                        } else {
+                            points[exId + ' Total'] = ex.tl || 0;
+                        }
                     }
                 }
                 
@@ -1171,10 +1182,20 @@
                 if(points.totals !== undefined) {
                     if (show_unofficial) {
                         points['Count'] = (points.totals.c || 0) + (points.totals.uc || 0);
-                        points['Total'] = (points.totals.t || 0) + (points.totals.ut || 0);
+                        // Use best or last grade based on grading mode
+                        if (ignore_last_grading_mode) {
+                            points['Total'] = (points.totals.tb || 0) + (points.totals.utb || 0);
+                        } else {
+                            points['Total'] = (points.totals.tl || 0) + (points.totals.utl || 0);
+                        }
                     } else {
                         points['Count'] = points.totals.c || 0;
-                        points['Total'] = points.totals.t || 0;
+                        // Use best or last grade based on grading mode
+                        if (ignore_last_grading_mode) {
+                            points['Total'] = points.totals.tb || 0;
+                        } else {
+                            points['Total'] = points.totals.tl || 0;
+                        }
                     }
                 }
             }
@@ -1272,8 +1293,8 @@
         setTimeout(function() {
             // If we have cached data and table already exists, just update the data in place
             if(_rawPointsData !== null && dtApi !== undefined) {
-                // Recalculate points from cached data with new show_unofficial and show_unconfirmed settings
-                const updatedData = recalculatePointsData(_rawPointsData, show_unofficial, show_unconfirmed);
+                // Recalculate points from cached data with new show_unofficial, show_unconfirmed, and ignore_last_grading_mode settings
+                const updatedData = recalculatePointsData(_rawPointsData, show_unofficial, show_unconfirmed, ignore_last_grading_mode);
                 
                 // Update DataTable data without destroying it
                 dtApi.clear();
@@ -1305,8 +1326,8 @@
                     $('.filter-users button').off('click');
                     $('#difficulty-exercises').tab('show');
                 }
-                // Process cached data with new show_unofficial setting
-                processAndRenderData(_exercises, _rawPointsData, _usertags, show_unofficial, show_unconfirmed);
+                // Process cached data with new show_unofficial, show_unconfirmed, and ignore_last_grading_mode settings
+                processAndRenderData(_exercises, _rawPointsData, _usertags, show_unofficial, show_unconfirmed, ignore_last_grading_mode);
                 return;
             }
         
@@ -1335,7 +1356,7 @@
         ).done(function(exerciseJson, pointsJson, userTags) {
             // Cache the raw data for future use
             _rawPointsData = pointsJson[0];
-            processAndRenderData(exerciseJson[0].results, pointsJson[0], userTags[0].results, show_unofficial, show_unconfirmed);
+            processAndRenderData(exerciseJson[0].results, pointsJson[0], userTags[0].results, show_unofficial, show_unconfirmed, ignore_last_grading_mode);
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error("Loading student data failed.");
             console.error(errorThrown);
@@ -1346,7 +1367,7 @@
     /**
      * Process and render the data table with the given parameters
      */
-    function processAndRenderData(exercises, pointsData, userTagsData, show_unofficial, show_unconfirmed) {
+    function processAndRenderData(exercises, pointsData, userTagsData, show_unofficial, show_unconfirmed, ignore_last_grading_mode) {
         const exerciseJson = [{results: exercises}];
         const pointsJson = [pointsData];
         // userTagsData is either an array of results (from AJAX) or already processed _usertags object (from cache)
@@ -1480,22 +1501,32 @@
             // converting nested format to flat format and adding columns for modules/difficulties
             pointsJson[0].forEach(function(points, index) {
                 // Convert new nested format to flat format for backward compatibility
-                // New format: { exercises: { "22": {c: 3, t: 10, uc: 1, ut: 5} }, totals: {c: 12, t: 117} }
+                // New format: { exercises: { "22": {c: 3, tb: 10, tl: 8, uc: 1, utb: 5, utl: 3} }, totals: {c: 12, tb: 117, tl: 100} }
                 // Old format: { "22 Count": 3, "22 Total": 10, Count: 12, Total: 117 }
                 
                 if(points.exercises !== undefined) {
                     // Convert exercises object to flat format
-                    // Use unofficial (all) counts if show_unofficial is true, otherwise use official counts
+                    // Choose between best (tb/utb) and last (tl/utl) grades based on ignore_last_grading_mode
                     for(let exId in points.exercises) {
                         const ex = points.exercises[exId];
                         if (show_unofficial) {
                             // Use official + unofficial (all counts)
                             points[exId + ' Count'] = (ex.c || 0) + (ex.uc || 0);
-                            points[exId + ' Total'] = (ex.t || 0) + (ex.ut || 0);
+                            // Use best or last grade based on grading mode
+                            if (ignore_last_grading_mode) {
+                                points[exId + ' Total'] = (ex.tb || 0) + (ex.utb || 0);
+                            } else {
+                                points[exId + ' Total'] = (ex.tl || 0) + (ex.utl || 0);
+                            }
                         } else {
                             // Use only official counts
                             points[exId + ' Count'] = ex.c || 0;
-                            points[exId + ' Total'] = ex.t || 0;
+                            // Use best or last grade based on grading mode
+                            if (ignore_last_grading_mode) {
+                                points[exId + ' Total'] = ex.tb || 0;
+                            } else {
+                                points[exId + ' Total'] = ex.tl || 0;
+                            }
                         }
                     }
                     
@@ -1503,10 +1534,20 @@
                     if(points.totals !== undefined) {
                         if (show_unofficial) {
                             points['Count'] = (points.totals.c || 0) + (points.totals.uc || 0);
-                            points['Total'] = (points.totals.t || 0) + (points.totals.ut || 0);
+                            // Use best or last grade based on grading mode
+                            if (ignore_last_grading_mode) {
+                                points['Total'] = (points.totals.tb || 0) + (points.totals.utb || 0);
+                            } else {
+                                points['Total'] = (points.totals.tl || 0) + (points.totals.utl || 0);
+                            }
                         } else {
                             points['Count'] = points.totals.c || 0;
-                            points['Total'] = points.totals.t || 0;
+                            // Use best or last grade based on grading mode
+                            if (ignore_last_grading_mode) {
+                                points['Total'] = points.totals.tb || 0;
+                            } else {
+                                points['Total'] = points.totals.tl || 0;
+                            }
                         }
                     }
                 }
@@ -1862,9 +1903,15 @@
         }
     });
     $('#ignore-last-mode-checkbox').change(() => {
-        // Need to refetch for grading mode changes
-        _rawPointsData = null;
-        loadStudentData();
+        if (_rawPointsData !== null) {
+            // Recalculate from cached data - frontend handles best/last grade selection
+            const show_unofficial = $('input.unofficial-checkbox').prop('checked');
+            const show_unconfirmed = $('input.unconfirmed-checkbox').prop('checked');
+            const ignore_last_grading_mode = $('#ignore-last-mode-checkbox').prop('checked');
+            loadStudentData(show_unofficial, show_unconfirmed, ignore_last_grading_mode);
+        } else {
+            loadStudentData();
+        }
     });
     $(document).on("aplus:translation-ready", () => loadStudentData());
 
