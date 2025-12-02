@@ -26,6 +26,11 @@
     var pointsBestUrl = currentScript.data("pointsBestUrl") + '?format=json';
 
     /**
+     * URL template for user results page (with user_id=0 as placeholder)
+     */
+    const userResultsUrlTemplate = currentScript.data("userResultsUrl");
+
+    /**
      * Stores the exercise data loaded via ajax call
      */
     let _exercises;
@@ -1373,9 +1378,12 @@
              * @returns HTML string used in table cell
              */
             function renderParticipantLink(data, type, row) {
-                // TODO: Get the link to students in a proper way
-                const link = $('li.menu-participants').find('a').attr('href');
-                return (row['UserID'] > 0 ? '<a href="' + link + row['UserID'] + '">' + (!data ? '—' : data) + '</a>' : '');
+                if (row['UserID'] > 0 && userResultsUrlTemplate) {
+                    // Replace the placeholder user_id (0) with actual user ID
+                    const link = userResultsUrlTemplate.replace('/0', '/' + row['UserID']);
+                    return '<a href="' + link + '">' + (!data ? '—' : data) + '</a>';
+                }
+                return (!data ? '—' : data);
             }
 
             let columns = [

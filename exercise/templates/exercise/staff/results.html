@@ -38,6 +38,7 @@
         data-usertags-url="{% url 'api:course-usertags-list' version=2 course_id=instance.id %}"
         data-points-url="{% url 'api:course-resultsdata-list' version=2 course_id=instance.id %}"
         data-points-best-url="{% url 'api:course-resultsdata-best-list' version=2 course_id=instance.id %}"
+        data-user-results-url="{% url 'user-results' user_id=0 course_slug=instance.course.url instance_slug=instance.url %}"
         defer>
     </script>
 {% endif %}
