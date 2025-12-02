@@ -12,12 +12,13 @@ from exercise.cache.content import LearningObjectContent
 # {
 #   "UserID": 13,
 #   "exercises": {
-#     "22": {"c": 3, "t": 10},
-#     "48": {"c": 2, "t": 2, "uc": 1, "ut": 5}  // only when unofficial differs
+#     "22": {"c": 3, "tb": 10, "tl": 8},
+#     "48": {"c": 2, "tb": 2, "tl": 1, "uc": 1, "utb": 5, "utl": 3}
 #   },
-#   "totals": {"c": 12, "t": 117, "uc": 1, "ut": 5}
+#   "totals": {"c": 12, "tb": 117, "tl": 100, "uc": 1, "utb": 5, "utl": 4}
 # }
-# Keys: c=official_count, t=official_total, uc=unofficial_count, ut=unofficial_total
+# Keys: c=official_count, tb=official_total_best, tl=official_total_last,
+#       uc=unofficial_count, utb=unofficial_total_best, utl=unofficial_total_last
 
 # pylint: disable-next=too-many-locals
 def aggregate_points(profiles, taggings, exercises: List[LearningObjectContent], aggregate):
@@ -26,15 +27,17 @@ def aggregate_points(profiles, taggings, exercises: List[LearningObjectContent],
     ]
 
     agg = {}
-    # Gather exercise points per student (now with official/all counts)
+    # Gather exercise points per student (now with official/all counts and best/last grades)
     for row in aggregate:
         ex = row['exercise_id']
         user_row = agg.get(row['submitters__user_id'], {})
         user_row[ex] = {
             'official_count': row['official_count'],
-            'official_total': row['official_total'],
+            'official_best': row['official_best'],
+            'official_last': row['official_last'],
             'all_count': row['all_count'],
-            'all_total': row['all_total'],
+            'all_best': row['all_best'],
+            'all_last': row['all_last'],
         }
         agg[row['submitters__user_id']] = user_row
 
@@ -70,40 +73,58 @@ def aggregate_points(profiles, taggings, exercises: List[LearningObjectContent],
         exercises_nested = {}
         if uid in agg:
             student_official_count = 0
-            student_official_total = 0
+            student_official_best = 0
+            student_official_last = 0
             student_all_count = 0
-            student_all_total = 0
+            student_all_best = 0
+            student_all_last = 0
 
             for ex_id, ex_data in agg[uid].items():
                 student_official_count += ex_data['official_count']
-                student_official_total += ex_data['official_total']
+                student_official_best += ex_data['official_best']
+                student_official_last += ex_data['official_last']
                 student_all_count += ex_data['all_count']
-                student_all_total += ex_data['all_total']
+                student_all_best += ex_data['all_best']
+                student_all_last += ex_data['all_last']
 
-                # Compact nested format: only include non-zero values
-                ex_nested = {'c': ex_data['official_count'], 't': ex_data['official_total']}
+                # Compact nested format: include both best and last grades
+                ex_nested = {
+                    'c': ex_data['official_count'],
+                    'tb': ex_data['official_best'],
+                    'tl': ex_data['official_last']
+                }
 
                 # Only add unofficial fields if they differ from official (omit zeros)
                 unofficial_count = ex_data['all_count'] - ex_data['official_count']
-                unofficial_total = ex_data['all_total'] - ex_data['official_total']
+                unofficial_best = ex_data['all_best'] - ex_data['official_best']
+                unofficial_last = ex_data['all_last'] - ex_data['official_last']
                 if unofficial_count > 0:
                     ex_nested['uc'] = unofficial_count
-                if unofficial_total > 0:
-                    ex_nested['ut'] = unofficial_total
+                if unofficial_best > 0:
+                    ex_nested['utb'] = unofficial_best
+                if unofficial_last > 0:
+                    ex_nested['utl'] = unofficial_last
 
                 exercises_nested[str(ex_id)] = ex_nested
 
             # Add nested exercises object
             row['exercises'] = exercises_nested
 
-            # Add totals in nested format
-            totals_nested = {'c': student_official_count, 't': student_official_total}
+            # Add totals in nested format with both best and last
+            totals_nested = {
+                'c': student_official_count,
+                'tb': student_official_best,
+                'tl': student_official_last
+            }
             unofficial_total_count = student_all_count - student_official_count
-            unofficial_total_total = student_all_total - student_official_total
+            unofficial_total_best = student_all_best - student_official_best
+            unofficial_total_last = student_all_last - student_official_last
             if unofficial_total_count > 0:
                 totals_nested['uc'] = unofficial_total_count
-            if unofficial_total_total > 0:
-                totals_nested['ut'] = unofficial_total_total
+            if unofficial_total_best > 0:
+                totals_nested['utb'] = unofficial_total_best
+            if unofficial_total_last > 0:
+                totals_nested['utl'] = unofficial_total_last
 
             row['totals'] = totals_nested
 

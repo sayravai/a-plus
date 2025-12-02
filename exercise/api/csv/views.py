@@ -448,26 +448,27 @@ class CourseResultsDataViewSet(NestedViewSetMixin,
         for stats in points_qs:
             # Apply revealed mask
             if revealed_ids is not None and stats.exercise_id not in revealed_ids:
-                official_total = 0
-                all_total = 0
+                official_best = 0
+                official_last = 0
+                all_best = 0
+                all_last = 0
             else:
-                # Use point_annotator logic for official (confirmed) points
-                if self.point_annotator == 'annotate_best_submitter_points':
-                    official_total = stats.forced_points or stats.official_best_grade or 0
-                    all_total = stats.forced_points or stats.all_best_grade or 0
-                else:
-                    # annotate_submitter_points respects grading mode
-                    official_total = stats.forced_points or stats.official_best_grade or 0
-                    all_total = stats.forced_points or stats.all_best_grade or 0
+                # Send both best and last grades - frontend will choose which to use
+                official_best = stats.forced_points or stats.official_best_grade or 0
+                official_last = stats.forced_points or stats.official_last_grade or 0
+                all_best = stats.forced_points or stats.all_best_grade or 0
+                all_last = stats.forced_points or stats.all_last_grade or 0
 
-            # Build compact nested format with omitted zeros
+            # Build compact nested format with both best and last grades
             aggr_list.append({
                 'submitters__user_id': stats.submitter.user_id,
                 'exercise_id': stats.exercise_id,
                 'official_count': stats.official_count,
                 'all_count': stats.all_count,
-                'official_total': official_total,
-                'all_total': all_total,
+                'official_best': official_best,
+                'official_last': official_last,
+                'all_best': all_best,
+                'all_last': all_last,
             })
 
         data,fields = aggregate_points(
