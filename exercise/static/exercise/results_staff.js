@@ -1105,11 +1105,40 @@
                 realIndex = colClasses[idx].split('-')[1];
             }
 
+            // Set vertical-align on the th to bottom so content aligns to the bottom
+            $(this).css('vertical-align', 'bottom');
+
+            // DataTables 2.3+: Wrap title and sort icon, then add input below
+            const $header = $(this).find('.dt-column-header');
+
+            // Set flex-direction to column and justify-content to flex-end to align items to bottom
+            $header.css({
+                'flex-direction': 'column',
+                'justify-content': 'flex-end'
+            });
+
+            // Wrap the title and sort icon in a flex row container
+            const $title = $header.find('.dt-column-title');
+            const $order = $header.find('.dt-column-order');
+
+            // Apply CSS ellipsis to truncate long titles
+            $title.css({
+                'overflow': 'hidden',
+                'text-overflow': 'ellipsis',
+                'white-space': 'nowrap',
+                'max-width': '20ch'
+            });
+            // Set title attribute for full text on hover
+            $title.attr('title', $title.text());
+
+            $title.wrap('<div style="display: flex; align-items: center; width: 100%;"></div>');
+            $title.parent().append($order);
+
             if(realIndex < TOTAL_COL_ID) {
                 /**
                  * Create column search boxes for other than points columns
                  */
-                $(this).append( '<br><input type="text" class="form-control-sm input textval" style="z-index: 4" placeholder="' + _("Search") + '" />' );
+                $header.append( '<input type="text" class="form-control-sm input textval" style="z-index: 4; margin-top: 4px; width: 100%;" placeholder="' + _("Search") + '" />' );
                 $( 'input.textval', this ).on( 'keyup change clear', function () {
                     if ( dtVar.column(realIndex).search() !== this.value ) {
                         recalculateTableDebounced(realIndex, this.value);
@@ -1119,13 +1148,14 @@
                 /**
                  * Create search boxes for points columns
                  */
-                $(this).append( '<br><input type="text" class="form-control-sm input numval" placeholder="' + _("Search") + '" />' );
+                $header.append( '<input type="text" class="form-control-sm input numval" style="margin-top: 4px; width: 100%;" placeholder="' + _("Search") + '" />' );
                 $( 'input.numval', this ).on('keyup change clear', function () {
                     if(this.value === '') delete colSearchVals[realIndex];
                     else colSearchVals[realIndex] = parsePointsSearchVal(this.value);
                     recalculateTableDebounced(realIndex, '');
                 });
             }
+
             // Prevent resorting when clicking the search box
             $( 'input', this ).click(function(e) {
                 e.stopPropagation();
