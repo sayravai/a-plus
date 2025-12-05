@@ -1108,6 +1108,9 @@
             // Set vertical-align on the th to bottom so content aligns to the bottom
             $(this).css('vertical-align', 'bottom');
 
+            // Remove table-info class from header cells to match the earlier A+ styling
+            $(this).removeClass('table-info');
+
             // DataTables 2.3+: Wrap title and sort icon, then add input below
             const $header = $(this).find('.dt-column-header');
 
@@ -1458,7 +1461,7 @@
                 {data: "AdditionalInfo-en", title: "additionalInfo-en", className: "always-hidden sisu col-14", type: "string", defaultContent: ""},
 
                 {data: "Count", title: "Count", className: "col-15", visible: false, defaultContent: 0, type: "num"},
-                {data: "Total", title: _("Total"), className: "points total col-16", defaultContent: 0, type: "num"}
+                {data: "Total", title: _("Total"), className: "points total col-16 dt-type-numeric", defaultContent: 0, type: "num", render: function(data) { return data; }}
             ];
 
             // Store exercises globally
@@ -1805,6 +1808,8 @@
                 buttonText: buttonText,
                 selectAllText: _("Select all"),
             });
+            // Show the module select now that multiselect is built
+            moduleSelectRef.show();
 
             // Initialize the bootstrap-multiselect plugin for exercise selection
             exerciseSelectRef.multiselect({
@@ -1817,6 +1822,8 @@
                 buttonText: buttonText,
                 selectAllText: _("Select all"),
             });
+            // Show the exercise select now that multiselect is built
+            exerciseSelectRef.show();
 
             // Save the jQuery DOM instance for later
             multiSelectSelector = $(".multiselect-container");
