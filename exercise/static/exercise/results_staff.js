@@ -1176,6 +1176,50 @@
      * @param {boolean} ignore_last_grading_mode - Whether to use best grades (true) or last grades (false)
      * @returns {Array} Array of student objects in flat format for DataTables
      */
+    function recomputeAggregateColumns(points) {
+        if(points['Count'] === undefined) {
+            return;
+        }
+
+        let studentTotalPoints = 0;
+
+        Object.keys(_difficulties).forEach(function(diff) {
+            points[diff] = 0;
+        });
+
+        _exercises.forEach(function(module) {
+            let moduleSubmissions = 0;
+            let moduleTotalPoints = 0;
+
+            if(module.exercises.length > 0) {
+                module.exercises.forEach(function(exercise) {
+                    const exId = exercise.id;
+
+                    if(points[exId + ' Count'] === undefined) {
+                        points[exId + ' Count'] = 0;
+                    }
+                    if(points[exId + ' Total'] === undefined) {
+                        points[exId + ' Total'] = 0;
+                    }
+
+                    moduleSubmissions += points[exId + ' Count'];
+                    moduleTotalPoints += points[exId + ' Total'];
+
+                    const diffKey = _reverseDifficulties[exId];
+                    if(diffKey !== undefined) {
+                        points[diffKey] = (points[diffKey] || 0) + points[exId + ' Total'];
+                    }
+                });
+            }
+
+            points['m' + module.id + ' Count'] = moduleSubmissions;
+            points['m' + module.id + ' Total'] = moduleTotalPoints;
+            studentTotalPoints += moduleTotalPoints;
+        });
+
+        points['Total'] = studentTotalPoints;
+    }
+
     function recalculatePointsData(rawDataArray, show_unofficial, show_unconfirmed, ignore_last_grading_mode) {
         // Create a deep copy to avoid modifying the cached data
         const recalculatedData = JSON.parse(JSON.stringify(rawDataArray));
@@ -1232,54 +1276,19 @@
                     }
                 }
             }
-            
-            // Calculate module and difficulty totals
-            if(points['Count'] !== undefined) {
-                let studentTotalPoints = 0;
-                for(let diff in _difficulties) {
-                    points[diff] = 0;
-                }
-                for(let moduleIdx in _exercises) {
-                    let moduleSubmissions = 0;
-                    let moduleTotalPoints = 0;
-                    const moduleId = _exercises[moduleIdx].id;
-                    if(_exercises[moduleIdx].exercises.length > 0) {
-                        for(let exerciseIdx in _exercises[moduleIdx].exercises) {
-                            const exId = _exercises[moduleIdx].exercises[exerciseIdx].id;
 
-                            if(points[exId + ' Count'] === undefined) {
-                                points[exId + ' Count'] = 0;
-                                points[exId + ' Total'] = 0;
-                            } else {
-                                if(points[exId + ' Total'] === undefined) {
-                                    points[exId + ' Total'] = 0;
-                                }
-                                moduleSubmissions += points[exId + ' Count'];
-                                moduleTotalPoints += points[exId + ' Total'];
-                                if(_reverseDifficulties[exId] !== undefined) {
-                                    points[_reverseDifficulties[exId]] += points[exId + ' Total'];
-                                }
-                            }
-                        }
-                    }
-                    points['m' + moduleId + ' Count'] = moduleSubmissions;
-                    points['m' + moduleId + ' Total'] = moduleTotalPoints;
-                    studentTotalPoints += moduleTotalPoints;
-                }
-            }
-            
             // Apply confirmation logic if show_unconfirmed is false
-            if (!show_unconfirmed) {
+            if (points['Count'] !== undefined && !show_unconfirmed) {
                 // Find all mandatory exercises (requires_confirmation = true)
                 const mandatoryExercises = Object.keys(_confirmationMap).filter(
                     exId => _confirmationMap[exId].requires_confirmation
                 );
-                
+
                 // For each mandatory exercise, check if student has passed it
                 mandatoryExercises.forEach(function(mandatoryExId) {
                     const mandatoryInfo = _confirmationMap[mandatoryExId];
                     const studentPoints = points[mandatoryExId + ' Total'] || 0;
-                    
+
                     // If student has 0 points on mandatory exercise, zero out all siblings
                     if (studentPoints === 0) {
                         // Find all siblings (exercises with same parent_id and module_id)
@@ -1295,6 +1304,8 @@
                     }
                 });
             }
+
+            recomputeAggregateColumns(points);
         });
         
         return recalculatedData;
@@ -1328,16 +1339,16 @@
             if(_rawPointsData !== null && dtApi !== undefined) {
                 // Recalculate points from cached data with new show_unofficial, show_unconfirmed, and ignore_last_grading_mode settings
                 const updatedData = recalculatePointsData(_rawPointsData, show_unofficial, show_unconfirmed, ignore_last_grading_mode);
-                
+
                 // Update DataTable data without destroying it
                 dtApi.clear();
                 dtApi.rows.add(updatedData);
                 // Draw first to update the table data, then recalculate summaries
                 dtApi.draw(false); // false = stay on current page
-                
+
                 // Now recalculate summaries and totals based on new data
                 recalculateTable();
-                
+
                 // Re-enable checkboxes
                 $('input.unofficial-checkbox').prop('disabled', false);
                 $('input.unconfirmed-checkbox').prop('disabled', false);
@@ -1345,7 +1356,7 @@
                 $('#ignore-last-mode-checkbox').prop('disabled', false);
                 return;
             }
-            
+
             // If we have cached data but no table yet (shouldn't happen), do full render
             if(_rawPointsData !== null) {
                 // Destroy old data table if it exists
@@ -1376,7 +1387,7 @@
             $('.filter-users button').off('click');
             $('#difficulty-exercises').tab('show');
         }
-        
+
         let pUrl = pointsBestUrl;
         if (!ignore_last_grading_mode) pUrl = pointsUrl;
         // Always fetch all data (official + unofficial + unconfirmed) from backend
@@ -1396,7 +1407,7 @@
         });
         }, 0); // End of setTimeout - allows DOM update before processing
     }
-    
+
     /**
      * Process and render the data table with the given parameters
      */
@@ -1409,7 +1420,7 @@
         // Reset global objects that accumulate data on each render
         _difficulties = {};
         _reverseDifficulties = {};
-        
+
         // Only process user tags if we have an array (first load from AJAX)
         if (userTagsArray.length > 0) {
             userTagsArray.forEach(function(entry) {
@@ -1585,46 +1596,34 @@
                     }
                 }
                 
-                // Only fill in row if student has submissions, otherwise defaults to 0 by definition
-                if(points['Count'] !== undefined) {
-                    //let studentTotalSubmissions = 0;
-                    let studentTotalPoints = 0;
-                    let moduleTotalPoints = 0;
-                    for(diff in _difficulties) {
-                        points[diff] = 0;
-                    }
-                    for(moduleIdx in _exercises) {
-                        let moduleSubmissions = 0;
-                        moduleTotalPoints = 0;
-                        const moduleId = _exercises[moduleIdx].id;
-                        if(_exercises[moduleIdx].exercises.length > 0) {
-                            for(exerciseIdx in _exercises[moduleIdx].exercises) {
-                                const exId = _exercises[moduleIdx].exercises[exerciseIdx].id; // store exercise id for code readability
+                if(points['Count'] !== undefined && !show_unconfirmed) {
+                    // Find all mandatory exercises (requires_confirmation = true)
+                    const mandatoryExercises = Object.keys(_confirmationMap).filter(
+                        exId => _confirmationMap[exId].requires_confirmation
+                    );
 
-                                if(points[exId + ' Count'] === undefined) {
-                                    // Fill out missing zero values
+                    // For each mandatory exercise, check if student has passed it
+                    mandatoryExercises.forEach(function(mandatoryExId) {
+                        const mandatoryInfo = _confirmationMap[mandatoryExId];
+                        const studentPoints = points[mandatoryExId + ' Total'] || 0;
+
+                        // If student has 0 points on mandatory exercise, zero out all siblings
+                        if (studentPoints === 0) {
+                            // Find all siblings (exercises with same parent_id and module_id)
+                            Object.keys(_confirmationMap).forEach(function(exId) {
+                                const exInfo = _confirmationMap[exId];
+                                if (exInfo.parent_id === mandatoryInfo.parent_id && 
+                                    exInfo.module_id === mandatoryInfo.module_id) {
+                                    // Zero out this sibling exercise
                                     points[exId + ' Count'] = 0;
                                     points[exId + ' Total'] = 0;
-                                } else {
-                                    if(points[exId + ' Total'] === undefined) {
-                                        points[exId + ' Total'] = 0;
-                                    }
-                                    // Add exercise points and submissions to module totals
-                                    moduleSubmissions += points[exId + ' Count'];
-                                    moduleTotalPoints += points[exId + ' Total'];
-                                    if(_reverseDifficulties[exId] !== undefined) {
-                                        points[_reverseDifficulties[exId]] += points[exId + ' Total'];
-                                    }
                                 }
-                            }
+                            });
                         }
-                        // Add submission count and points for module
-                        points['m' + moduleId + ' Count'] = 0;
-                        points['m' + moduleId + ' Total'] = 0;
-                        //studentTotalSubmissions += moduleSubmissions;
-                        studentTotalPoints += moduleTotalPoints;
-                    }
+                    });
                 }
+
+                recomputeAggregateColumns(points);
             });
 
             /**
@@ -1713,14 +1712,11 @@
                  * based on all columns visible after the total column
                  */
                 rowCallback: function( row, data, displayNum, displayIndex, dataIndex ) {
-                    var api = this.api();
-                    var visibleCols = api.columns().indexes('visible');
-                    var sum = api.cells(dataIndex, api.columns()
-                        .indexes()
-                        .filter(function(value,index){return index > (TOTAL_COL_ID + 1) && (visibleCols[index] !== null)}))
-                        .data()
-                        .sum()
-                    api.cell(dataIndex, TOTAL_COL_ID).data(sum);
+                    var totalValue = parseFloat(data['Total']);
+                    if (isNaN(totalValue)) {
+                        totalValue = 0;
+                    }
+                    this.api().cell(dataIndex, TOTAL_COL_ID).data(totalValue);
                 },
                 /**
                  * On each table redraw, also recreate the summary rows
