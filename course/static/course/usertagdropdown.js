@@ -1,5 +1,6 @@
 (function ($) {
   $(document).on('aplus:translation-ready', function() {
+    const tag_dropdown_handles = {};
     $('.usertags-container').each(function() {
       const $container = $(this);
       const add_text = _("Add new tagging");
@@ -12,7 +13,7 @@
         function() { return [user_id]; };
       const add_taggings_id = 'add-taggings-' + user_id;
 
-      create_tagging_dropdown(
+      tag_dropdown_handles[user_id] = create_tagging_dropdown(
         tag_ids,
         get_users,
         add_text,
@@ -30,15 +31,38 @@
               // This callback may be called for multiple taggings (because
               // the same tag may be added to multiple students at once), hence
               // the tag must be added to the right container in the DOM.
-              $('.usertags-container[data-user-id="' + data.user.id + '"]')
-                .find('.dropdown').before(django_colortag_label(tag), ' ');
+              const $usertags = $('.usertags-container[data-user-id="' + data.user.id + '"]');
+              const $dropdown = $usertags.find('.dropdown');
+              if ($dropdown.length) {
+                $dropdown.before(django_colortag_badge(tag), ' ');
+              } else {
+                $usertags.append(' ', django_colortag_badge(tag));
+              }
               if (typeof extra_click_handler === 'function') {
                  extra_click_handler(data);
               }
             });
           });
-        });}
+        });},
+        'aplus-button--secondary aplus-button--xs'
       );
     });
+
+    // When a tag is removed via the popover on a single-user page, re-add it
+    // to the dropdown so it can be immediately re-applied if needed.
+    // On multi-user pages (e.g. participants list) removal is handled
+    // differently and the dropdowns are replaced by modals, so no handler
+    // is needed there.
+    if ($('.usertags-container').length === 1) {
+      $(document).on('aplus:tags-changed', function (e, data) {
+        if (data.type !== 'remove') return;
+        data.user_ids.forEach(function (uid) {
+          const handle = tag_dropdown_handles[uid];
+          if (handle && typeof handle.readd_tag === 'function') {
+            handle.readd_tag(data.tag_slug);
+          }
+        });
+      });
+    }
   });
 })(jQuery);
