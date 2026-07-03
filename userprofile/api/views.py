@@ -17,13 +17,14 @@ class UserViewSet(ListSerializerMixin,
                   MeUserMixin,
                   viewsets.ReadOnlyModelViewSet):
     """
-    The `users` endpoint returns information about all users.
+    The `users` endpoint returns information about users.
 
     Operations
     ----------
 
-    `GET /users/`:
-        returns a list of all users.
+    `GET /users/?search=email@address.com`:
+        returns a list of users matching the exact email address.
+        The search parameter is required.
 
     `GET /users/<user_id>/`:
         returns the details of a specific user.
@@ -37,10 +38,8 @@ class UserViewSet(ListSerializerMixin,
     filter_backends = (
         IsTeacherOrAdminOrSelf,
         filters.SearchFilter,
-        FieldValuesFilter,
     )
-    search_fields = ['user__first_name', 'user__last_name', 'student_id', 'user__email']
-    field_values_map = {'id': 'user_id', 'student_id': 'student_id', 'email': 'user__email'}
+    search_fields = ['=user__email']
     lookup_field = 'user_id' # UserProfile.user.id
     lookup_url_kwarg = 'user_id'
     lookup_value_regex = REGEX_INT_ME
@@ -48,8 +47,18 @@ class UserViewSet(ListSerializerMixin,
     serializer_class = UserSerializer
     queryset = UserProfile.objects.all()
 
-    # if update is required, change to normal modelviewset and
-    # change permissions
+    def get_queryset(self):
+        """
+        Only return users in list view when searching by exact email address.
+        Prevents listing all users.
+        """
+        queryset = super().get_queryset()
+
+        # Only restrict the list endpoint
+        if getattr(self, 'action', None) == 'list' and not self.request.query_params.get('search'):
+            return queryset.none()
+
+        return queryset
 
 
 class MeDetail(APIView):

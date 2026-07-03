@@ -1,6 +1,7 @@
 from typing import Any
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.contrib.humanize.templatetags.humanize import ordinal
 from django.utils.safestring import mark_safe
 from django.utils.text import format_lazy
@@ -10,6 +11,7 @@ from django.db.models import Count
 from aplus.api import api_reverse
 from exercise.models import SubmissionDraft
 from lib.fields import UsersSearchSelectField
+from lib.widgets import EmailUserSelect
 from .models import Enrollment, StudentGroup
 from userprofile.models import UserProfile
 
@@ -147,18 +149,51 @@ class GroupEditForm(forms.ModelForm):
 
 class EnrollStudentsForm(forms.Form):
 
-    user_profiles = UsersSearchSelectField(queryset=UserProfile.objects.all(),
-        initial_queryset=UserProfile.objects.none(),
+    user_profiles = forms.CharField(
         label=_('LABEL_USERS'),
+        widget=EmailUserSelect(),
         required=False,
     )
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.instance = kwargs.pop('instance')
         super().__init__(*args, **kwargs)
-        self.fields['user_profiles'].widget.search_api_url = api_reverse("user-list")
         if self.instance.sis_id:
             self.fields['sis'] = forms.BooleanField(
                 required=False,
                 label=_('LABEL_ENROLL_FROM_SIS'),
             )
+
+    def clean_user_profiles(self):
+        """
+        Validate and convert comma-separated user IDs to UserProfile objects.
+        """
+        user_ids_text = self.cleaned_data.get('user_profiles', '')
+        if not user_ids_text:
+            return []
+
+        # Split by comma and strip whitespace
+        user_ids = []
+        seen = set()
+        for item in user_ids_text.split(','):
+            item = item.strip()
+            if not item:
+                continue
+            try:
+                user_id = int(item)
+            except ValueError as exc:
+                raise ValidationError(_('ERROR_INVALID_USER_IDS')) from exc
+            if user_id not in seen:
+                seen.add(user_id)
+                user_ids.append(user_id)
+
+        # Look up users by ID
+        users = list(UserProfile.objects.filter(user_id__in=user_ids))
+
+        # Verify all IDs were found
+        if len(users) != len(user_ids):
+            raise ValidationError(
+                _('ERROR_INVALID_USER_IDS')
+            )
+
+        return users

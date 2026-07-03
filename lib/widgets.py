@@ -176,3 +176,43 @@ class SearchSelect(forms.SelectMultiple):
         else:
             value = getattr(instance, field, None)
         return str(value) if value is not None else ''
+
+
+class EmailUserSelect(forms.TextInput):
+    """
+    A widget for entering email addresses that displays selected users as badges.
+
+    This widget allows users to type an email and add it to a badge list.
+    The widget validates if the email exists in the database and provides
+    visual feedback. The badge list represents the actual form value.
+
+    Features:
+    - Type an email and press Enter or click Add to add to the list
+    - Validates if user exists before adding
+    - Shows user info in badges
+    - Click badge to remove from list
+    - Hidden field stores comma-separated UIDs
+    """
+    template_name = 'email_user_select.html'
+
+    class Media:
+        js = ('js/email_user_select.js',)
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
+    def get_context(self, name: str, value: Any, attrs: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+        """
+        Get data used to render the widget.
+        """
+
+        context = super().get_context(name, value, attrs)
+
+        # When bound, the field value is a raw string; don't iterate it as "selected users".
+        if value is None or isinstance(value, str):
+            context['selected_users'] = []
+        else:
+            context['selected_users'] = value
+        # Use the input ID, not the wrapper ID
+        context['widget_id'] = context['widget']['attrs'].get('id', '')
+        return context
