@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
 
-from lib.api.filters import FieldValuesFilter
 from lib.api.mixins import ListSerializerMixin, MeUserMixin
 from lib.api.constants import REGEX_INT_ME
 
